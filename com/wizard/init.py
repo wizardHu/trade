@@ -2,6 +2,36 @@
 import HuobiService as huobi
 import matplotlib.pyplot as plt
 
+def get_MA(datas,count):
+    
+    list = []
+    x = []
+    y = []
+    xy = []
+    
+        
+    for data in datas:
+        index = datas.index(data)
+        close = data['close']
+        
+        list.insert(0, close)
+        if len(list)>count:
+            list.pop()
+
+        if len(list)==count:
+            priceCount = 0
+            for price in list:
+                priceCount += price
+            
+            ma = priceCount/count
+            y.append(ma)
+            x.append(index)    
+
+    xy.append(x)
+    xy.append(y)
+    
+    return xy
+    
 #得到K线图的xy
 def get_kline_xy(data):
     xy = [0]*2
