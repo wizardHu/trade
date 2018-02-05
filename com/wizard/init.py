@@ -56,10 +56,17 @@ if __name__ == '__main__':
     klineXY = get_kline_xy(test['data'])
     klinex = klineXY[0]
     kliney = klineXY[1]
+    
+    MA60XY = get_MA(test['data'],60)
+    MA30XY = get_MA(test['data'],30)
+    MA10XY = get_MA(test['data'],10)
 
 #     plt.text(tempx, tempy, "sss %s %s" % (tempx,tempy))  
 #     plt.plot(tempx,tempy,'ro',color='red' )
     plt.plot(klinex, kliney, label='xrpusdt')
+    plt.plot(MA60XY[0], MA60XY[1], label='ma60')
+    plt.plot(MA30XY[0], MA30XY[1], label='ma30')
+    plt.plot(MA10XY[0], MA10XY[1], label='ma10')
    
     plt.legend()
     plt.show()
