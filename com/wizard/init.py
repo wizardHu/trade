@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import HuobiService as huobi
+import Tactics001 as tac
 import matplotlib.pyplot as plt
 from matplotlib.ticker import  MultipleLocator
 from matplotlib.ticker import  FormatStrFormatter
 
-balance = 100000
+balance = 10
+lastBuy = 0
+packageBuy = []
+buynum = 0;
 
 def get_MA(datas,count):
     
@@ -53,6 +57,9 @@ def get_kline_xy(data):
 
 def get_KDJ(data):
     global balance
+    global lastBuy
+    global packageBuy
+    global buynum
     KDJ = []
     KXY = []
     DXY = []
@@ -79,6 +86,7 @@ def get_KDJ(data):
     send = 0
     
     for i in data:
+         
         Cn = i['close']
         Ln = i['low']
         Hn = i['high']
@@ -95,19 +103,23 @@ def get_KDJ(data):
         dy.append(D)
         jy.append(J)
         
-        if check_buy(K, D, J, lastK, lastD, lastJ, i['close'], buy):
+        if tac.judgeBuy(i,data.index(i)) and buy == 0:
             buy= 1
          
             buyx.append(data.index(i))
             buyy.append(i['close'])
-            balance -= (i['close']+0.02)
+            balance -= i['close']
+            lastBuy = i['close']
+            buynum= 0.998
+            
             print '购买',i['close'],'余额',balance
             
         if check_send(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             buy = 0
             sendx.append(data.index(i))
             sendy.append(i['close'])
-            balance += (i['close']-0.02)
+            balance += (buynum*i['close']*0.98)
+            buynum = 0
             print '卖出',i['close'],'余额',balance,'\n'
         
         lastK = K
@@ -137,30 +149,36 @@ def get_KDJ(data):
     return KDJ
 
 
-def check_buy(K,D,J,lastK,lastD,lastJ,close,buy):
-    if (K>D and lastK<lastD or J<0)  and buy == 0:
-        return True
-    
-    return False
 
 def check_send(K,D,J,lastK,lastD,lastJ,close,buy):
+    global lastBuy
+    global buynum
+    isSend = False
     if buy== 1:
         
         if (D>K and lastK>lastD  or J>100 ) :
-            return True
+            isSend = True
         
-        if J < lastJ :
-            return True
-    
-    return False
+        if J < lastJ and J>50:
+            isSend = True
+        
+        gap = (buynum*close*0.998) - lastBuy*1.002
+        if isSend:
+            print buynum,close,lastBuy,gap
+        
+        
+        if gap<0:
+            isSend = False
+        
+    return isSend
 
 if __name__ == '__main__':
     
     fig = plt.figure()
-    test = huobi.get_kline('xrpusdt','1min',100)
+    test = huobi.get_kline('eosusdt','1min',100)
     test['data'].reverse()
     
-    xmajorLocator = MultipleLocator(2);
+    xmajorLocator = MultipleLocator(1);
   
     klineXY = get_kline_xy(test['data'])
     klinex = klineXY[0]
