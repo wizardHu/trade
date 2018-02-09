@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import  MultipleLocator
 from matplotlib.ticker import  FormatStrFormatter
 
-balance = 10000
+balance = 10
 lastBuy = 0
 packageBuy = []
 buynum = 0;
@@ -172,7 +172,7 @@ def check_send(K,D,J,lastK,lastD,lastJ,close,buy):
 if __name__ == '__main__':
     
     fig = plt.figure()
-    test = huobi.get_kline('btcusdt','1min',80)
+    test = huobi.get_kline('eosusdt','1min',100)
     test['data'].reverse()
     
     xmajorLocator = MultipleLocator(1);
