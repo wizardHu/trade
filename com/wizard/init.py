@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import  MultipleLocator
 from matplotlib.ticker import  FormatStrFormatter
 
-balance = 10
+balance = 10000
 lastBuy = 0
 packageBuy = []
 buynum = 0;
@@ -118,7 +118,7 @@ def get_KDJ(data):
             buy = 0
             sendx.append(data.index(i))
             sendy.append(i['close'])
-            balance += (buynum*i['close']*0.98)
+            balance += (buynum*i['close']*0.998)
             buynum = 0
             print '卖出',i['close'],'余额',balance,'\n'
         
@@ -156,16 +156,13 @@ def check_send(K,D,J,lastK,lastD,lastJ,close,buy):
     isSend = False
     if buy== 1:
         
-        if (D>K and lastK>lastD  or J>100 ) :
+        if (D<K and lastK<lastD  or J>100 ) :
             isSend = True
         
-        if J < lastJ and J>50:
+        if J < lastJ and J>50 and J>K:
             isSend = True
         
         gap = (buynum*close*0.998) - lastBuy*1.002
-        if isSend:
-            print buynum,close,lastBuy,gap
-        
         
         if gap<0:
             isSend = False
@@ -175,7 +172,7 @@ def check_send(K,D,J,lastK,lastD,lastJ,close,buy):
 if __name__ == '__main__':
     
     fig = plt.figure()
-    test = huobi.get_kline('eosusdt','1min',100)
+    test = huobi.get_kline('btcusdt','1min',80)
     test['data'].reverse()
     
     xmajorLocator = MultipleLocator(1);
