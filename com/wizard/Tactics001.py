@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import HuobiService as huobi
+import Point as point
 from inspect import isbuiltin
 
 
@@ -39,15 +40,26 @@ def judgeBuy(data,index):
     D = 2.0/3*lastD[-1]+1.0/3*K
     J = 3*K-2*D
     
-    if (K<D and lastK[-1]>lastD[-1] or J<0) and D-K>2 : #普通下穿
-        isBuy = True
+    
+    if (K<D and lastK[-1]>lastD[-1] ) and D-K>2 : #普通下穿
+        p1=point.Point(index-1,lastK[-1])
+        p2=point.Point(index,K)
+        line1=point.Line(p1,p2)
+        
+        p3=point.Point(index-1,lastD[-1])
+        p4=point.Point(index,D)
+        line2=point.Line(p3,p4)
+        
+        pointXY = point.GetCrossPoint(line1, line2)
+        if pointXY.y < 55:
+            isBuy = True
     
     if len(lastJ) >= 3: # J 连续为负数3个周期
         if lastJ[-1] < 0  and lastJ[-2] < 0 and lastJ[-3] < 0 :
             isBuy = True
     
     
-    if K>90 and D>80 or J-lastJ[-1]>30:
+    if K>50 and D>50 or J-lastJ[-1]>30:
         isBuy = False
         
     if isBuy:
@@ -55,6 +67,7 @@ def judgeBuy(data,index):
             isBuy = False
     
     lastK.append(K)
+    
     lastD.append(D)
     lastJ.append(J)
     
@@ -73,7 +86,7 @@ def judgeBuy(data,index):
 
 
 if __name__ == '__main__':
-    test = huobi.get_kline('eosusdt','15min',100)
+    test = huobi.get_kline('eosusdt','1min',100)
     test['data'].reverse()
     
     for i in test['data']:
