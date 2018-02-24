@@ -86,7 +86,7 @@ def get_KDJ(data):
     send = 0
     
     for i in data:
-         
+        
         Cn = i['close']
         Ln = i['low']
         Hn = i['high']
@@ -104,7 +104,7 @@ def get_KDJ(data):
         jy.append(J)
         
         if tac.judgeBuy(i,data.index(i)) and buy == 0:
-            buy= 1
+#             buy= 1
          
             buyx.append(data.index(i))
             buyy.append(i['close'])
@@ -112,7 +112,7 @@ def get_KDJ(data):
             lastBuy = i['close']
             buynum= 0.998
             
-            print '购买',i['close'],'余额',balance
+#             print '购买',i['close'],'余额',balance
             
         if check_send(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             buy = 0
@@ -174,6 +174,7 @@ if __name__ == '__main__':
     fig = plt.figure()
     test = huobi.get_kline('eosusdt','1min',100)
     test['data'].reverse()
+    
     
     xmajorLocator = MultipleLocator(1);
   

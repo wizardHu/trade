@@ -22,6 +22,8 @@ last100 = [0]
 
 def judgeBuy(data,index):
     
+    print data['amount'],index
+    
     global lastK
     global lastD
     global lastJ
@@ -39,7 +41,9 @@ def judgeBuy(data,index):
     D = 2.0/3*lastD[-1]+1.0/3*K
     J = 3*K-2*D
     
-    if (K<D and lastK[-1]>lastD[-1] or J<0) and D-K>2 : #普通下穿
+    lastJ.append(J)
+    
+    if (K<D and lastK[-1]>lastD[-1]) and D-K>2 : #普通下穿
         isBuy = True
     
     if len(lastJ) >= 3: # J 连续为负数3个周期
@@ -54,9 +58,11 @@ def judgeBuy(data,index):
         if Cn >= last100[-1]:
             isBuy = False
     
+     
+    
     lastK.append(K)
     lastD.append(D)
-    lastJ.append(J)
+    
     
     if len(lastK)>10:
         lastK = lastK[1:]
