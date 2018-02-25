@@ -42,10 +42,7 @@ def judgeBuy(data,index):
     D = 2.0/3*lastD[-1]+1.0/3*K
     J = 3*K-2*D
     
-    lastJ.append(J)
-    
-    
-    if (K<D and lastK[-1]>lastD[-1] ) and D-K>2 : #普通下穿
+    if K<D and lastK[-1]>lastD[-1]  and D-K>2  and lastK[-1]-lastD[-1]>2: #普通下穿
         p1=point.Point(index-1,lastK[-1])
         p2=point.Point(index,K)
         line1=point.Line(p1,p2)
@@ -58,12 +55,12 @@ def judgeBuy(data,index):
         if pointXY.y < 55:
             isBuy = True
     
-    if len(lastJ) >= 3: # J 连续为负数3个周期
-        if lastJ[-1] < 0  and lastJ[-2] < 0 and lastJ[-3] < 0 :
+    if len(lastJ) >= 2: # J 连续为负数3个周期
+        if lastJ[-1] < 0  and lastJ[-2] < 0 and J < 0 :
             isBuy = True
     
     
-    if K>50 and D>50 or J-lastJ[-1]>30:
+    if K>55 and D>55 or abs(J-lastJ[-1])<30:
         isBuy = False
         
     if isBuy:
@@ -72,7 +69,7 @@ def judgeBuy(data,index):
      
     
     lastK.append(K)
-    
+    lastJ.append(J)
     lastD.append(D)
     
     
