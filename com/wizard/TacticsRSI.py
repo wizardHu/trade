@@ -18,7 +18,7 @@ def rsiJudgeBuy(data,index,pre):
     if len(lastPrice) > pre:
         listPrice = lastPrice[-(pre+1):]
         for i in range(len(listPrice)-1):
-            print i
+           
             if listPrice[i]>=listPrice[i+1]:#前面的比后面的大 跌
                 down += (listPrice[i]-listPrice[i+1])
             

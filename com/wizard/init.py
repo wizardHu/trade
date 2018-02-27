@@ -160,7 +160,6 @@ def get_KDJ(data):
     KDJ.append(SENDXY)
     KDJ.append(RSIXY)
     
-    print RSIXY
     
     return KDJ
 
