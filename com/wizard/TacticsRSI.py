@@ -34,6 +34,9 @@ def rsiJudgeBuy(data,index,pre):
         
         X.append(index)
         Y.append(rsi)
+    else :
+        X.append(index)
+        Y.append(50)
         
     if len(lastPrice) >30:
         lastPrice = lastPrice[1:]

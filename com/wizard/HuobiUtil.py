@@ -49,7 +49,8 @@ ACCOUNT_ID = None
 
 
 # API 请求地址
-MARKET_URL = TRADE_URL = "https://api.huobi.pro"
+MARKET_URL = TRADE_URL = "https://api.huobipro.com"
+
 
 #各种请求,获取数据方式
 def http_get_request(url, params, add_to_headers=None):
@@ -61,6 +62,9 @@ def http_get_request(url, params, add_to_headers=None):
         headers.update(add_to_headers)
     postdata = urllib.urlencode(params)
     try:
+        requests.adapters.DEFAULT_RETRIES = 5
+        s = requests.session()
+        s.keep_alive = False
         response = requests.get(url, postdata, headers=headers, timeout=TIMEOUT)
         if response.status_code == 200:
             return response.json()

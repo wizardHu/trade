@@ -15,8 +15,6 @@ last100 = []
 
 def judgeBuy(data,index):
     
-    print data['amount'],index
-    
     global lastK
     global lastD
     global lastJ

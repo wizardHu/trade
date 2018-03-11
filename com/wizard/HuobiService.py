@@ -5,13 +5,13 @@
 # @QQ      : 375235513
 # @github  : https://github.com/KlausQIU
 
+from HuobiUtil import *
+
 '''
 Market data API
 '''
+
 # 获取KLine
-
-from HuobiUtil import *
-
 
 
 def get_kline(symbol, period, size):
@@ -40,19 +40,6 @@ def get_depth(symbol, type):
               'type': type}
 
     url = MARKET_URL + '/market/depth'
-    return http_get_request(url, params)
-
-#  /market/detail/merged 获取聚合行情(Ticker)
-def get_merged(symbol, type):
-    """
-    :param symbol: 
-    :param type: 可选值：{ percent10, step0, step1, step2, step3, step4, step5 }
-    :return:
-    """
-    params = {'symbol': symbol,
-              'type': type}
-
-    url = MARKET_URL + '/market/detail/merged'
     return http_get_request(url, params)
 
 
@@ -103,14 +90,15 @@ def get_accounts():
     params = {}
     return api_key_get(params, path)
 
-
+ACCOUNT_ID = 0
 # 获取当前账户资产
 def get_balance(acct_id=None):
     """
     :param acct_id
     :return:
     """
-
+    global ACCOUNT_ID
+    
     if not acct_id:
         try:
             accounts = get_accounts()
@@ -420,16 +408,5 @@ def margin_balance(symbol):
     return api_key_get(params, url)
 
 
-
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+if __name__ == '__main__':
+    print get_symbols()

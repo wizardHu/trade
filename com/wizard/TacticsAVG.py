@@ -9,7 +9,7 @@ def avgJudgeBuy(data,index):
     
     price.append(Cn)
     
-    if len(price) > 100:
+    if len(price) > 10:
         price = price[1:]
     
     count = 0.0
@@ -18,7 +18,6 @@ def avgJudgeBuy(data,index):
     
     avg = round(count/len(price),2)
     
-    print avg,"==========",Cn,index
     
     if len(price)<=5:
         return False
