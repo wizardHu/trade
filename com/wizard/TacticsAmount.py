@@ -12,7 +12,7 @@ def amountJudgeBuy(data,index):
     
     deal = data['amount']
     
-    print deal,"======",index
+#     print deal,"======",index
     
     amount.append(deal)
     
