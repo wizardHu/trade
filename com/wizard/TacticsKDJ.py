@@ -25,7 +25,7 @@ def judgeBuy(data,index):
     Ln = data['low']
     Hn = data['high']
     if Hn==Ln:
-        False
+        return False
         
     RSV = (Cn-Ln)/(Hn-Ln)*100 
     K = 2.0/3*lastK[-1]+1.0/3*RSV
