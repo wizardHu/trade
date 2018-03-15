@@ -63,13 +63,27 @@ def isLowest(price,exchangeamount):
         if i < price:
             return False
     
-    for i in amount:
-        index = amount.index(i)
-        if uplow[index] == 0:
-            if i > exchangeamount:
-                return False
+#     for i in amount:
+#         index = amount.index(i)
+#         if uplow[index] == 0:
+#             if i > exchangeamount:
+#                 return False
     
     return True
+
+def isfastLowAmount(exchangeamount):
+    global amount
+   
+    if len(amount)<2:
+        return False
+        
+    lastAmount = amount[-2]
+    multiple = lastAmount/exchangeamount
+    
+    if multiple >= 5:
+        return True
+    
+    return False
     
 if __name__ == '__main__':
     amountJudgeBuy(1,2)
