@@ -9,6 +9,7 @@ from matplotlib.ticker import  MultipleLocator
 from matplotlib.ticker import  FormatStrFormatter
 from audioop import avg
 import CalAmount as calAmounts
+import globalConstant as constant
 
 balance = 10
 lastBuy = 0
@@ -100,7 +101,8 @@ def get_KDJ(data):
         Ln = i['low']
         Hn = i['high']
         
-        tacRsi.rsiJudgeBuy(i, data.index(i), 12)
+        constant.add(i, data.index(i))
+        tacRsi.getrsi(i, data.index(i), 12)
         
         K = 50
         D = 50
@@ -124,6 +126,7 @@ def get_KDJ(data):
         kdjFlag = tac.judgeBuy(i,data.index(i))
         lowest = tacAmount.isLowest(i['close'], i['amount']);
         isfastLowAmount = tacAmount.isfastLowAmount( i['amount']);
+        rsiflag = tacRsi.rsiJudgeBuy(i, data.index(i), 12)
         
 #         flag = True
         if kdjFlag and avgFlag and amountFlag and buy == 0:
@@ -137,7 +140,7 @@ def get_KDJ(data):
             
             print i['amount'],data.index(i)
 #             print '购买',i['close'],'余额',balance
-        elif lowest and isfastLowAmount and avgFlag and buy == 0:
+        elif lowest  and rsiflag and avgFlag and buy == 0:
             buyx.append(data.index(i))
             buyy.append(i['close'])
             balance -= i['close']

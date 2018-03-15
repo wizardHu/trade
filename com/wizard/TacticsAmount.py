@@ -25,7 +25,7 @@ def amountJudgeBuy(data,index):
         up = 0
     
     
-    print deal,"======",index,"==",up
+#     print deal,"======",index,"==",up
     
     amount.append(deal)
     uplow.append(up)
@@ -74,7 +74,7 @@ def isLowest(price,exchangeamount):
 def isfastLowAmount(exchangeamount):
     global amount
    
-    if len(amount)<2:
+    if len(amount)<2 or exchangeamount==0:
         return False
         
     lastAmount = amount[-2]
