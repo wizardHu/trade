@@ -5,6 +5,7 @@ import numpy as np
 amount = []
 uplow = []
 prices = []
+risk
 
 def amountJudgeBuy(data,index):
     global amount

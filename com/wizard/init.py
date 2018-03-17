@@ -129,25 +129,27 @@ def get_KDJ(data):
         rsiflag = tacRsi.rsiJudgeBuy(i, data.index(i), 12)
         
 #         flag = True
-        if kdjFlag and avgFlag and amountFlag and buy == 0:
-#             buy= 1
-         
-            buyx.append(data.index(i))
-            buyy.append(i['close'])
-            balance -= i['close']
-            lastBuy = i['close']
-            buynum= 0.998
-            
-            print i['amount'],data.index(i)
-#             print '购买',i['close'],'余额',balance
-        elif lowest  and rsiflag and avgFlag and buy == 0:
-            buyx.append(data.index(i))
-            buyy.append(i['close'])
-            balance -= i['close']
-            lastBuy = i['close']
-            buynum= 0.998
-               
-            print i['amount'],data.index(i)
+
+        if avgFlag and buy == 0 :
+            if kdjFlag  and amountFlag :
+    #             buy= 1
+             
+                buyx.append(data.index(i))
+                buyy.append(i['close'])
+                balance -= i['close']
+                lastBuy = i['close']
+                buynum= 0.998
+                
+                print i['amount'],data.index(i)
+    #             print '购买',i['close'],'余额',balance
+            elif lowest  and rsiflag :
+                buyx.append(data.index(i))
+                buyy.append(i['close'])
+                balance -= i['close']
+                lastBuy = i['close']
+                buynum= 0.998
+                   
+                print i['amount'],data.index(i)
             
         if check_send(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             buy = 0

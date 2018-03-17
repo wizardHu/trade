@@ -15,7 +15,7 @@ def avgJudgeBuy(data,index):
     ma10 = getMa(10)
     ma30 = getMa(30)
      
-    if ma30 < ma10 or ma30 == 0 or ma10 == 0:
+    if ma30 <= ma10 or ma30 == 0 or ma10 == 0:
         return False
      
     if Cn >= ma10:
