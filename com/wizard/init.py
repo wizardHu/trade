@@ -9,9 +9,10 @@ from matplotlib.ticker import  MultipleLocator
 from matplotlib.ticker import  FormatStrFormatter
 from audioop import avg
 import CalAmount as calAmounts
-import globalConstant as constant
+import globalUtil as constant
+import aaa as ddd
 
-balance = 10
+balance = 0
 lastBuy = 0
 packageBuy = []
 buynum = 0;
@@ -124,40 +125,46 @@ def get_KDJ(data):
         avgFlag = tacAvg.avgJudgeBuy(i,data.index(i)) 
         amountFlag = tacAmount.amountJudgeBuy(i,data.index(i))
         kdjFlag = tac.judgeBuy(i,data.index(i))
-        lowest = tacAmount.isLowest(i['close'], i['amount']);
+        lowest = tacAmount.isLowest(i['close']);
         isfastLowAmount = tacAmount.isfastLowAmount( i['amount']);
         rsiflag = tacRsi.rsiJudgeBuy(i, data.index(i), 12)
         
 #         flag = True
 
-        if avgFlag and buy == 0 :
-            if kdjFlag  and amountFlag :
+        if avgFlag and buy == 0 and amountFlag:
+            if kdjFlag and rsiflag :
     #             buy= 1
              
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
                 balance -= i['close']
                 lastBuy = i['close']
-                buynum= 0.998
-                
-                print i['amount'],data.index(i)
-    #             print '购买',i['close'],'余额',balance
-            elif lowest  and rsiflag :
+                constant.buyPackage.append(lastBuy)
+#                 print i['amount'],data.index(i)
+                print '购买',i['close'],'余额',balance
+            elif lowest  and tacAmount.judgeRisk() :
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
                 balance -= i['close']
                 lastBuy = i['close']
-                buynum= 0.998
-                   
-                print i['amount'],data.index(i)
+                      
+                constant.buyPackage.append(lastBuy)
+                print '购买',i['close'],'余额',balance
             
         if check_send(K, D, J, lastK, lastD, lastJ, i['close'], buy):
-            buy = 0
-            sendx.append(data.index(i))
-            sendy.append(i['close'])
-            balance += (buynum*i['close']*0.998)
-            buynum = 0
-            print '卖出',i['close'],'余额',balance,'\n'
+            
+            listPrice = constant.canSend(i['close'])
+            
+            if len(listPrice) > 0:
+                constant.send(listPrice)
+            
+                buy = 0
+                sendx.append(data.index(i))
+                sendy.append(i['close'])
+                
+                balance += (len(listPrice)*i['close']*0.998)
+                buynum = 0
+                print '卖出',listPrice,'单价：',i['close'],'余额',balance,'\n'
         
         lastK = K
         lastD = D
@@ -196,18 +203,13 @@ def check_send(K,D,J,lastK,lastD,lastJ,close,buy):
     global lastBuy
     global buynum
     isSend = False
-    if buy== 1:
+    if buy== 0:
         
         if (D<K and lastK<lastD  or J>100 ) :
             isSend = True
         
         if J < lastJ and J>50 and J>K:
             isSend = True
-        
-        gap = (buynum*close*0.998) - lastBuy*1.002
-        
-        if gap<0:
-            isSend = False
         
     return isSend
 
@@ -216,6 +218,7 @@ if __name__ == '__main__':
     fig = plt.figure()
     
     test = huobi.get_kline('eosusdt','1min',1200)
+#     test = ddd.test2
 
     test['data'].reverse()
     
@@ -226,12 +229,12 @@ if __name__ == '__main__':
     klinex = klineXY[0]
     kliney = klineXY[1]
     
-    MA60XY = get_MA(test['data'],60)
-    MA30XY = get_MA(test['data'],30)
-    MA10XY = get_MA(test['data'],10)
+    MA60XY = get_MA(test['data'],30)
+    MA30XY = get_MA(test['data'],10)
+    MA10XY = get_MA(test['data'],5)
 
-    ax1 = fig.add_subplot(211)
-    ax2 = fig.add_subplot(212)
+    ax1 = fig.add_subplot(111)
+#     ax2 = fig.add_subplot(112)
 #     ax3 = fig.add_subplot(313)
     KDJ = get_KDJ(test['data'])
 
@@ -246,14 +249,15 @@ if __name__ == '__main__':
 #     ax2.plot(KDJ[0][0], KDJ[0][1], color="red")
 #     ax2.plot(KDJ[1][0], KDJ[1][1], color='blue')
 #     ax2.plot(KDJ[2][0], KDJ[2][1], color='green')
-    ax2.plot(KDJ[5][0], KDJ[5][1], color='green')
-    ax2.xaxis.set_major_locator(xmajorLocator)
+#     ax2.plot(KDJ[5][0], KDJ[5][1], color='green')
+#     ax2.xaxis.set_major_locator(xmajorLocator)
 #     ax3.xaxis.set_major_locator(xmajorLocator)
    
     print balance
+    print constant.buyPackage
    
     ax1.grid(linestyle='--')
-    ax2.grid(linestyle='--')
+#     ax2.grid(linestyle='--')
 #     ax3.grid(linestyle='--')
 
 #     calAmounts.calAmount(test['data'])

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import globalConstant as constant
+import globalUtil as constant
 
 X = []
 Y = []
@@ -66,8 +66,8 @@ def rsiJudgeBuy(data,index,pre):
         if avgUp!=0 or avgDown != 0:
             rsi = 100*avgUp/(avgUp+avgDown)
         
-        print rsi,index
-        if rsi <8:
+#         print rsi,index
+        if rsi <40:
             return True
         
     
