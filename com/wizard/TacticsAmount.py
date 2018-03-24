@@ -22,7 +22,7 @@ def amountJudgeBuy(data,index):
         up = 0
     
     
-#     print deal,"======",index,"==",up
+    print (deal,"======",index,"==",up)
     
     uplow.append(up)
     
@@ -80,7 +80,7 @@ def isHighPer(per,exchangeamount):
     
     count = len(amount)-(len(amount)*per/100)
     
-    amount = amount[(-1*count):]
+    amount = amount[int((-1*count)):]
     
     
     if exchangeamount < (amount[0]*0.9):
@@ -88,18 +88,23 @@ def isHighPer(per,exchangeamount):
     
     return True
 
-def judgeRisk():
+def judgeRisk(index):
     amounts = constant.amount
     prices = constant.prices
     global uplow
     
     risk = 0
     
-    amount10 = amounts[-13:len(amounts)-1]#取最后13 并排除最后一个
-    prices10 = prices[-11:len(prices)-1]
-    uplow10 = uplow[-11:len(uplow)-1]
+    amount10 = amounts[-13:len(amounts)]#取最后13 
+    prices10 = prices[-11:len(prices)]
+    uplow10 = uplow[-11:len(uplow)]
     
-    if len(amount10) == 12:
+    if index == 132:
+        print(amount10)
+        print(prices10)
+        print(uplow10)
+    
+    if len(amount10) == 13:
         for index in range(len(prices10)):
             amount = amount10[index+2]#与 index位置的price 对应的成交额度
              
@@ -113,7 +118,7 @@ def judgeRisk():
                 if last1 == 0:
                     last1=1
                 
-                if amount/last1 >= 5 or amount/last2 >= 6:#成交量异常 需要进行风险判断
+                if amount/last1 >= 4 or amount/last2 >= 5:#成交量异常 需要进行风险判断
                     risk += 2
                     continue
             
@@ -122,8 +127,8 @@ def judgeRisk():
                     risk -= 1
                 else:
                     risk += 1
-#                     if risk >5:
-#                         risk = 0
+                    if risk >5:
+                        risk = 0
                     
     else:
         return False
@@ -144,6 +149,6 @@ if __name__ == '__main__':
     
     flag =  isHighPer(70,4)
     
-    print not flag
+    print (not flag)
 
 

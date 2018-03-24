@@ -10,7 +10,7 @@ from matplotlib.ticker import  FormatStrFormatter
 from audioop import avg
 import CalAmount as calAmounts
 import globalUtil as constant
-import aaa as ddd
+import aaa as aa
 
 balance = 0
 lastBuy = 0
@@ -88,6 +88,7 @@ def get_KDJ(data):
     sendx = []
     sendy = []
     
+    
     lastK = 50
     lastD = 50
     lastJ = 50
@@ -141,22 +142,22 @@ def get_KDJ(data):
                 lastBuy = i['close']
                 constant.buyPackage.append(lastBuy)
 #                 print i['amount'],data.index(i)
-                print '购买',i['close'],'余额',balance
-            elif lowest  and tacAmount.judgeRisk() :
+                print ('购买',i['close'],'余额',balance)
+            elif lowest  and tacAmount.judgeRisk(data.index(i)) :
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
                 balance -= i['close']
                 lastBuy = i['close']
                       
                 constant.buyPackage.append(lastBuy)
-                print '购买',i['close'],'余额',balance
+#                 print ('购买',i['close'],'余额',balance)
             
-        if check_send(K, D, J, lastK, lastD, lastJ, i['close'], buy):
+        if check_sell(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             
-            listPrice = constant.canSend(i['close'])
+            listPrice = constant.canSell(i['close'])
             
             if len(listPrice) > 0:
-                constant.send(listPrice)
+                constant.sell(listPrice)
             
                 buy = 0
                 sendx.append(data.index(i))
@@ -164,7 +165,7 @@ def get_KDJ(data):
                 
                 balance += (len(listPrice)*i['close']*0.998)
                 buynum = 0
-                print '卖出',listPrice,'单价：',i['close'],'余额',balance,'\n'
+#                 print ('卖出',listPrice,'单价：',i['close'],'余额',balance,'\n')
         
         lastK = K
         lastD = D
@@ -199,7 +200,7 @@ def get_KDJ(data):
 
 
 
-def check_send(K,D,J,lastK,lastD,lastJ,close,buy):
+def check_sell(K,D,J,lastK,lastD,lastJ,close,buy):
     global lastBuy
     global buynum
     isSend = False
@@ -217,8 +218,8 @@ if __name__ == '__main__':
    
     fig = plt.figure()
     
-    test = huobi.get_kline('eosusdt','1min',1200)
-#     test = ddd.test2
+#     test = huobi.get_kline('eosusdt','1min',1200)
+    test = aa.test0
 
     test['data'].reverse()
     
@@ -229,9 +230,9 @@ if __name__ == '__main__':
     klinex = klineXY[0]
     kliney = klineXY[1]
     
-    MA60XY = get_MA(test['data'],30)
-    MA30XY = get_MA(test['data'],10)
-    MA10XY = get_MA(test['data'],5)
+    MA60XY = get_MA(test['data'],60)
+    MA30XY = get_MA(test['data'],30)
+    MA10XY = get_MA(test['data'],10)
 
     ax1 = fig.add_subplot(111)
 #     ax2 = fig.add_subplot(112)
@@ -253,8 +254,8 @@ if __name__ == '__main__':
 #     ax2.xaxis.set_major_locator(xmajorLocator)
 #     ax3.xaxis.set_major_locator(xmajorLocator)
    
-    print balance
-    print constant.buyPackage
+    print (balance)
+    print (constant.buyPackage)
    
     ax1.grid(linestyle='--')
 #     ax2.grid(linestyle='--')

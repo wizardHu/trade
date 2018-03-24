@@ -37,8 +37,8 @@ def calAmount(datas):
         count += i
     
     
-    print len(num),len(index),count
-    print num,"\n",index
+    print (len(num),len(index),count)
+    print (num,"\n",index)
     
 
 

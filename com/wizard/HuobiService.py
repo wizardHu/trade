@@ -1,24 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Date    : 2017-12-15 15:40:03
+# @Date    : 2017-12-20 15:40:03
 # @Author  : KlausQiu
 # @QQ      : 375235513
 # @github  : https://github.com/KlausQIU
 
-from HuobiUtil import *
+from Utils import *
 
 '''
 Market data API
 '''
 
+
 # 获取KLine
-
-
-def get_kline(symbol, period, size):
+def get_kline(symbol, period, size=150):
     """
     :param symbol
     :param period: 可选值：{1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year }
-    :param size: [1,2000]
+    :param size: 可选值： [1,2000]
     :return:
     """
     params = {'symbol': symbol,
@@ -32,13 +31,13 @@ def get_kline(symbol, period, size):
 # 获取marketdepth
 def get_depth(symbol, type):
     """
-    :param symbol: 
+    :param symbol
     :param type: 可选值：{ percent10, step0, step1, step2, step3, step4, step5 }
     :return:
     """
     params = {'symbol': symbol,
               'type': type}
-
+    
     url = MARKET_URL + '/market/depth'
     return http_get_request(url, params)
 
@@ -46,7 +45,7 @@ def get_depth(symbol, type):
 # 获取tradedetail
 def get_trade(symbol):
     """
-    :param symbol: 可选值：{ ethcny }
+    :param symbol
     :return:
     """
     params = {'symbol': symbol}
@@ -55,10 +54,22 @@ def get_trade(symbol):
     return http_get_request(url, params)
 
 
+# 获取merge ticker
+def get_ticker(symbol):
+    """
+    :param symbol: 
+    :return:
+    """
+    params = {'symbol': symbol}
+
+    url = MARKET_URL + '/market/detail/merged'
+    return http_get_request(url, params)
+
+
 # 获取 Market Detail 24小时成交量数据
 def get_detail(symbol):
     """
-    :param symbol: 可选值：{ ethcny }
+    :param symbol
     :return:
     """
     params = {'symbol': symbol}
@@ -66,16 +77,16 @@ def get_detail(symbol):
     url = MARKET_URL + '/market/detail'
     return http_get_request(url, params)
 
-# 查询系统支持的所有交易对
-
-
-def get_symbols():
+# 获取  支持的交易对
+def get_symbols(long_polling=None):
     """
-    :return:
+
     """
-    url = MARKET_URL + '/v1/common/symbols'
     params = {}
-    return http_get_request(url, params)
+    if long_polling:
+        params['long-polling'] = long_polling
+    path = '/v1/common/symbols'
+    return api_key_get(params, path)
 
 '''
 Trade/Account API
@@ -100,21 +111,17 @@ def get_balance(acct_id=None):
     global ACCOUNT_ID
     
     if not acct_id:
-        try:
-            accounts = get_accounts()
-            acct_id = ACCOUNT_ID = accounts['data'][0]['id']
-        except BaseException as e:
-            print 'get acct_id error.%s' % e
-            acct_id = ACCOUNT_ID
+        accounts = get_accounts()
+        acct_id = accounts['data'][0]['id'];
 
     url = "/v1/account/accounts/{0}/balance".format(acct_id)
     params = {"account-id": acct_id}
     return api_key_get(params, url)
 
 
+# 下单
+
 # 创建并执行订单
-
-
 def send_order(amount, source, symbol, _type, price=0):
     """
     :param amount: 
@@ -128,7 +135,7 @@ def send_order(amount, source, symbol, _type, price=0):
         accounts = get_accounts()
         acct_id = accounts['data'][0]['id']
     except BaseException as e:
-        print 'get acct_id error.%s' % e
+        print ('get acct_id error.%s' % e)
         acct_id = ACCOUNT_ID
 
     params = {"account-id": acct_id,
@@ -146,7 +153,7 @@ def send_order(amount, source, symbol, _type, price=0):
 # 撤销订单
 def cancel_order(order_id):
     """
-
+    
     :param order_id: 
     :return: 
     """
@@ -158,7 +165,7 @@ def cancel_order(order_id):
 # 查询某个订单
 def order_info(order_id):
     """
-
+    
     :param order_id: 
     :return: 
     """
@@ -170,7 +177,7 @@ def order_info(order_id):
 # 查询某个订单的成交明细
 def order_matchresults(order_id):
     """
-
+    
     :param order_id: 
     :return: 
     """
@@ -182,6 +189,7 @@ def order_matchresults(order_id):
 # 查询当前委托、历史委托
 def orders_list(symbol, states, types=None, start_date=None, end_date=None, _from=None, direct=None, size=None):
     """
+    
     :param symbol: 
     :param states: 可选值 {pre-submitted 准备提交, submitted 已提交, partial-filled 部分成交, partial-canceled 部分成交撤销, filled 完全成交, canceled 已撤销}
     :param types: 可选值 {buy-market：市价买, sell-market：市价卖, buy-limit：限价买, sell-limit：限价卖}
@@ -214,6 +222,7 @@ def orders_list(symbol, states, types=None, start_date=None, end_date=None, _fro
 # 查询当前成交、历史成交
 def orders_matchresults(symbol, types=None, start_date=None, end_date=None, _from=None, direct=None, size=None):
     """
+    
     :param symbol: 
     :param types: 可选值 {buy-market：市价买, sell-market：市价卖, buy-limit：限价买, sell-limit：限价卖}
     :param start_date: 
@@ -241,6 +250,7 @@ def orders_matchresults(symbol, types=None, start_date=None, end_date=None, _fro
     return api_key_get(params, url)
 
 
+
 # 申请提现虚拟币
 def withdraw(address, amount, currency, fee=0, addr_tag=""):
     """
@@ -249,7 +259,7 @@ def withdraw(address, amount, currency, fee=0, addr_tag=""):
     :param amount: 
     :param currency:btc, ltc, bcc, eth, etc ...(火币Pro支持的币种)
     :param fee: 
-    :param addr_tag:
+    :param addr-tag:
     :return: {
               "status": "ok",
               "data": 700
@@ -265,8 +275,6 @@ def withdraw(address, amount, currency, fee=0, addr_tag=""):
     return api_key_post(params, url)
 
 # 申请取消提现虚拟币
-
-
 def cancel_withdraw(address_id):
     """
 
@@ -287,6 +295,8 @@ def cancel_withdraw(address_id):
 '''
 
 # 创建并执行借贷订单
+
+
 def send_margin_order(amount, source, symbol, _type, price=0):
     """
     :param amount: 
@@ -300,7 +310,7 @@ def send_margin_order(amount, source, symbol, _type, price=0):
         accounts = get_accounts()
         acct_id = accounts['data'][0]['id']
     except BaseException as e:
-        print 'get acct_id error.%s' % e
+        print ('get acct_id error.%s' % e)
         acct_id = ACCOUNT_ID
 
     params = {"account-id": acct_id,
@@ -315,34 +325,38 @@ def send_margin_order(amount, source, symbol, _type, price=0):
     return api_key_post(params, url)
 
 # 现货账户划入至借贷账户
-def exchange_to_margin(symbol,currency,amount):
+
+
+def exchange_to_margin(symbol, currency, amount):
     """
     :param amount: 
     :param currency: 
     :param symbol: 
     :return: 
     """
-    params = {"symbol":symbol,
-              "currency":currency,
-              "amount":amount}
+    params = {"symbol": symbol,
+              "currency": currency,
+              "amount": amount}
 
     url = "/v1/dw/transfer-in/margin"
-    return api_key_post(params,url)
+    return api_key_post(params, url)
 
 # 借贷账户划出至现货账户
-def margin_to_exchange(symbol,currency,amount):
+
+
+def margin_to_exchange(symbol, currency, amount):
     """
     :param amount: 
     :param currency: 
     :param symbol: 
     :return: 
     """
-    params = {"symbol":symbol,
-              "currency":currency,
-              "amount":amount}
+    params = {"symbol": symbol,
+              "currency": currency,
+              "amount": amount}
 
     url = "/v1/dw/transfer-out/margin"
-    return api_key_post(params,url)
+    return api_key_post(params, url)
 
 # 申请借贷
 def get_margin(symbol, currency, amount):
@@ -378,20 +392,20 @@ def loan_orders(symbol, currency, start_date="", end_date="", start="", direct="
     :param direct: prev 向前，next 向后
     :return: 
     """
-    params = {"symbol":symbol,
-              "currency":currency}
+    params = {"symbol": symbol,
+              "currency": currency}
     if start_date:
         params["start-date"] = start_date
     if end_date:
         params["end-date"] = end_date
     if start:
         params["from"] = start
-    if direct and direct in ["prev","next"]:
+    if direct and direct in ["prev", "next"]:
         params["direct"] = direct
     if size:
         params["size"] = size
     url = "/v1/margin/loan-orders"
-    return api_key_get(params,url)
+    return api_key_get(params, url)
 
 
 # 借贷账户详情,支持查询单个币种
@@ -409,4 +423,4 @@ def margin_balance(symbol):
 
 
 if __name__ == '__main__':
-    print get_symbols()
+    print (get_symbols())

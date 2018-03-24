@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import numpy as np
+
 prices = []
 amount = []
 
@@ -33,7 +35,7 @@ def add(data,index):
         ma10 = ma10[1:]
         
     
-def canSend(price):
+def canSell(price):
     global buyPackage
     global wait
     global ma10
@@ -48,7 +50,7 @@ def canSend(price):
                     listPrice.append(buyPrice) 
                 elif wait==0:
                     wait+=1
-                    print price ,"wait"
+                    print (price ,"wait")
                 elif wait == 1:
                     wait = 0
                     listPrice.append(buyPrice) 
@@ -56,10 +58,41 @@ def canSend(price):
     
     return listPrice
 
-def send(priceList):
+def sell(priceList):
     global buyPackage
     
     for price in priceList:
         buyPackage.remove(price)
-            
+        
+def getMa(period):
+    global prices
+    
+    count = 0.0
+    
+    if len(prices) >= period:
+        lists = prices[(-1*period):]
+        for p in lists:
+            count += p
+    
+    return round(count/period,2)   
+
+def getBoll(period,times):
+    global prices
+    
+    boll = []
+    
+    if len(prices) >= period:
+        lists = prices[(-1*period):]
+         
+        midBBand = np.nanmean(lists)
+        sigma = np.nanstd(lists)
+        
+        upBBand = midBBand + times*sigma
+        downBBand = midBBand - times*sigma
+    
+        boll.append(upBBand)
+        boll.append(downBBand)
+    
+    return boll
+         
     
