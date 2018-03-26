@@ -7,6 +7,7 @@ amount = []
 
 buyPackage = []
 wait = 0
+nextBuy = 0
 ma10 = []
 
 def add(data,index):
@@ -76,23 +77,20 @@ def getMa(period):
     
     return round(count/period,2)   
 
-def getBoll(period,times):
+def canBuy():
     global prices
     
-    boll = []
+    curPrice = prices[-1]
+    lastPrice = prices[-2]
     
-    if len(prices) >= period:
-        lists = prices[(-1*period):]
-         
-        midBBand = np.nanmean(lists)
-        sigma = np.nanstd(lists)
+    if curPrice <= lastPrice:
+        return True
+    else:
+        gap = curPrice - lastPrice
+        times = gap/lastPrice
+        if times < 0.002:
+            return True
+    
+    return False
         
-        upBBand = midBBand + times*sigma
-        downBBand = midBBand - times*sigma
-    
-        boll.append(upBBand)
-        boll.append(downBBand)
-    
-    return boll
-         
     

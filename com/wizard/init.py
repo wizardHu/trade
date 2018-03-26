@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import  MultipleLocator
 from matplotlib.ticker import  FormatStrFormatter
 from audioop import avg
+import TacticsBoll as tacBoll
 import CalAmount as calAmounts
 import globalUtil as constant
 import aaa as aa
@@ -82,12 +83,17 @@ def get_KDJ(data):
     
     BUYXY = []
     SENDXY = []
+    BOLLUPXY = []
+    BOLLDOWNXY = []
     
     buyx = []
     buyy = []
     sendx = []
     sendy = []
     
+    bollx = []
+    bolldowny = []
+    bollupy = []
     
     lastK = 50
     lastD = 50
@@ -105,6 +111,11 @@ def get_KDJ(data):
         
         constant.add(i, data.index(i))
         tacRsi.getrsi(i, data.index(i), 12)
+        bollxy = tacBoll.getBoll(20, 2)
+        if len(bollxy)>1:
+            bollx.append(data.index(i))
+            bollupy.append(bollxy[0])
+            bolldowny.append(bollxy[1])
         
         K = 50
         D = 50
@@ -130,27 +141,28 @@ def get_KDJ(data):
         isfastLowAmount = tacAmount.isfastLowAmount( i['amount']);
         rsiflag = tacRsi.rsiJudgeBuy(i, data.index(i), 12)
         
-#         flag = True
-
-        if avgFlag and buy == 0 and amountFlag:
-            if kdjFlag and rsiflag :
-    #             buy= 1
-             
-                buyx.append(data.index(i))
-                buyy.append(i['close'])
-                balance -= i['close']
-                lastBuy = i['close']
-                constant.buyPackage.append(lastBuy)
-#                 print i['amount'],data.index(i)
-                print ('购买',i['close'],'余额',balance)
-            elif lowest  and tacAmount.judgeRisk(data.index(i)) :
+        if constant.nextBuy == 1:
+            constant.nextBuy = 0
+            if constant.canBuy():
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
                 balance -= i['close']
                 lastBuy = i['close']
                       
                 constant.buyPackage.append(lastBuy)
-#                 print ('购买',i['close'],'余额',balance)
+                print ('购买',i['close'],'余额',balance,"index=",data.index(i))
+        
+        elif avgFlag and buy == 0 and amountFlag:
+            if kdjFlag and rsiflag :
+                buyx.append(data.index(i))
+                buyy.append(i['close'])
+                balance -= i['close']
+                lastBuy = i['close']
+                constant.buyPackage.append(lastBuy)
+
+                print ('购买',i['close'],'余额',balance)
+            elif lowest  and tacAmount.judgeRisk(data.index(i))   and tacBoll.judgeBoll(i['close']):
+                constant.nextBuy = 1
             
         if check_sell(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             
@@ -165,7 +177,7 @@ def get_KDJ(data):
                 
                 balance += (len(listPrice)*i['close']*0.998)
                 buynum = 0
-#                 print ('卖出',listPrice,'单价：',i['close'],'余额',balance,'\n')
+                print ('卖出',listPrice,'单价：',i['close'],'余额',balance,'\n')
         
         lastK = K
         lastD = D
@@ -188,12 +200,20 @@ def get_KDJ(data):
     RSIXY.append(tacRsi.X)
     RSIXY.append(tacRsi.Y)
     
+    BOLLUPXY.append(bollx)
+    BOLLUPXY.append(bollupy)
+    
+    BOLLDOWNXY.append(bollx)
+    BOLLDOWNXY.append(bolldowny)
+    
     KDJ.append(KXY)
     KDJ.append(DXY)
     KDJ.append(JXY)
     KDJ.append(BUYXY)
     KDJ.append(SENDXY)
     KDJ.append(RSIXY)
+    KDJ.append(BOLLUPXY)
+    KDJ.append(BOLLDOWNXY)
     
     
     return KDJ
@@ -240,9 +260,13 @@ if __name__ == '__main__':
     KDJ = get_KDJ(test['data'])
 
     ax1.plot(klinex, kliney, label='xrpusdt')
-#     ax1.plot(MA60XY[0], MA60XY[1], label='ma60')
-#     ax1.plot(MA30XY[0], MA30XY[1], label='ma30')
-#     ax1.plot(MA10XY[0], MA10XY[1], label='ma10')
+    ax1.plot(MA60XY[0], MA60XY[1], label='ma60')
+    ax1.plot(MA30XY[0], MA30XY[1], label='ma30')
+    ax1.plot(MA10XY[0], MA10XY[1], label='ma10')
+
+#     ax1.plot(KDJ[6][0], KDJ[6][1], color='green',label='bollup')
+#     ax1.plot(KDJ[7][0], KDJ[7][1], color='red',label='bolldown')
+    
     ax1.scatter(KDJ[3][0], KDJ[3][1],marker = 'x', color = 'm', label='1' )
     ax1.scatter(KDJ[4][0], KDJ[4][1], label='1' )
     ax1.xaxis.set_major_locator(xmajorLocator)
@@ -254,6 +278,10 @@ if __name__ == '__main__':
 #     ax2.xaxis.set_major_locator(xmajorLocator)
 #     ax3.xaxis.set_major_locator(xmajorLocator)
    
+    balance += (len(constant.buyPackage)*constant.prices[-1]*0.998)
+    print ('卖出',constant.buyPackage,'单价：',constant.prices[-1],'余额',balance,'\n')
+    constant.buyPackage = []
+    
     print (balance)
     print (constant.buyPackage)
    

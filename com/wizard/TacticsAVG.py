@@ -9,11 +9,12 @@ def avgJudgeBuy(data,index):
     
     ma10 = constant.getMa(10)
     ma30 = constant.getMa(30)
+    ma60 = constant.getMa(60)
      
     if ma30 <= ma10 or ma30 == 0 or ma10 == 0:
         return False
      
-    if Cn >= ma10:
+    if Cn >= ma10 or Cn >= ma30 or Cn >= ma60:
         return False
     
     return True

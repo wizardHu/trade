@@ -22,7 +22,7 @@ def amountJudgeBuy(data,index):
         up = 0
     
     
-    print (deal,"======",index,"==",up)
+#     print (deal,"======",index,"==",up)
     
     uplow.append(up)
     
@@ -99,10 +99,6 @@ def judgeRisk(index):
     prices10 = prices[-11:len(prices)]
     uplow10 = uplow[-11:len(uplow)]
     
-    if index == 132:
-        print(amount10)
-        print(prices10)
-        print(uplow10)
     
     if len(amount10) == 13:
         for index in range(len(prices10)):
