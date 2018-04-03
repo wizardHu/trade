@@ -252,7 +252,7 @@ if __name__ == '__main__':
     
     MA60XY = get_MA(test['data'],60)
     MA30XY = get_MA(test['data'],30)
-    MA10XY = get_MA(test['data'],10)
+    MA10XY = get_MA(test['data'],5)
 
     ax1 = fig.add_subplot(111)
 #     ax2 = fig.add_subplot(112)
@@ -260,9 +260,9 @@ if __name__ == '__main__':
     KDJ = get_KDJ(test['data'])
 
     ax1.plot(klinex, kliney, label='xrpusdt')
-    ax1.plot(MA60XY[0], MA60XY[1], label='ma60')
-    ax1.plot(MA30XY[0], MA30XY[1], label='ma30')
-    ax1.plot(MA10XY[0], MA10XY[1], label='ma10')
+#     ax1.plot(MA60XY[0], MA60XY[1], label='ma60')
+#     ax1.plot(MA30XY[0], MA30XY[1], label='ma30')
+#     ax1.plot(MA10XY[0], MA10XY[1], label='ma10')
 
 #     ax1.plot(KDJ[6][0], KDJ[6][1], color='green',label='bollup')
 #     ax1.plot(KDJ[7][0], KDJ[7][1], color='red',label='bolldown')

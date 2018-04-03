@@ -9,17 +9,23 @@ buyPackage = []
 wait = 0
 nextBuy = 0
 ma10 = []
+closeGap = []
 
 def add(data,index):
     global prices
     global amount
     global ma10
+    global closeGap
     
     Cn = data['close']
     prices.append(Cn)
     
     deal = data['amount']
     amount.append(deal)
+    
+    if len(prices)>1:
+        gap = prices[-1] - prices[-2]
+        closeGap.append(gap)
     
     count = 0.0
     if len(prices) > 10:
@@ -34,12 +40,14 @@ def add(data,index):
         prices = prices[1:]
         amount = amount[1:]
         ma10 = ma10[1:]
+        closeGap = closeGap[1:]
         
     
 def canSell(price):
     global buyPackage
     global wait
     global ma10
+    global closeGap
     
     listPrice = []
     
@@ -56,6 +64,14 @@ def canSell(price):
                     wait = 0
                     listPrice.append(buyPrice) 
     
+    flag = True
+    for gap in closeGap[-50:]:
+        if closeGap[-1] < gap:
+            flag = False
+    
+    if flag:
+        listPrice.clear()
+        wait = 1
     
     return listPrice
 

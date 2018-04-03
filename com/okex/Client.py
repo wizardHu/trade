@@ -25,7 +25,7 @@ print (u' 现货深度 ')
 print (okcoinSpot.depth('btc_usd'))
 
 print (u' 现货深kline ')
-kline = okcoinSpot.kline('btc_usd', "1min", 1200)
+kline = okcoinSpot.kline('eos_usd', "1min", 1200)
 print(kline)
 data = []
 for line in kline:
