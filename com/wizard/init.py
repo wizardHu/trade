@@ -12,6 +12,7 @@ import TacticsBoll as tacBoll
 import CalAmount as calAmounts
 import globalUtil as constant
 import aaa as aa
+import Client as client
 
 balance = 0
 lastBuy = 0
@@ -238,11 +239,11 @@ if __name__ == '__main__':
    
     fig = plt.figure()
     
-    test = huobi.get_kline('eosusdt','1min',1200)
+#     test = huobi.get_kline('eosusdt','1min',1200)
 #     test = aa.test0
     
-    test['data'].reverse()
-    
+#     test['data'].reverse()
+    test = client.getKline(1200,"eos_usdt")
     
     xmajorLocator = MultipleLocator(10);
   

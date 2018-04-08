@@ -8,40 +8,46 @@ from OkcoinFutureAPI import OKCoinFuture
 import time
 
 #初始化apikey，secretkey,url
-apikey = 'XXXX'
-secretkey = 'XXXXX'
-okcoinRESTURL = 'www.okcoin.com'   #请求注意：国内账号需要 修改为 www.okcoin.cn  
+apikey = 'dcf58cbf-2a74-470d-92d2-9acb8d2c6c27'
+secretkey = '002DFA8A76CE4A565A83389BE2A50764'
+okcoinRESTURL = 'www.okex.com'   #请求注意：国内账号需要 修改为 www.okcoin.cn  
 
 #现货API
 okcoinSpot = OKCoinSpot(okcoinRESTURL,apikey,secretkey)
 
 #期货API
-okcoinFuture = OKCoinFuture(okcoinRESTURL,apikey,secretkey)
+# okcoinFuture = OKCoinFuture(okcoinRESTURL,apikey,secretkey)
 
-print (u' 现货行情 ')
-print (okcoinSpot.ticker('ltc_btc'))
+# print (u' 现货行情 ')
+# print (okcoinSpot.ticker('eos_usdt'))
+# 
+# print (u' 现货深度 ')
+# print (okcoinSpot.depth('eos_usdt'))
 
-print (u' 现货深度 ')
-print (okcoinSpot.depth('btc_usd'))
+def getKline(count,Symbol):
 
-print (u' 现货深kline ')
-kline = okcoinSpot.kline('eos_usd', "1min", 1200)
-print(kline)
-data = []
-for line in kline:
-    timestamp = int(line[0])/1000
-    time_local = time.localtime(timestamp)
-    id = time.strftime("%Y-%m-%d %H:%M:%S",time_local)
-    open = line[1]
-    high = line[2]
-    low = line[3]
-    close = line[4]
-    amount = line[5]
-    
-    k = {'id':id,'open':open,'high':high,'low':low,'close':close,'amount':amount}
-    data.append(k)
-    
-print(data)
+    print (u' 现货深kline ')
+    kline = okcoinSpot.kline(Symbol, "1min", count)
+    # print(kline)
+    data = []
+    for line in kline:
+        timestamp = int(line[0])/1000
+        time_local = time.localtime(timestamp)
+        id = time.strftime("%Y-%m-%d %H:%M:%S",time_local)
+        open = line[1]
+        high = line[2]
+        low = line[3]
+        close = line[4]
+        amount = line[5]
+        
+        k = {'id':id,'open':float(open),'high':float(high),'low':float(low),'close':float(close),'amount':float(amount)}
+        data.append(k)
+        
+    print(data)
+    line = {"data":data}
+    return line
+
+# getKline(1200,"btc_usdt")
 
 #print (u' 现货历史交易信息 ')
 #print (okcoinSpot.trades())

@@ -6,6 +6,7 @@ import gzip
 import time
 
 if __name__ == '__main__':
+    
     while(1):
         try:
             ws = create_connection("wss://api.huobipro.com/ws")
@@ -15,25 +16,7 @@ if __name__ == '__main__':
             time.sleep(5)
 
     # 订阅 KLine 数据
-    tradeStr="""{"sub": "market.ethusdt.kline.1min","id": "id10"}"""
-
-    # 请求 KLine 数据
-    # tradeStr="""{"req": "market.ethusdt.kline.1min","id": "id10", "from": 1513391453, "to": 1513392453}"""
-
-    #订阅 Market Depth 数据
-    # tradeStr="""{"sub": "market.ethusdt.depth.step5", "id": "id10"}"""
-
-    #请求 Market Depth 数据
-    # tradeStr="""{"req": "market.ethusdt.depth.step5", "id": "id10"}"""
-
-    #订阅 Trade Detail 数据
-    # tradeStr="""{"sub": "market.ethusdt.trade.detail", "id": "id10"}"""
-
-    #请求 Trade Detail 数据
-    # tradeStr="""{"req": "market.ethusdt.trade.detail", "id": "id10"}"""
-
-    #请求 Market Detail 数据
-    # tradeStr="""{"req": "market.ethusdt.detail", "id": "id12"}"""
+    tradeStr="""{"sub": "market.eosusdt.kline.1min","id": "id10"}"""
 
     ws.send(tradeStr)
     while(1):
@@ -45,6 +28,12 @@ if __name__ == '__main__':
             ws.send(pong)
             ws.send(tradeStr)
         else:
-            print(result)
+            if 'ts' in result:
+                
+                a = result['ts']
+#                 timestamp = a/1000
+#                 time_local = time.localtime(timestamp)
+#                 id = time.strftime("%Y-%m-%d %H:%M:%S",time_local)
+                print(id,result)
 
     
