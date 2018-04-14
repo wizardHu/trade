@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
+import MyHuobiService as myHuo
 
 prices = []
 amount = []
@@ -42,12 +42,33 @@ def add(data,index):
         ma10 = ma10[1:]
         closeGap = closeGap[1:]
         
+#获取买入记录
+def getBuyPackage(evn,symbol):
     
-def canSell(price):
     global buyPackage
+    
+    if evn == 'pro':
+        return myHuo.getOrderFromFile()
+    else:
+        return buyPackage
+    
+#获取订单状态
+def getOrderStatus(evn):
+    
+    global buyPackage
+    
+    if evn == 'pro':
+        return myHuo.getOrderFromFile()
+    else:
+        return buyPackage
+
+    
+def canSell(price,evn):
     global wait
     global ma10
     global closeGap
+    
+    buyPackage = getBuyPackage(evn, 'eosusdt')#查询购买历史
     
     listPrice = []
     
@@ -55,9 +76,9 @@ def canSell(price):
         if buyPrice*1.007 <= price:
             ma = ma10[-2:]
             if len(ma) > 1:
-                if ma[0] >= ma[1]:
+                if ma[0] >= ma[1]:# 十日均线向下
                     listPrice.append(buyPrice) 
-                elif wait==0:
+                elif wait==0:# 向上 再等一期才卖
                     wait+=1
                     print (price ,"wait")
                 elif wait == 1:
@@ -65,7 +86,7 @@ def canSell(price):
                     listPrice.append(buyPrice) 
     
     flag = True
-    for gap in closeGap[-50:]:
+    for gap in closeGap[-50:]:#最新50期中，这一期是不是最大
         if closeGap[-1] < gap:
             flag = False
     
@@ -75,7 +96,7 @@ def canSell(price):
     
     return listPrice
 
-def sell(priceList):
+def sell(priceList):#挂卖单
     global buyPackage
     
     for price in priceList:
@@ -93,7 +114,7 @@ def getMa(period):
     
     return round(count/period,2)   
 
-def canBuy():
+def juideGap():#两期差距不到0.2%就可以买
     global prices
     
     curPrice = prices[-1]
@@ -108,5 +129,65 @@ def canBuy():
             return True
     
     return False
+
+def juideAllGap(price,evn):#拿当前价格和以往买过的对比，差距在0.2%内的不买
+    buyPackage = getBuyPackage(evn, 'eosusdt')#查询购买历史 #查询购买历史
+    
+    for buyPrice in buyPackage:
+        gap = abs(buyPrice-price)
+        times = gap/buyPrice
+        if times < 0.002:
+            return False
+    
+    return True
+
+
+def write(msg):
+    f = open('buy','a',encoding='utf-8')
+    f.write("{0}\n".format(msg))
+    f.flush()
+    f.close()
+    
+
+def delAll():
+    f = open('buy','w',encoding='utf-8')
+    f.close()
+
+def readAll():
+    lines = []
+    f = open('buy',encoding='utf-8')
+    for line in f.readlines() :
+        if line != '\n' and line!='':
+            lines.append(line.replace('\n',''))
+    
+    f.close()
+    return lines
+
+def delMsgFromFile(msg):
+    
+    msg = "{0}\n".format(msg)
+    lines = []
+    f = open('buy',encoding='utf-8')
+    for line in f:
+        if line != msg:
+            lines.append(line.replace('\n',''))
+    
+    delAll()
+    f.close()
+    
+    for line in lines:
+        write(line)
+
+
+if __name__ == '__main__':
+    
+    write("qw1,er1,121")
+    write("qw2,er2,122")
         
+    delMsgFromFile('qw1,er1,121')
+    write("qw3,er4,125")
+    
+    lines = readAll()
+    for line in lines:
+        print(line)
     

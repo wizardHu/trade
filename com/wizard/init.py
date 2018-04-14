@@ -141,10 +141,11 @@ def get_KDJ(data):
         lowest = tacAmount.isLowest(i['close']);
         isfastLowAmount = tacAmount.isfastLowAmount( i['amount']);
         rsiflag = tacRsi.rsiJudgeBuy(i, data.index(i), 12)
+        allGap = constant.juideAllGap(i['close'],'dev')
         
         if constant.nextBuy == 1:
             constant.nextBuy = 0
-            if constant.canBuy():
+            if constant.juideGap():
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
                 balance -= i['close']
@@ -153,7 +154,7 @@ def get_KDJ(data):
                 constant.buyPackage.append(lastBuy)
                 print ('购买',i['close'],'余额',balance,"index=",data.index(i))
         
-        elif avgFlag and buy == 0 and amountFlag:
+        elif avgFlag and buy == 0 and amountFlag and allGap:
             if kdjFlag and rsiflag :
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
@@ -162,12 +163,12 @@ def get_KDJ(data):
                 constant.buyPackage.append(lastBuy)
 
                 print ('购买',i['close'],'余额',balance)
-            elif lowest  and tacAmount.judgeRisk(data.index(i))   and tacBoll.judgeBoll(i['close']):
-                constant.nextBuy = 1
+            elif lowest  and tacAmount.judgeRisk(data.index(i)) and tacBoll.judgeBoll(i['close']) and allGap:
+                constant.nextBuy = 1#下一期买
             
         if check_sell(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             
-            listPrice = constant.canSell(i['close'])
+            listPrice = constant.canSell(i['close'],'dev')
             
             if len(listPrice) > 0:
                 constant.sell(listPrice)
@@ -239,11 +240,11 @@ if __name__ == '__main__':
    
     fig = plt.figure()
     
-#     test = huobi.get_kline('eosusdt','1min',1200)
+    test = huobi.get_kline('eosusdt','1min',1200)
 #     test = aa.test0
     
-#     test['data'].reverse()
-    test = client.getKline(1200,"eos_usdt")
+    test['data'].reverse()
+#     test = client.getKline(1200,"eos_usdt")
     
     xmajorLocator = MultipleLocator(10);
   

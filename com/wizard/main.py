@@ -6,9 +6,8 @@ import TacticsRSI as tacRsi
 import TacticsAmount as tacAmount
 import TacticsBoll as tacBoll
 import globalUtil as constant
-import Client as client
-import aaa as aa
 import time
+import MyHuobiService as myHuo
 
 balance = 0
 lastBuy = 0
@@ -27,12 +26,9 @@ buy = 0
 
 
 def get_KDJ(i,index):
-    global balance
     global lastBuy
     global packageBuy
     global buynum
-    global buyx
-    global buyy
     global sendx 
     global sendy
     global lastK
@@ -67,28 +63,26 @@ def get_KDJ(i,index):
     
     if constant.nextBuy == 1:
         constant.nextBuy = 0
-        if constant.canBuy():
-            buyx.append(index)
-            buyy.append(i['close'])
-            balance -= i['close']
+        if constant.juideGap():
             lastBuy = i['close']
-                  
+            
+            #挂单
+            
             constant.buyPackage.append(lastBuy)
-            print ('购买',i['close'],'余额',balance,"index=",index)
+            print ('购买',i['close'],"index=",index)
     
     elif avgFlag and buy == 0 and amountFlag:
         if kdjFlag and rsiflag :
-            buyx.append(index)
-            buyy.append(i['close'])
-            balance -= i['close']
             lastBuy = i['close']
             constant.buyPackage.append(lastBuy)
-
-            print ('购买',i['close'],'余额',balance)
+            
+            #挂单
+            
+            print ('购买',i['close'] )
         elif lowest  and tacAmount.judgeRisk(index)   and tacBoll.judgeBoll(i['close']):
             constant.nextBuy = 1
         
-    if check_sell(K, D, J, lastK, lastD, lastJ, i['close'], buy):
+    if check_sell(K, D, J, lastK, lastD, lastJ,  buy):
         
         listPrice = constant.canSell(i['close'])
         
@@ -99,9 +93,11 @@ def get_KDJ(i,index):
             sendx.append(index)
             sendy.append(i['close'])
             
-            balance += (len(listPrice)*i['close']*0.998)
+            
             buynum = 0
-            print ('卖出',listPrice,'单价：',i['close'],'余额',balance,'\n')
+            
+            #挂单
+            print ('卖出',listPrice,'单价：',i['close']  ,'\n')
     
     lastK = K
     lastD = D
@@ -109,7 +105,7 @@ def get_KDJ(i,index):
     
 
 
-def check_sell(K,D,J,lastK,lastD,lastJ,close,buy):
+def check_sell(K,D,J,lastK,lastD,lastJ,buy):
     global lastBuy
     global buynum
     isSend = False
@@ -126,34 +122,31 @@ def check_sell(K,D,J,lastK,lastD,lastJ,close,buy):
 if __name__ == '__main__':
    
     
-    while True:
-        
-        try:
-            test = huobi.get_kline('eosusdt','1min',1)
-            test['data'].reverse()
-#             test = client.getKline(1,"eos_usdt")
-            print(test['data'])
+#     while True:
+#         
+#         lastId = 0
+#         count = 0
+#         
+#         try:
+#             test = huobi.get_kline('eosusdt','1min',1)
+#             test['data'].reverse()
+#             print(test['data'])
+#             
+#             if lastId != test['data'][0]['id']:
+#                 get_KDJ(test['data'][0],count)
+#                 count += 1
+#             
+#             time.sleep(1)
+#         except:
+#             print('connect ws error,retry...')
 #             time.sleep(5)
-        except:
-            print('connect ws error,retry...')
-            time.sleep(5)
-  
-    count = 0
-    for i in test['data']:
-        get_KDJ(i,count)
-        count += 1
-  
-     
-    balance += (len(constant.buyPackage)*constant.prices[-1]*0.998)
-    print ('卖出',constant.buyPackage,'单价：',constant.prices[-1],'余额',balance,'\n')
-    constant.buyPackage = []
-      
-    print (balance)
-    print (constant.buyPackage)
     
-    
-    
-     
+#     print(huobi.get_balance())
+#     print(huobi.send_order(1, "api", "xrpusdt", "buy-limit", "0.4820"))
+    orders = myHuo.getAllOrder("eosusdt")
+    for order in orders:
+        order.printTransaction()
+
     
     
     
