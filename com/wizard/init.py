@@ -151,7 +151,9 @@ def get_KDJ(data):
                 balance -= i['close']
                 lastBuy = i['close']
                       
-                constant.buyPackage.append(lastBuy)
+#                 constant.buyPackage.append(lastBuy)
+                constant.sendBuy('dev', 1, i['close'], 'eosusdt')
+                
                 print ('购买',i['close'],'余额',balance,"index=",data.index(i))
         
         elif avgFlag and buy == 0 and amountFlag and allGap:
@@ -160,7 +162,8 @@ def get_KDJ(data):
                 buyy.append(i['close'])
                 balance -= i['close']
                 lastBuy = i['close']
-                constant.buyPackage.append(lastBuy)
+#                 constant.buyPackage.append(lastBuy)
+                constant.sendBuy('dev', 1, i['close'], 'eosusdt')
 
                 print ('购买',i['close'],'余额',balance)
             elif lowest  and tacAmount.judgeRisk(data.index(i)) and tacBoll.judgeBoll(i['close']) and allGap:
@@ -168,18 +171,18 @@ def get_KDJ(data):
             
         if check_sell(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             
-            listPrice = constant.canSell(i['close'],'dev')
+            transactions = constant.canSell('dev',i['close'])
             
-            if len(listPrice) > 0:
-                constant.sell(listPrice)
+            if len(transactions) > 0:
+                constant.sell('dev',transactions)
             
                 buy = 0
                 sendx.append(data.index(i))
                 sendy.append(i['close'])
                 
-                balance += (len(listPrice)*i['close']*0.998)
+                balance += (len(transactions)*i['close']*0.998)
                 buynum = 0
-                print ('卖出',listPrice,'单价：',i['close'],'余额',balance,'\n')
+                print ('卖出',transactions,'单价：',i['close'],'余额',balance,'\n')
         
         lastK = K
         lastD = D
@@ -262,9 +265,9 @@ if __name__ == '__main__':
     KDJ = get_KDJ(test['data'])
 
     ax1.plot(klinex, kliney, label='xrpusdt')
-#     ax1.plot(MA60XY[0], MA60XY[1], label='ma60')
-#     ax1.plot(MA30XY[0], MA30XY[1], label='ma30')
-#     ax1.plot(MA10XY[0], MA10XY[1], label='ma10')
+    ax1.plot(MA60XY[0], MA60XY[1], label='ma60')
+    ax1.plot(MA30XY[0], MA30XY[1], label='ma30')
+    ax1.plot(MA10XY[0], MA10XY[1], label='ma10')
 
 #     ax1.plot(KDJ[6][0], KDJ[6][1], color='green',label='bollup')
 #     ax1.plot(KDJ[7][0], KDJ[7][1], color='red',label='bolldown')
@@ -280,8 +283,8 @@ if __name__ == '__main__':
 #     ax2.xaxis.set_major_locator(xmajorLocator)
 #     ax3.xaxis.set_major_locator(xmajorLocator)
    
-    balance += (len(constant.buyPackage)*constant.prices[-1]*0.998)
-    print ('卖出',constant.buyPackage,'单价：',constant.prices[-1],'余额',balance,'\n')
+    balance += (len(constant.getBuyPackage('eosusdt'))*constant.prices[-1]*0.998)
+    print ('卖出',constant.getBuyPackage('eosusdt'),'单价：',constant.prices[-1],'余额',balance,'\n')
     constant.buyPackage = []
     
     print (balance)

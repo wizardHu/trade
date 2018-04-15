@@ -7,7 +7,13 @@ import TacticsAmount as tacAmount
 import TacticsBoll as tacBoll
 import globalUtil as constant
 import time
-import MyHuobiService as myHuo
+import logging
+
+# 1.初始化日志默认配置
+logging.basicConfig(filename='./my.log',                                                 # 日志输出文件
+                    level=logging.INFO,                                                 # 日志写入级别
+                    datefmt='%Y-%m-%d %H:%M:%S',                                         # 时间格式
+                    format='%(asctime)s Line:%(lineno)s==>%(message)s')    # 日志写入格式
 
 balance = 0
 lastBuy = 0
@@ -25,7 +31,7 @@ lastJ = 50
 buy = 0
 
 
-def get_KDJ(i,index):
+def get_KDJ(i,index,evn):
     global lastBuy
     global packageBuy
     global buynum
@@ -60,44 +66,48 @@ def get_KDJ(i,index):
     kdjFlag = tac.judgeBuy(i,index)
     lowest = tacAmount.isLowest(i['close']);
     rsiflag = tacRsi.rsiJudgeBuy(i, index, 12)
+    allGap = constant.juideAllGap(i['close'],'pro')
+    risk = tacAmount.judgeRisk(index)
+    gap = constant.juideGap()
+    boll = tacBoll.judgeBoll(i['close'])
+    
+    if evn == 'init':
+        return
+    
+    logging.info("avgFlag={} amountFlag={} allGap={} kdjFlag={} rsiflag={}  lowest={}  risk={}  boll={} gap={} nextBuy={} \n"
+          .format(avgFlag,amountFlag,allGap, kdjFlag,rsiflag,lowest,risk,boll,gap,constant.nextBuy))
     
     if constant.nextBuy == 1:
         constant.nextBuy = 0
-        if constant.juideGap():
+        if gap:
             lastBuy = i['close']
             
-            #挂单
-            
-            constant.buyPackage.append(lastBuy)
-            print ('购买',i['close'],"index=",index)
+            constant.sendBuy('pro', 1, i['close'], 'eosusdt')
+            logging.info ('购买',i['close'],"index=",index)
     
-    elif avgFlag and buy == 0 and amountFlag:
+    elif avgFlag and buy == 0 and amountFlag and allGap:
         if kdjFlag and rsiflag :
             lastBuy = i['close']
-            constant.buyPackage.append(lastBuy)
+            constant.sendBuy('pro', 1, i['close'], 'eosusdt')
             
-            #挂单
-            
-            print ('购买',i['close'] )
-        elif lowest  and tacAmount.judgeRisk(index)   and tacBoll.judgeBoll(i['close']):
+            logging.info ('购买',i['close'] )
+        elif lowest  and risk   and boll and allGap:
             constant.nextBuy = 1
         
     if check_sell(K, D, J, lastK, lastD, lastJ,  buy):
         
-        listPrice = constant.canSell(i['close'])
+        transactions = constant.canSell('pro',i['close'])
         
-        if len(listPrice) > 0:
-            constant.sell(listPrice)
+        if len(transactions) > 0:
+            constant.sell('pro',transactions)
         
             buy = 0
             sendx.append(index)
             sendy.append(i['close'])
             
-            
             buynum = 0
             
-            #挂单
-            print ('卖出',listPrice,'单价：',i['close']  ,'\n')
+            logging.info ('卖出',transactions,'单价：',i['close']  ,'\n')
     
     lastK = K
     lastD = D
@@ -121,32 +131,33 @@ def check_sell(K,D,J,lastK,lastD,lastJ,buy):
 
 if __name__ == '__main__':
    
+    test = huobi.get_kline('eosusdt','1min',1200)
+    test['data'].reverse()
+    for i in test['data']:  
+        get_KDJ(i,test['data'].index(i),'init')
     
-#     while True:
-#         
-#         lastId = 0
-#         count = 0
-#         
-#         try:
-#             test = huobi.get_kline('eosusdt','1min',1)
-#             test['data'].reverse()
-#             print(test['data'])
-#             
-#             if lastId != test['data'][0]['id']:
-#                 get_KDJ(test['data'][0],count)
-#                 count += 1
-#             
-#             time.sleep(1)
-#         except:
-#             print('connect ws error,retry...')
-#             time.sleep(5)
-    
-#     print(huobi.get_balance())
-#     print(huobi.send_order(1, "api", "xrpusdt", "buy-limit", "0.4820"))
-    orders = myHuo.getAllOrder("eosusdt")
-    for order in orders:
-        order.printTransaction()
-
+    while True:
+         
+        lastId = 0
+        count = 0
+         
+        try:
+            test = huobi.get_kline('eosusdt','1min',1)
+            test['data'].reverse()
+            logging.info(test['data'])
+             
+            if lastId != test['data'][0]['id']:
+                get_KDJ(test['data'][0],count,'pro')
+                count += 1
+                print(lastId,test['data'][0]['id'])
+                lastId = test['data'][0]['id']
+                
+             
+            time.sleep(1)
+        except:
+            logging.info('connect https error,retry...')
+            time.sleep(5)
+     
     
     
     

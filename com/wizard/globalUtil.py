@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import time
+
 import MyHuobiService as myHuo
+from Transaction import Transaction
+
 
 prices = []
 amount = []
@@ -43,47 +47,49 @@ def add(data,index):
         closeGap = closeGap[1:]
         
 #获取买入记录
-def getBuyPackage(evn,symbol):
+def getBuyPackage(symbol):
     
-    global buyPackage
-    
-    if evn == 'pro':
-        return myHuo.getOrderFromFile()
-    else:
-        return buyPackage
+    return myHuo.getOrderFromFile()
     
 #获取订单状态
-def getOrderStatus(evn):
-    
-    global buyPackage
+def getOrderStatus(evn,orderId):
     
     if evn == 'pro':
-        return myHuo.getOrderFromFile()
+        return myHuo.getOrderStatus(orderId)
     else:
-        return buyPackage
+        return 'filled'
 
-    
-def canSell(price,evn):
+
+#判断是否可卖
+def canSell(evn,price):
     global wait
     global ma10
     global closeGap
     
-    buyPackage = getBuyPackage(evn, 'eosusdt')#查询购买历史
+    buyPackage = getBuyPackage('eosusdt')#查询购买历史
     
     listPrice = []
     
-    for buyPrice in buyPackage:
+    for transaction in buyPackage:
+        
+        state = getOrderStatus(evn,transaction.orderId) #先判断订单的状态
+        
+        if state != 'filled':
+            continue
+        
+        buyPrice = float(transaction.price)
+        
         if buyPrice*1.007 <= price:
             ma = ma10[-2:]
             if len(ma) > 1:
                 if ma[0] >= ma[1]:# 十日均线向下
-                    listPrice.append(buyPrice) 
+                    listPrice.append(transaction) 
                 elif wait==0:# 向上 再等一期才卖
                     wait+=1
                     print (price ,"wait")
                 elif wait == 1:
                     wait = 0
-                    listPrice.append(buyPrice) 
+                    listPrice.append(transaction) 
     
     flag = True
     for gap in closeGap[-50:]:#最新50期中，这一期是不是最大
@@ -96,11 +102,15 @@ def canSell(price,evn):
     
     return listPrice
 
-def sell(priceList):#挂卖单
-    global buyPackage
+#挂卖单
+def sell(evn,transactions):
     
-    for price in priceList:
-        buyPackage.remove(price)
+    for transaction in transactions:
+        
+        if evn == 'pro':
+            myHuo.sendOrder(1, transaction.price, 'eosusdt', 'sell-limit')
+        
+        delMsgFromFile(transaction.getValue())
         
 def getMa(period):
     global prices
@@ -114,8 +124,12 @@ def getMa(period):
     
     return round(count/period,2)   
 
-def juideGap():#两期差距不到0.2%就可以买
+#两期差距不到0.2%就可以买
+def juideGap():
     global prices
+    
+    if len(prices)<2:
+        return False
     
     curPrice = prices[-1]
     lastPrice = prices[-2]
@@ -130,10 +144,14 @@ def juideGap():#两期差距不到0.2%就可以买
     
     return False
 
-def juideAllGap(price,evn):#拿当前价格和以往买过的对比，差距在0.2%内的不买
-    buyPackage = getBuyPackage(evn, 'eosusdt')#查询购买历史 #查询购买历史
+#拿当前价格和以往买过的对比，差距在0.2%内的不买
+def juideAllGap(price,evn):
+    buyPackage = getBuyPackage( 'eosusdt')#查询购买历史 #查询购买历史
     
-    for buyPrice in buyPackage:
+    for transaction in buyPackage:
+        
+        buyPrice = float(transaction.price)
+        
         gap = abs(buyPrice-price)
         times = gap/buyPrice
         if times < 0.002:
@@ -141,6 +159,17 @@ def juideAllGap(price,evn):#拿当前价格和以往买过的对比，差距在0
     
     return True
 
+#买入
+def sendBuy(evn,amount,price,symbol):
+    
+    orderId = 0
+    
+    if evn == 'pro':
+        orderId = myHuo.sendOrder(amount, price, symbol, 'buy-limit')
+         
+    index = int(round(time.time() * 1000))
+    transaction = Transaction(price,index,amount,orderId,0)
+    write(transaction.getValue())
 
 def write(msg):
     f = open('buy','a',encoding='utf-8')
@@ -181,13 +210,14 @@ def delMsgFromFile(msg):
 
 if __name__ == '__main__':
     
-    write("qw1,er1,121")
-    write("qw2,er2,122")
-        
-    delMsgFromFile('qw1,er1,121')
-    write("qw3,er4,125")
-    
-    lines = readAll()
-    for line in lines:
-        print(line)
+#     write("qw1,er1,121")
+#     write("qw2,er2,122")
+#         
+#     delMsgFromFile('qw1,er1,121')
+#     write("qw3,er4,125")
+#     
+#     lines = readAll()
+#     for line in lines:
+#         print(line)
+    print(myHuo.getAllOrder("eosusdt"))
     

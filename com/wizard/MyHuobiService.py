@@ -10,7 +10,7 @@ import time
 #获得所有的买记录
 def getAllOrder(symbol):
     result = huobi.orders_matchresults(symbol, "buy-limit", "2017-04-09")
-    
+    print(result)
     buyPackage = []
     
     if result['status'] == 'ok':
@@ -41,22 +41,33 @@ def getOrderFromFile():
     buys = constant.readAll()
     
     for order in buys:
-        params = order.split(',')
-        price = params[0]
-        amount = params[1]
-        orderId = params[2]
-        index = params[3]
-        #int(round(time.time() * 1000))
         
-        transaction = Transaction(price,index,amount,orderId)
-        buyPackage.append(transaction)
+        if order != '' and order != '\n':
+            params = order.split(',')
+            price = params[0]
+            amount = params[1]
+            orderId = params[2]
+            index = params[3]
+            isSpecial = params[4]
+            
+            transaction = Transaction(price,index,amount,orderId,isSpecial)
+            buyPackage.append(transaction)
     
     return buyPackage
 
+#获得订单状态
 def getOrderStatus(orderId):
     result = huobi.order_info(orderId)
     data = result['data']
     state = data['state']
     
     return state
-        
+
+#下单
+def sendOrder(amount,price,symbol,types):
+    result = huobi.send_order(amount, "api", symbol, types, price)
+    
+    if result['status'] == 'ok':
+        return result['data']
+    
+    return 0

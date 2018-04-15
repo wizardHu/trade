@@ -17,14 +17,14 @@ import requests
 
 # 此处填写APIKEY
 
-ACCESS_KEY = " "
-SECRET_KEY = " "
+ACCESS_KEY = "8419e46c-b85831c9-8f1c62d2-f226c"
+SECRET_KEY = ""
 
 
 
 # API 请求地址
 MARKET_URL = "https://api.huobipro.com"
-TRADE_URL = "https://api.huobipro.com"
+TRADE_URL = " https://api.huobipro.com"
 
 # 首次运行可通过get_accounts()获取acct_id,然后直接赋值,减少重复获取。
 ACCOUNT_ID = None
@@ -81,7 +81,7 @@ def api_key_get(params, request_path):
 
     host_url = TRADE_URL
     host_name = urllib.parse.urlparse(host_url).hostname
-    host_name = host_name.lower()
+    host_name = "api.huobipro.com"
     params['Signature'] = createSign(params, method, host_name, request_path, SECRET_KEY)
 
     url = host_url + request_path
@@ -98,7 +98,7 @@ def api_key_post(params, request_path):
 
     host_url = TRADE_URL
     host_name = urllib.parse.urlparse(host_url).hostname
-    host_name = host_name.lower()
+    host_name = "api.huobipro.com"
     params_to_sign['Signature'] = createSign(params_to_sign, method, host_name, request_path, SECRET_KEY)
     url = host_url + request_path + '?' + urllib.parse.urlencode(params_to_sign)
     return http_post_request(url, params)

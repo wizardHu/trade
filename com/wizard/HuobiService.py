@@ -92,7 +92,7 @@ def get_symbols(long_polling=None):
 Trade/Account API
 '''
 
-
+ACCOUNT_ID = 
 def get_accounts():
     """
     :return: 
@@ -101,7 +101,7 @@ def get_accounts():
     params = {}
     return api_key_get(params, path)
 
-ACCOUNT_ID = 0
+
 # 获取当前账户资产
 def get_balance(acct_id=None):
     """
@@ -235,7 +235,7 @@ def orders_matchresults(symbol, types=None, start_date=None, end_date=None, _fro
     params = {'symbol': symbol}
 
     if types:
-        params[types] = types
+        params['types'] = types
     if start_date:
         params['start-date'] = start_date
     if end_date:
