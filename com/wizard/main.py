@@ -83,20 +83,24 @@ def get_KDJ(i,index,evn):
             lastBuy = i['close']
             
             constant.sendBuy('pro', 1, i['close'], 'eosusdt')
-            logging.info ('购买',i['close'],"index=",index)
+            logging.info('购买',i['close'],"index=",index)
     
     elif avgFlag and buy == 0 and amountFlag and allGap:
         if kdjFlag and rsiflag :
             lastBuy = i['close']
             constant.sendBuy('pro', 1, i['close'], 'eosusdt')
             
-            logging.info ('购买',i['close'] )
+            logging.info('购买',i['close'] )
         elif lowest  and risk   and boll and allGap:
             constant.nextBuy = 1
-        
-    if check_sell(K, D, J, lastK, lastD, lastJ,  buy):
+    
+    ckeckSell = check_sell(K, D, J, lastK, lastD, lastJ,  buy)
+    logging.info("ckeckSell={} K={}, D={}, J={}, lastK={}, lastD={}, lastJ={},  buy={}".format(ckeckSell,K, D, J, lastK, lastD, lastJ,  buy))
+    
+    if ckeckSell:
         
         transactions = constant.canSell('pro',i['close'])
+        logging.info("transactions={}".format(transactions))
         
         if len(transactions) > 0:
             constant.sell('pro',transactions)
@@ -107,7 +111,7 @@ def get_KDJ(i,index,evn):
             
             buynum = 0
             
-            logging.info ('卖出',transactions,'单价：',i['close']  ,'\n')
+            logging.info('卖出',transactions,'单价：',i['close']  ,'\n')
     
     lastK = K
     lastD = D
@@ -136,23 +140,26 @@ if __name__ == '__main__':
     for i in test['data']:  
         get_KDJ(i,test['data'].index(i),'init')
     
+    lastId = 0
+    count = 0
+    lastDate = huobi.get_kline('eosusdt','1min',1)
+    
     while True:
-         
-        lastId = 0
-        count = 0
          
         try:
             test = huobi.get_kline('eosusdt','1min',1)
             test['data'].reverse()
             logging.info(test['data'])
-             
-            if lastId != test['data'][0]['id']:
-                get_KDJ(test['data'][0],count,'pro')
+            
+            if lastId != test['data'][0]['id'] : 
+                
+                logging.info(lastDate['data'])
+                get_KDJ(lastDate['data'][0],count,'pro')
                 count += 1
-                print(lastId,test['data'][0]['id'])
+                 
                 lastId = test['data'][0]['id']
                 
-             
+            lastDate = test
             time.sleep(1)
         except:
             logging.info('connect https error,retry...')

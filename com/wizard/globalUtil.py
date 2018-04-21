@@ -73,7 +73,7 @@ def canSell(evn,price):
     for transaction in buyPackage:
         
         state = getOrderStatus(evn,transaction.orderId) #先判断订单的状态
-        
+         
         if state != 'filled':
             continue
         
@@ -219,5 +219,5 @@ if __name__ == '__main__':
 #     lines = readAll()
 #     for line in lines:
 #         print(line)
-    print(myHuo.getAllOrder("eosusdt"))
+    print(getAllOrder("eosusdt"))
     
