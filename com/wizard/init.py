@@ -148,11 +148,11 @@ def get_KDJ(data):
             if constant.juideGap():
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
-                balance -= i['close']
+                balance -= (i['close']*2)
                 lastBuy = i['close']
                       
 #                 constant.buyPackage.append(lastBuy)
-                constant.sendBuy('dev', 1, i['close'], 'eosusdt')
+                constant.sendBuy('dev', 2, i['close'], 'eosusdt')
                 
                 print ('购买',i['close'],'余额',balance,"index=",data.index(i))
         
@@ -160,10 +160,10 @@ def get_KDJ(data):
             if kdjFlag and rsiflag :
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
-                balance -= i['close']
+                balance -= (i['close']*2)
                 lastBuy = i['close']
 #                 constant.buyPackage.append(lastBuy)
-                constant.sendBuy('dev', 1, i['close'], 'eosusdt')
+                constant.sendBuy('dev', 2, i['close'], 'eosusdt')
 
                 print ('购买',i['close'],'余额',balance)
             elif lowest  and tacAmount.judgeRisk(data.index(i)) and tacBoll.judgeBoll(i['close']) and allGap:
@@ -180,7 +180,7 @@ def get_KDJ(data):
                 sendx.append(data.index(i))
                 sendy.append(i['close'])
                 
-                balance += (len(transactions)*i['close']*0.998)
+                balance += (len(transactions)*i['close']*0.998*2)
                 buynum = 0
                 print ('卖出',transactions,'单价：',i['close'],'余额',balance,'\n')
         
