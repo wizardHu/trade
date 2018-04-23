@@ -70,6 +70,7 @@ def get_KDJ(i,index,evn):
     risk = tacAmount.judgeRisk(index)
     gap = constant.juideGap()
     boll = tacBoll.judgeBoll(i['close'])
+    isHighPrice = constant.isLagerBigger(i['close'])
     
     if evn == 'init':
         lastK = K
@@ -77,8 +78,8 @@ def get_KDJ(i,index,evn):
         lastJ = J
         return
     
-    logging.info("avgFlag={} amountFlag={} allGap={} kdjFlag={} rsiflag={}  lowest={}  risk={}  boll={} gap={} nextBuy={} \n"
-          .format(avgFlag,amountFlag,allGap, kdjFlag,rsiflag,lowest,risk,boll,gap,constant.nextBuy))
+    logging.info("avgFlag={} amountFlag={} allGap={} kdjFlag={} rsiflag={}  lowest={}  risk={}  boll={} gap={} nextBuy={} isHighPrice={} \n"
+          .format(avgFlag,amountFlag,allGap, kdjFlag,rsiflag,lowest,risk,boll,gap,constant.nextBuy,isHighPrice))
     
     if constant.nextBuy == 1:
         constant.nextBuy = 0
@@ -89,13 +90,13 @@ def get_KDJ(i,index,evn):
 
             logging.info(('购买  {} index= {}').format(i['close'],index))
     
-    elif avgFlag and buy == 0 and amountFlag and allGap:
+    elif avgFlag and buy == 0 and amountFlag and allGap and isHighPrice:
         if kdjFlag and rsiflag :
             lastBuy = i['close']
             constant.sendBuy(evn, 2, i['close'], 'eosusdt')
             
             logging.info(('购买  {}').format(i['close']))
-        elif lowest  and risk   and boll and allGap:
+        elif lowest  and risk   and boll :
             constant.nextBuy = 1
     
     ckeckSell = check_sell(K, D, J, lastK, lastD, lastJ,  buy)

@@ -142,6 +142,7 @@ def get_KDJ(data):
         isfastLowAmount = tacAmount.isfastLowAmount( i['amount']);
         rsiflag = tacRsi.rsiJudgeBuy(i, data.index(i), 12)
         allGap = constant.juideAllGap(i['close'],'dev')
+        isHighPrice = constant.isLagerBigger(i['close'])
         
         if constant.nextBuy == 1:
             constant.nextBuy = 0
@@ -156,7 +157,7 @@ def get_KDJ(data):
                 
                 print ('购买',i['close'],'余额',balance,"index=",data.index(i))
         
-        elif avgFlag and buy == 0 and amountFlag and allGap:
+        elif avgFlag and buy == 0 and amountFlag and allGap and isHighPrice:
             if kdjFlag and rsiflag :
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
@@ -283,7 +284,7 @@ if __name__ == '__main__':
 #     ax2.xaxis.set_major_locator(xmajorLocator)
 #     ax3.xaxis.set_major_locator(xmajorLocator)
    
-    balance += (len(constant.getBuyPackage('eosusdt'))*constant.prices[-1]*0.998)
+    balance += (len(constant.getBuyPackage('eosusdt'))*constant.prices[-1]*0.998*2)
     print ('卖出',constant.getBuyPackage('eosusdt'),'单价：',constant.prices[-1],'余额',balance,'\n')
     constant.buyPackage = []
     

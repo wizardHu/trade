@@ -40,7 +40,7 @@ def add(data,index):
         ma = round(count/10,2)
         ma10.append(ma)
     
-    if len(prices) >300:
+    if len(prices) >720:
         prices = prices[1:]
         amount = amount[1:]
         ma10 = ma10[1:]
@@ -170,6 +170,17 @@ def sendBuy(evn,amount,price,symbol):
     index = int(round(time.time() * 1000))
     transaction = Transaction(price,index,amount,orderId,0)
     write(transaction.getValue())
+
+#判断是否比最近12小时的最大值要大
+def isLagerBigger(price):
+    global prices
+    
+    high = max(prices)
+     
+    if price >= high*0.985:
+        return False
+    
+    return True
 
 def write(msg):
     f = open('buy','a',encoding='utf-8')
