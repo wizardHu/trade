@@ -10,7 +10,7 @@ import time
 #获得所有的买记录
 def getAllOrder(symbol):
     result = huobi.orders_matchresults(symbol, "buy-limit", "2017-04-09")
-    print(result)
+     
     buyPackage = []
     
     if result['status'] == 'ok':
@@ -21,7 +21,7 @@ def getAllOrder(symbol):
             amount = order['filled-amount']
             orderId = order['order-id']
             
-            transaction = Transaction(price,index,amount,orderId)
+            transaction = Transaction(price,index,amount,orderId,0)
             buyPackage.append(transaction)
     
     return buyPackage

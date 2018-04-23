@@ -66,12 +66,15 @@ def get_KDJ(i,index,evn):
     kdjFlag = tac.judgeBuy(i,index)
     lowest = tacAmount.isLowest(i['close']);
     rsiflag = tacRsi.rsiJudgeBuy(i, index, 12)
-    allGap = constant.juideAllGap(i['close'],'pro')
+    allGap = constant.juideAllGap(i['close'],evn)
     risk = tacAmount.judgeRisk(index)
     gap = constant.juideGap()
     boll = tacBoll.judgeBoll(i['close'])
     
     if evn == 'init':
+        lastK = K
+        lastD = D
+        lastJ = J
         return
     
     logging.info("avgFlag={} amountFlag={} allGap={} kdjFlag={} rsiflag={}  lowest={}  risk={}  boll={} gap={} nextBuy={} \n"
@@ -82,15 +85,16 @@ def get_KDJ(i,index,evn):
         if gap:
             lastBuy = i['close']
             
-            constant.sendBuy('pro', 1, i['close'], 'eosusdt')
-            logging.info('购买',i['close'],"index=",index)
+            constant.sendBuy(evn, 2, i['close'], 'eosusdt')
+
+            logging.info(('购买  {} index= {}').format(i['close'],index))
     
     elif avgFlag and buy == 0 and amountFlag and allGap:
         if kdjFlag and rsiflag :
             lastBuy = i['close']
-            constant.sendBuy('pro', 1, i['close'], 'eosusdt')
+            constant.sendBuy(evn, 2, i['close'], 'eosusdt')
             
-            logging.info('购买',i['close'] )
+            logging.info(('购买  {}').format(i['close']))
         elif lowest  and risk   and boll and allGap:
             constant.nextBuy = 1
     
@@ -99,11 +103,11 @@ def get_KDJ(i,index,evn):
     
     if ckeckSell:
         
-        transactions = constant.canSell('pro',i['close'])
+        transactions = constant.canSell(evn,i['close'])
         logging.info("transactions={}".format(transactions))
         
         if len(transactions) > 0:
-            constant.sell('pro',transactions)
+            constant.sell(evn,transactions)
         
             buy = 0
             sendx.append(index)
@@ -111,7 +115,7 @@ def get_KDJ(i,index,evn):
             
             buynum = 0
             
-            logging.info('卖出',transactions,'单价：',i['close']  ,'\n')
+            logging.info(('卖出 {} 单价：{}  \n').format(transactions,i['close']))
     
     lastK = K
     lastD = D

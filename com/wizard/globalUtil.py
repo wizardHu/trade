@@ -108,7 +108,7 @@ def sell(evn,transactions):
     for transaction in transactions:
         
         if evn == 'pro':
-            myHuo.sendOrder(1, transaction.price, 'eosusdt', 'sell-limit')
+            myHuo.sendOrder(2, transaction.price, 'eosusdt', 'sell-limit')
         
         delMsgFromFile(transaction.getValue())
         
