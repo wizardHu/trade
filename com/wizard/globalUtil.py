@@ -177,7 +177,7 @@ def isLagerBigger(price):
     
     high = max(prices)
      
-    if price >= high*0.985:
+    if price >= high*0.93:
         return False
     
     return True
