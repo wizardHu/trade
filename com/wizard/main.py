@@ -140,7 +140,7 @@ def check_sell(K,D,J,lastK,lastD,lastJ,buy):
 
 if __name__ == '__main__':
    
-    test = huobi.get_kline('eosusdt','1min',1200)
+    test = huobi.get_kline('eosusdt','1min',1000)
     test['data'].reverse()
     for i in test['data']:  
         get_KDJ(i,test['data'].index(i),'init')
@@ -166,7 +166,8 @@ if __name__ == '__main__':
                 
             lastDate = test
             time.sleep(1)
-        except:
+        except Exception as err:  
+            print(err)  
             logging.info('connect https error,retry...')
             time.sleep(5)
      
