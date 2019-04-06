@@ -143,36 +143,42 @@ def get_KDJ(data):
         rsiflag = tacRsi.rsiJudgeBuy(i, data.index(i), 12)
         allGap = constant.juideAllGap(i['close'],'dev')
         isHighPrice = constant.isLagerBigger(i['close'])
-        
+
+        # print("index=",data.index(i)," avgFlag=",avgFlag," kdjFlag=",kdjFlag," rsi=",rsiflag)
+
         if constant.nextBuy == 1:
             constant.nextBuy = 0
             if constant.juideGap():
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
-                balance -= (i['close']*2)
-                lastBuy = i['close']
-                      
-#                 constant.buyPackage.append(lastBuy)
-                constant.sendBuy('dev', 2, i['close'], 'eosusdt')
-                
-                print ('购买',i['close'],'余额',balance,"index=",data.index(i))
-        
-        elif avgFlag and buy == 0 and amountFlag and allGap and isHighPrice:
+#                 constant.buyPackage.append
+                shouldBuy = constant.getShouldByAmount(i['close'])
+                if shouldBuy>0:
+                    constant.sendBuy('dev', shouldBuy, i['close'], 'eosusdt')
+                    balance -= (i['close'] * shouldBuy)
+                    lastBuy = i['close']
+                    print ('购买', i['close'],' 个数=',shouldBuy, '余额', balance," 平均价=",constant.getBuyPriceAVG(), "index=", data.index(i))
+
+        elif avgFlag and buy == 0  and allGap and isHighPrice:
             if kdjFlag and rsiflag :
                 buyx.append(data.index(i))
                 buyy.append(i['close'])
-                balance -= (i['close']*2)
-                lastBuy = i['close']
-#                 constant.buyPackage.append(lastBuy)
-                constant.sendBuy('dev', 2, i['close'], 'eosusdt')
 
-                print ('购买',i['close'],'余额',balance)
+#                 constant.buyPackage.append(lastBuy)
+                shouldBuy = constant.getShouldByAmount(i['close'])
+                if shouldBuy > 0:
+                    constant.sendBuy('dev', shouldBuy, i['close'], 'eosusdt')
+                    balance -= (i['close'] * shouldBuy)
+                    lastBuy = i['close']
+                    print ('购买', i['close'], ' 个数=', shouldBuy, '余额', balance," 平均价=",constant.getBuyPriceAVG(), "index=", data.index(i))
+
+
             elif lowest  and tacAmount.judgeRisk(data.index(i)) and tacBoll.judgeBoll(i['close']) and allGap:
                 constant.nextBuy = 1#下一期买
             
         if check_sell(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             
-            transactions = constant.canSell('dev',i['close'])
+            transactions = constant.canSellv2('dev',i['close'])
             
             if len(transactions) > 0:
                 constant.sell('dev',transactions)
@@ -180,10 +186,15 @@ def get_KDJ(data):
                 buy = 0
                 sendx.append(data.index(i))
                 sendy.append(i['close'])
-                
-                balance += (len(transactions)*i['close']*0.998*2)
+
+                sellCount = 0;
+
+                for transaction in transactions:
+                    sellCount = sellCount + float(transaction.amount);
+
+                balance += (sellCount*i['close']*0.998)
                 buynum = 0
-                print ('卖出',transactions,'单价：',i['close'],'余额',balance,'\n')
+                print ('卖出',transactions," 总数=",sellCount,'单价：',i['close'],'余额',balance,'\n')
         
         lastK = K
         lastD = D
@@ -244,8 +255,8 @@ if __name__ == '__main__':
    
     fig = plt.figure()
     
-    test = huobi.get_kline('eosusdt','1min',1000)
-#     test = aa.test0
+    test = huobi.get_kline('eosusdt','1min',2000)
+    # test = aa.test0
     
     test['data'].reverse()
 #     test = client.getKline(1200,"eos_usdt")
@@ -266,15 +277,15 @@ if __name__ == '__main__':
     KDJ = get_KDJ(test['data'])
 
     ax1.plot(klinex, kliney, label='xrpusdt')
-#     ax1.plot(MA60XY[0], MA60XY[1], label='ma60')
-#     ax1.plot(MA30XY[0], MA30XY[1], label='ma30')
-#     ax1.plot(MA10XY[0], MA10XY[1], label='ma10')
+    # ax1.plot(MA60XY[0], MA60XY[1], label='ma60')
+    # ax1.plot(MA30XY[0], MA30XY[1], label='ma30')
+    # ax1.plot(MA10XY[0], MA10XY[1], label='ma10')
 
 #     ax1.plot(KDJ[6][0], KDJ[6][1], color='green',label='bollup')
 #     ax1.plot(KDJ[7][0], KDJ[7][1], color='red',label='bolldown')
     
     ax1.scatter(KDJ[3][0], KDJ[3][1],marker = 'x', color = 'm', label='1' )
-    ax1.scatter(KDJ[4][0], KDJ[4][1], label='1' )
+    ax1.scatter(KDJ[4][0], KDJ[4][1], label='1' , color = 'red')
     ax1.xaxis.set_major_locator(xmajorLocator)
     
 #     ax2.plot(KDJ[0][0], KDJ[0][1], color="red")
@@ -284,7 +295,7 @@ if __name__ == '__main__':
 #     ax2.xaxis.set_major_locator(xmajorLocator)
 #     ax3.xaxis.set_major_locator(xmajorLocator)
    
-    balance += (len(constant.getBuyPackage('eosusdt'))*constant.prices[-1]*0.998*2)
+    balance += (len(constant.getBuyPackage('eosusdt'))*constant.prices[-1]*0.998)
     print ('卖出',constant.getBuyPackage('eosusdt'),'单价：',constant.prices[-1],'余额',balance,'\n')
     constant.buyPackage = []
     

@@ -6,6 +6,8 @@ class Transaction:
     amount = 0.0
     orderId = 0
     isSpecial = 0
+    sellAmount = 0
+    sellPrice = 0
     
     def __init__(self,price,index,amount,orderId,isSpecial):
         self.price = price
@@ -21,7 +23,7 @@ class Transaction:
         return "{},{},{},{},{}".format(self.price,self.amount,self.orderId,self.index,self.isSpecial)
         
     def printTransaction(self):
-        print('price={} index={} amount={} orderId={} isSpecial={}'.format(self.price,self.index,self.amount,self.orderId,self.isSpecial)) 
+        print('price={} index={} amount={} orderId={} isSpecial={} sellAmount={} sellPrice={}'.format(self.price,self.index,self.amount,self.orderId,self.isSpecial,self.sellAmount,self.sellPrice))
     
     def __str__(self):
         return "{}".format(self.price)
