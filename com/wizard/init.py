@@ -175,7 +175,7 @@ def get_KDJ(data):
 
             elif lowest  and tacAmount.judgeRisk(data.index(i)) and tacBoll.judgeBoll(i['close']) and allGap:
                 constant.nextBuy = 1#下一期买
-            
+
         if check_sell(K, D, J, lastK, lastD, lastJ, i['close'], buy):
             
             transactions = constant.canSellv2('dev',i['close'])
@@ -294,8 +294,13 @@ if __name__ == '__main__':
 #     ax2.plot(KDJ[5][0], KDJ[5][1], color='green')
 #     ax2.xaxis.set_major_locator(xmajorLocator)
 #     ax3.xaxis.set_major_locator(xmajorLocator)
-   
-    balance += (len(constant.getBuyPackage('eosusdt'))*constant.prices[-1]*0.998)
+
+    buyPackage = constant.getBuyPackage('eosusdt')
+    count = 0
+    for tran in buyPackage:
+        count = count + float(tran.amount)
+
+    balance += (count*constant.prices[-1]*0.998)
     print ('卖出',constant.getBuyPackage('eosusdt'),'单价：',constant.prices[-1],'余额',balance,'\n')
     constant.buyPackage = []
     

@@ -84,18 +84,20 @@ def get_KDJ(i,index,evn):
     if constant.nextBuy == 1:
         constant.nextBuy = 0
         if gap:
-            lastBuy = i['close']
-            
-            constant.sendBuy(evn, 2, i['close'], 'eosusdt')
+            shouldBuy = constant.getShouldByAmount(i['close'])
+            if shouldBuy > 0:
+                constant.sendBuy(evn, shouldBuy, i['close'], 'eosusdt')
+                logging.info(('购买  {} {}个 index= {}').format(i['close'],shouldBuy, index))
+                lastBuy = i['close']
 
-            logging.info(('购买  {} index= {}').format(i['close'],index))
-    
-    elif avgFlag and buy == 0 and amountFlag and allGap and isHighPrice:
+    elif avgFlag and buy == 0 and allGap and isHighPrice:
         if kdjFlag and rsiflag :
-            lastBuy = i['close']
-            constant.sendBuy(evn, 2, i['close'], 'eosusdt')
-            
-            logging.info(('购买  {}').format(i['close']))
+            shouldBuy = constant.getShouldByAmount(i['close'])
+            if shouldBuy > 0:
+                constant.sendBuy(evn, shouldBuy, i['close'], 'eosusdt')
+                logging.info(('购买  {} {}个 index= {}').format(i['close'], shouldBuy, index))
+                lastBuy = i['close']
+
         elif lowest  and risk   and boll :
             constant.nextBuy = 1
     
@@ -104,7 +106,7 @@ def get_KDJ(i,index,evn):
     
     if ckeckSell:
         
-        transactions = constant.canSell(evn,i['close'])
+        transactions = constant.canSellV2(evn,i['close'])
         logging.info("transactions={}".format(transactions))
         
         if len(transactions) > 0:

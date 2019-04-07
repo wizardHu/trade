@@ -4,6 +4,7 @@ import time
 
 import MyHuobiService as myHuo
 from Transaction import Transaction
+import HuobiService as huobi
 
 
 prices = []
@@ -175,7 +176,7 @@ def juideGap():
     
     return False
 
-#拿当前价格和以往买过的对比，差距在0.2%内的不买
+#拿当前价格和以往买过的对比，差距在0.5%内的不买
 def juideAllGap(price,evn):
     buyPackage = getBuyPackage( 'eosusdt')#查询购买历史 #查询购买历史
     
@@ -185,7 +186,7 @@ def juideAllGap(price,evn):
         
         gap = abs(buyPrice-price)
         times = gap/buyPrice
-        if times < 0.002:
+        if times < 0.005:
             return False
     
     return True
@@ -292,7 +293,10 @@ def delMsgFromFile(msg):
 
 
 if __name__ == '__main__':
-    
+    print(1)
+    # print(huobi.get_accounts())
+    # myHuo.sendOrder(1,0.3570,'xrpusdt','buy-limit')
+    # myHuo.sendOrder(1,0.5,'xrpusdt','sell-limit')
 #     write("qw1,er1,121")
 #     write("qw2,er2,122")
 #         
@@ -302,5 +306,3 @@ if __name__ == '__main__':
 #     lines = readAll()
 #     for line in lines:
 #         print(line)
-    print(getAllOrder("eosusdt"))
-    

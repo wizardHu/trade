@@ -92,15 +92,16 @@ def get_symbols(long_polling=None):
 Trade/Account API
 '''
 
-ACCOUNT_ID = '0'
+ACCOUNT_ID = 1057795
 def get_accounts():
     """
     :return: 
     """
     path = "/v1/account/accounts"
     params = {}
-    return api_key_get(params, path)
-
+    # return api_key_get(params, path)
+    # return ACCOUNT_ID;
+    return {'status': 'ok', 'data': [{'id': 1057795, 'type': 'spot', 'subtype': '', 'state': 'working'}]};
 
 # 获取当前账户资产
 def get_balance(acct_id=None):
