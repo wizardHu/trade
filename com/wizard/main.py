@@ -78,7 +78,7 @@ def get_KDJ(i,index,evn):
         lastJ = J
         return
     
-    logging.info("avgFlag={} amountFlag={} allGap={} kdjFlag={} rsiflag={}  lowest={}  risk={}  boll={} gap={} nextBuy={} isHighPrice={} \n"
+    logging.info("avgFlag={} amountFlag={} allGap={} kdjFlag={} rsiflag={}  lowest={}  risk={}  boll={} gap={} nextBuy={} isHighPrice={}"
           .format(avgFlag,amountFlag,allGap, kdjFlag,rsiflag,lowest,risk,boll,gap,constant.nextBuy,isHighPrice))
     
     if constant.nextBuy == 1:
@@ -89,7 +89,7 @@ def get_KDJ(i,index,evn):
                 constant.sendBuy(evn, shouldBuy, i['close'], 'eosusdt')
                 logging.info(('购买  {} {}个 index= {}').format(i['close'],shouldBuy, index))
                 lastBuy = i['close']
-                constant.writeTradeRecord(('购买  {} {}个  {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
+                constant.writeTradeRecord(('1 {} {} {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
 
     elif avgFlag and buy == 0 and allGap and isHighPrice:
         if kdjFlag and rsiflag :
@@ -98,17 +98,17 @@ def get_KDJ(i,index,evn):
                 constant.sendBuy(evn, shouldBuy, i['close'], 'eosusdt')
                 logging.info(('购买  {} {}个 index= {}').format(i['close'], shouldBuy, index))
                 lastBuy = i['close']
-                constant.writeTradeRecord(('购买  {} {}个  {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
+                constant.writeTradeRecord(('1 {} {} {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
 
         elif lowest  and risk   and boll :
             constant.nextBuy = 1
     
     ckeckSell = check_sell(K, D, J, lastK, lastD, lastJ,  buy)
-    logging.info("ckeckSell={} K={}, D={}, J={}, lastK={}, lastD={}, lastJ={},  buy={}".format(ckeckSell,K, D, J, lastK, lastD, lastJ,  buy))
+    logging.info("ckeckSell={} K={}, D={}, J={}, lastK={}, lastD={}, lastJ={},  buy={} \n".format(ckeckSell,K, D, J, lastK, lastD, lastJ,  buy))
     
     if ckeckSell:
         
-        transactions = constant.canSellV2(evn,i['close'])
+        transactions = constant.canSellv2(evn,i['close'])
         logging.info("transactions={}".format(transactions))
         
         if len(transactions) > 0:
@@ -166,14 +166,14 @@ if __name__ == '__main__':
                 get_KDJ(lastDate['data'][0],count,'pro')
                 count += 1
                  
-                lastId = test['data'][0]['id']
+                # lastId = test['data'][0]['id']
                 
             lastDate = test
             time.sleep(1)
         except Exception as err:  
             print(err)  
             logging.info('connect https error,retry...')
-            time.sleep(5)
+            time.sleep(1)
      
     
     

@@ -66,7 +66,7 @@ def getOrderStatus(orderId):
 #下单
 def sendOrder(amount,price,symbol,types):
     result = huobi.send_order(amount, "api", symbol, types, price)
-    
+    print(result)
     if result['status'] == 'ok':
         return result['data']
     

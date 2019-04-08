@@ -143,7 +143,7 @@ def sell(evn,transactions):
             myHuo.sendOrder(transaction.amount, transaction.sellPrice, 'eosusdt', 'sell-limit')
         
         delMsgFromFile(transaction.getValue())
-        writeTradeRecord(('卖出  {} {}个  单价{} {}').format(transaction.price, transaction.amount,transaction.sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
+        writeTradeRecord(('0 {} {} {} {}').format(transaction.price, transaction.amount,transaction.sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
         
 def getMa(period):
     global prices
@@ -300,9 +300,8 @@ def delMsgFromFile(msg):
 
 
 if __name__ == '__main__':
-    print(1)
-    # print(huobi.get_accounts())
-    # myHuo.sendOrder(1,0.3570,'xrpusdt','buy-limit')
+    print(huobi.get_accounts())
+    # myHuo.sendOrder(1,0.2570,'xrpusdt','buy-limit')
     # myHuo.sendOrder(1,0.5,'xrpusdt','sell-limit')
 #     write("qw1,er1,121")
 #     write("qw2,er2,122")

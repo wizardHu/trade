@@ -158,7 +158,7 @@ def get_KDJ(data):
                     constant.sendBuy('dev', shouldBuy, i['close'], 'eosusdt')
                     balance -= (i['close'] * shouldBuy)
                     lastBuy = i['close']
-                    constant.writeTradeRecord(('购买  {} {}个  {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
+                    constant.writeTradeRecord(('1 {} {} {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
                     print ('购买', i['close'],' 个数=',shouldBuy, '余额', balance," 平均价=",constant.getBuyPriceAVG(), "index=", data.index(i))
 
         elif avgFlag and buy == 0  and allGap and isHighPrice:
@@ -172,7 +172,7 @@ def get_KDJ(data):
                     constant.sendBuy('dev', shouldBuy, i['close'], 'eosusdt')
                     balance -= (i['close'] * shouldBuy)
                     lastBuy = i['close']
-                    constant.writeTradeRecord(('购买  {} {}个  {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
+                    constant.writeTradeRecord(('1 {} {} {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
                     print ('购买', i['close'], ' 个数=', shouldBuy, '余额', balance," 平均价=",constant.getBuyPriceAVG(), "index=", data.index(i))
 
 
@@ -259,7 +259,7 @@ if __name__ == '__main__':
    
     fig = plt.figure()
     
-    test = huobi.get_kline('eosusdt','1min',2000)
+    test = huobi.get_kline('eosusdt','1min',1000)
     # test = aa.test0
     
     test['data'].reverse()
