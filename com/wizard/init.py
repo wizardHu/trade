@@ -13,6 +13,7 @@ import CalAmount as calAmounts
 import globalUtil as constant
 import aaa as aa
 import Client as client
+import time
 
 balance = 0
 lastBuy = 0
@@ -157,6 +158,7 @@ def get_KDJ(data):
                     constant.sendBuy('dev', shouldBuy, i['close'], 'eosusdt')
                     balance -= (i['close'] * shouldBuy)
                     lastBuy = i['close']
+                    constant.writeTradeRecord(('购买  {} {}个  {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
                     print ('购买', i['close'],' 个数=',shouldBuy, '余额', balance," 平均价=",constant.getBuyPriceAVG(), "index=", data.index(i))
 
         elif avgFlag and buy == 0  and allGap and isHighPrice:
@@ -170,6 +172,7 @@ def get_KDJ(data):
                     constant.sendBuy('dev', shouldBuy, i['close'], 'eosusdt')
                     balance -= (i['close'] * shouldBuy)
                     lastBuy = i['close']
+                    constant.writeTradeRecord(('购买  {} {}个  {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
                     print ('购买', i['close'], ' 个数=', shouldBuy, '余额', balance," 平均价=",constant.getBuyPriceAVG(), "index=", data.index(i))
 
 
@@ -194,6 +197,7 @@ def get_KDJ(data):
 
                 balance += (sellCount*i['close']*0.998)
                 buynum = 0
+                
                 print ('卖出',transactions," 总数=",sellCount,'单价：',i['close'],'余额',balance,'\n')
         
         lastK = K
@@ -303,6 +307,7 @@ if __name__ == '__main__':
     balance += (count*constant.prices[-1]*0.998)
     print ('卖出',constant.getBuyPackage('eosusdt'),'单价：',constant.prices[-1],'余额',balance,'\n')
     constant.buyPackage = []
+    constant.delAll()
     
     print (balance)
     print (constant.buyPackage)

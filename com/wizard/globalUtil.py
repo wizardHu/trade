@@ -143,6 +143,7 @@ def sell(evn,transactions):
             myHuo.sendOrder(transaction.amount, transaction.sellPrice, 'eosusdt', 'sell-limit')
         
         delMsgFromFile(transaction.getValue())
+        writeTradeRecord(('卖出  {} {}个  单价{} {}').format(transaction.price, transaction.amount,transaction.sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
         
 def getMa(period):
     global prices
@@ -257,6 +258,12 @@ def isLagerBigger(price):
 
 def write(msg):
     f = open('buy','a',encoding='utf-8')
+    f.write("{0}\n".format(msg))
+    f.flush()
+    f.close()
+    
+def writeTradeRecord(msg):
+    f = open('tradeRecord','a',encoding='utf-8')
     f.write("{0}\n".format(msg))
     f.flush()
     f.close()

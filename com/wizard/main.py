@@ -89,6 +89,7 @@ def get_KDJ(i,index,evn):
                 constant.sendBuy(evn, shouldBuy, i['close'], 'eosusdt')
                 logging.info(('购买  {} {}个 index= {}').format(i['close'],shouldBuy, index))
                 lastBuy = i['close']
+                constant.writeTradeRecord(('购买  {} {}个  {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
 
     elif avgFlag and buy == 0 and allGap and isHighPrice:
         if kdjFlag and rsiflag :
@@ -97,6 +98,7 @@ def get_KDJ(i,index,evn):
                 constant.sendBuy(evn, shouldBuy, i['close'], 'eosusdt')
                 logging.info(('购买  {} {}个 index= {}').format(i['close'], shouldBuy, index))
                 lastBuy = i['close']
+                constant.writeTradeRecord(('购买  {} {}个  {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
 
         elif lowest  and risk   and boll :
             constant.nextBuy = 1
