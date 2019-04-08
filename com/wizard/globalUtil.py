@@ -80,7 +80,7 @@ def canSell(evn,price):
         
         buyPrice = float(transaction.price)
         
-        if buyPrice*1.007 <= price:
+        if buyPrice*1.01 <= price:
             ma = ma10[-2:]
             if len(ma) > 1:
                 if ma[0] >= ma[1]:# 十日均线向下
