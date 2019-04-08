@@ -4,6 +4,7 @@ import time
 
 import MyHuobiService as myHuo
 from Transaction import Transaction
+import HuobiService as huobi
 
 
 prices = []
@@ -102,13 +103,44 @@ def canSell(evn,price):
     
     return listPrice
 
+def canSellv2(evn,price):
+    buyPackage = getBuyPackage('eosusdt')  # 查询购买历史
+
+    listPrice = []
+    avgPrice = getBuyPriceAVG();
+
+    if avgPrice > 0:
+        avgGap = price - avgPrice;
+        avgGap = avgGap/avgPrice
+
+        if avgGap >= 0.02:
+            for transaction in buyPackage:
+                transaction.sellPrice = price;
+                listPrice.append(transaction)
+
+            return  listPrice
+
+
+    for transaction in buyPackage:
+        transactionPrice = transaction.price;
+
+        gap = price - float(transactionPrice)
+        gap = gap/float(transactionPrice)
+
+        if gap >= 0.02:
+            transaction.sellPrice = price;
+            listPrice.append(transaction)
+
+    return  listPrice
+
+
 #挂卖单
 def sell(evn,transactions):
     
     for transaction in transactions:
         
         if evn == 'pro':
-            myHuo.sendOrder(2, transaction.price, 'eosusdt', 'sell-limit')
+            myHuo.sendOrder(transaction.amount, transaction.sellPrice, 'eosusdt', 'sell-limit')
         
         delMsgFromFile(transaction.getValue())
         
@@ -122,7 +154,7 @@ def getMa(period):
         for p in lists:
             count += p
     
-    return round(count/period,2)   
+    return round(count/period,3)
 
 #两期差距不到0.2%就可以买
 def juideGap():
@@ -144,7 +176,7 @@ def juideGap():
     
     return False
 
-#拿当前价格和以往买过的对比，差距在0.2%内的不买
+#拿当前价格和以往买过的对比，差距在0.5%内的不买
 def juideAllGap(price,evn):
     buyPackage = getBuyPackage( 'eosusdt')#查询购买历史 #查询购买历史
     
@@ -154,10 +186,51 @@ def juideAllGap(price,evn):
         
         gap = abs(buyPrice-price)
         times = gap/buyPrice
-        if times < 0.002:
+        if times < 0.005:
             return False
     
     return True
+
+#得到所有购买的平均值
+def getBuyPriceAVG():
+    buyPackage = getBuyPackage('eosusdt')  # 查询购买历史 #查询购买历史
+
+    price = 0.0;
+    count = 0.0;
+
+    for transaction in buyPackage:
+        amount = float(transaction.amount)
+        count = count + amount;
+
+        buyPrice = float(transaction.price)
+        price = price + buyPrice*amount;
+
+    if count == 0:
+        return 0;
+
+    return price/count;
+
+#根据收盘价和历史购买的平均值，确定这一期要买几个
+def getShouldByAmount(close):
+    avgPrice = getBuyPriceAVG();
+
+    if avgPrice == 0:#意味着还没买过
+        return 1;
+
+    if avgPrice <= close:
+        return 0;
+
+    gap = avgPrice - close;
+    rang = gap/avgPrice;
+
+    if rang <= 0.015:
+        return 1;
+    elif rang <= 0.03:
+        return 2;
+    else:
+        return 5;
+
+
 
 #买入
 def sendBuy(evn,amount,price,symbol):
@@ -176,8 +249,8 @@ def isLagerBigger(price):
     global prices
     
     high = max(prices)
-     
-    if price >= high*0.93:
+    #比最大值少两个点还要大就不要买了 风险高
+    if price >= high*0.98:
         return False
     
     return True
@@ -220,7 +293,10 @@ def delMsgFromFile(msg):
 
 
 if __name__ == '__main__':
-    
+    print(1)
+    # print(huobi.get_accounts())
+    # myHuo.sendOrder(1,0.3570,'xrpusdt','buy-limit')
+    # myHuo.sendOrder(1,0.5,'xrpusdt','sell-limit')
 #     write("qw1,er1,121")
 #     write("qw2,er2,122")
 #         
@@ -230,5 +306,3 @@ if __name__ == '__main__':
 #     lines = readAll()
 #     for line in lines:
 #         print(line)
-    print(getAllOrder("eosusdt"))
-    

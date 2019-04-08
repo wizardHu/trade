@@ -92,15 +92,16 @@ def get_symbols(long_polling=None):
 Trade/Account API
 '''
 
-ACCOUNT_ID = 
+ACCOUNT_ID = 1057795
 def get_accounts():
     """
     :return: 
     """
     path = "/v1/account/accounts"
     params = {}
-    return api_key_get(params, path)
-
+    # return api_key_get(params, path)
+    # return ACCOUNT_ID;
+    return {'status': 'ok', 'data': [{'id': 1057795, 'type': 'spot', 'subtype': '', 'state': 'working'}]};
 
 # 获取当前账户资产
 def get_balance(acct_id=None):
@@ -149,6 +150,25 @@ def send_order(amount, source, symbol, _type, price=0):
     url = '/v1/order/orders/place'
     return api_key_post(params, url)
 
+
+# 查询所有当前帐号下未成交订单
+def open_orders(account_id, symbol, side='', size=10):
+    """
+    :param symbol:
+    :return:
+    """
+    params = {}
+    url = "/v1/order/openOrders"
+    if symbol:
+        params['symbol'] = symbol
+    if account_id:
+        params['account-id'] = account_id
+    if side:
+        params['side'] = side
+    if size:
+        params['size'] = size
+
+    return api_key_get(params, url)
 
 # 撤销订单
 def cancel_order(order_id):
