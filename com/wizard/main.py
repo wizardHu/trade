@@ -149,10 +149,8 @@ if __name__ == '__main__':
     for i in test['data']:  
         get_KDJ(i,test['data'].index(i),'init')
     
-    lastId = 0
     count = 0
-    lastDate = huobi.get_kline('eosusdt','1min',1)
-    
+
     while True:
          
         try:
@@ -160,15 +158,9 @@ if __name__ == '__main__':
             test['data'].reverse()
             logging.info(test['data'])
 
-            if lastId != test['data'][0]['id'] : 
-                
-                logging.info(lastDate['data'])
-                get_KDJ(lastDate['data'][0],count,'pro')
-                count += 1
+            get_KDJ(test['data'][0],count,'pro')
+            count += 1
 
-                # lastId = test['data'][0]['id']
-                
-            lastDate = test
             time.sleep(1)
         except Exception as err:  
             logging.info('connect https error,retry...',err)
