@@ -113,7 +113,7 @@ def canSellv2(evn,price):
         avgGap = price - avgPrice;
         avgGap = avgGap/avgPrice
 
-        if avgGap >= 0.02:
+        if avgGap >= 0.015:
             for transaction in buyPackage:
                 transaction.sellPrice = price;
                 listPrice.append(transaction)
@@ -127,7 +127,7 @@ def canSellv2(evn,price):
         gap = price - float(transactionPrice)
         gap = gap/float(transactionPrice)
 
-        if gap >= 0.02:
+        if gap >= 0.015:
             transaction.sellPrice = price;
             listPrice.append(transaction)
 
