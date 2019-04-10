@@ -145,7 +145,7 @@ def get_KDJ(data):
         allGap = constant.juideAllGap(i['close'],'dev')
         isHighPrice = constant.isLagerBigger(i['close'])
 
-        print("index=",data.index(i)," avgFlag=",avgFlag," kdjFlag=",kdjFlag," rsi=",rsiflag," allGap=",allGap," isHighPrice=",isHighPrice)
+        # print("index=",data.index(i)," avgFlag=",avgFlag," kdjFlag=",kdjFlag," rsi=",rsiflag," allGap=",allGap," isHighPrice=",isHighPrice)
 
         if constant.nextBuy == 1:
             constant.nextBuy = 0
