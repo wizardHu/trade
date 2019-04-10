@@ -12,3 +12,6 @@ class TranPairs:
 
     def getValue(self):
         return "{},{},{},{}".format(self.symbols1,self.symbols2,self.pvalue,self.corr)
+
+    def __str__(self):
+        return "{},{},{},{}".format(self.symbols1,self.symbols2,self.pvalue,self.corr)

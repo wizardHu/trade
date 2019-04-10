@@ -34,7 +34,7 @@ if __name__ == '__main__':
         first = symbolPair[0]
         second = symbolPair[1]
 
-        if count == 20:
+        if count == 5:
             break
         count = count + 1
 
@@ -62,11 +62,12 @@ if __name__ == '__main__':
             Y = pd.Series(secondData, name='Y')
             score, pvalue, _ = coint(X, Y)  # pvalue 就是协整值  越小越好
             corrXY = X.corr(Y)
-            # print(pvalue, corrXY,first,second)  # X.corr(Y) 是相关性 [-1,1]越大越好 0.7以上就行
+            print(pvalue, corrXY,first,second)  # X.corr(Y) 是相关性 [-1,1]越大越好 0.7以上就行
 
             tranPairs = TranPairs(first,second,pvalue,corrXY)
             tranPairsList.append(tranPairs)
 
     tranPairsList.sort(key=takeKey)
-
-    print(tranPairsList)
+    print(len(tranPairsList))
+    for tranPair in tranPairsList:
+        print(tranPair.getValue()+"sss")
