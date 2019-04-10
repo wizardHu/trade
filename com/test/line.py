@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     # pd.concat([Y], axis=1).plot(figsize=(10,7))
     # pd.concat([X], axis=1).plot(figsize=(10,7))
-    # (X / Y).plot(figsize=(15, 7))
+    # (X / Y).plot(figsize=(10, 7))
     # plt.axhline((X / Y).mean(), color='red', linestyle='--')
     # plt.show()
 
