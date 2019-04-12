@@ -6,9 +6,10 @@ import numpy as np
 def zscore(series):
     return (series - series.mean()) / np.std(series)
 
+
 if __name__ == '__main__':
-    firstLine = huobi.get_kline('ltcusdt', '1min', 500)
-    secondLine = huobi.get_kline('bchusdt', '1min', 500)
+    firstLine = huobi.get_kline('xlmusdt', '1min', 110)
+    secondLine = huobi.get_kline('omgusdt', '1min', 110)
 
     firstLine['data'].reverse()
     secondLine['data'].reverse()
@@ -27,10 +28,9 @@ if __name__ == '__main__':
     # plt.axhline((X / Y).mean(), color='red', linestyle='--')
     # plt.show()
 
-    ratios = X / Y
+    ratios = Y - 24.3042*X
     zscore(ratios).plot()
     plt.axhline(zscore(ratios).mean())
     plt.axhline(1.0, color='red')
     plt.axhline(-1.0, color='green')
     plt.show()
-

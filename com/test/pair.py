@@ -5,6 +5,12 @@ from TranPairs import TranPairs
 from statsmodels.tsa.stattools import coint
 import HuobiService as huobi
 
+def writeSymbolRecord(msg):
+    f = open('pairTxt','a',encoding='utf-8')
+    f.write("{0}\n".format(msg))
+    f.flush()
+    f.close()
+
 def takeKey(tranPairs):
     return tranPairs.pvalue
 
@@ -41,8 +47,8 @@ if __name__ == '__main__':
             #     break
             # count = count + 1
 
-            firstLine = huobi.get_kline(first, '1min', 500)
-            secondLine = huobi.get_kline(second, '1min', 500)
+            firstLine = huobi.get_kline(first, '1min', 2000)
+            secondLine = huobi.get_kline(second, '1min', 2000)
 
             # print(firstLine,first)
             # print(secondLine,second)
@@ -77,3 +83,4 @@ if __name__ == '__main__':
     print(len(tranPairsList),"------------------------------------")
     for tranPair in tranPairsList:
         print(tranPair.getValue()+"sss")
+        writeSymbolRecord(tranPair.getValue())
