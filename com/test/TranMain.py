@@ -2,13 +2,14 @@ import HuobiService as huobi
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from arch.unitroot import ADF
 
 def zscore(series):
     return (series - series.mean()) / np.std(series)
 
 if __name__ == '__main__':
-    firstLine = huobi.get_kline('xlmusdt', '1min', 110)
-    secondLine = huobi.get_kline('omgusdt', '1min', 110)
+    firstLine = huobi.get_kline('eosusdt', '1min', 2000)
+    secondLine = huobi.get_kline('iotausdt', '1min', 2000)
 
     firstLine['data'].reverse()
     secondLine['data'].reverse()
@@ -25,6 +26,18 @@ if __name__ == '__main__':
     b = 0
     c = 0
 
+    mu = 0
+    sd = 0
+    gap1 = 0
+    gap2 = 0
+    gap3 = 0
+    gap4 = 0
+    gap5 = 0
+    gap6 = 0
+
+    beat = 0.0753
+    times = 10
+
     for index in range(min(len(firstLine['data']), len(secondLine['data']))):
 
         firstClose = firstLine['data'][index]['close']
@@ -33,57 +46,97 @@ if __name__ == '__main__':
         firstData.append(firstClose)
         secondData.append(secondClose)
 
-        if len(firstData) < 100:
+        if len(firstData) < 1000:
             continue
 
         X = pd.Series(firstData, name='X')
         Y = pd.Series(secondData, name='Y')
 
+        spreadf = Y - beat * X
+        if len(firstData) == 1000:
+            adfSpread = ADF(spreadf)
+            mu = np.mean(spreadf)
+            sd = np.std(spreadf)
+            gap1 = mu - 2.5 * sd
+            gap2 = mu - 1.5 * sd
+            gap3 = mu - 0.2 * sd
+            gap4 = mu + 0.2 * sd
+            gap5 = mu + 1.5 * sd
+            gap6 = mu + 2.5 * sd
+            print(mu,sd)
         # ratios = X / Y
 
-        ratios = Y - 24.3042*X
+        # ratios = np.log(Y) - 24.3042*np.log(X)
 
-        score = zscore(ratios)
-        scoreList = score.tolist()
+        concurent = spreadf[len(spreadf)-1]
+        last = spreadf[len(spreadf)-2]
 
-        s = scoreList[-1]
+        if last < gap5 and concurent > gap5:#上穿gap5 mu + 1.5 * sd
+            print("卖出Y，买入X", index, concurent)
+            buyCount = times*beat*secondClose/firstClose;
+            firstCount = firstCount + buyCount * 0.998;
+            balance = balance - times*beat*secondClose;
 
-        if s > 1 and c == 0:
-
-            buyCount = 24.3042;
-            firstCount = firstCount + buyCount*0.998;
-            balance = balance - firstClose*buyCount;
-
-            sellCount = 1;
+            sellCount = times;
 
             if secondCount < sellCount:
                 sellCount = secondCount
 
             secondCount = secondCount - sellCount
-            balance = balance + sellCount*secondClose*0.998
+            balance = balance + sellCount * secondClose * 0.998
 
-            print("index=",index," s=",s," 买入first:",buyCount," firstClose=",firstClose," firstCount=",firstCount," 卖出second:",sellCount," secondClose=",secondClose," secondCount=",secondCount," balance=",balance)
+            print("index=", index, "买入first:", buyCount, " firstClose=", firstClose, " firstCount=",
+                  firstCount, " 卖出second:",
+                  sellCount, " secondCount=", secondCount, " secondClose=", secondClose, " balance=", balance)
 
-            c = 1
-            b = 0;
 
-        if s < -1 and b == 0:
-            buyCount = 1;
+        elif last > gap2 and concurent < gap2:#g下穿gap2 mu - 1.5 * sd
+            print("卖出X，买入Y",index)
+            buyCount = times;
             secondCount = secondCount + buyCount * 0.998;
-            balance = balance - secondClose;
+            balance = balance - times * secondClose;
 
-            sellCount = 24.3042;
+            sellCount = times*beat*secondClose/firstClose;
 
             if firstCount < sellCount:
                 sellCount = firstCount
 
             firstCount = firstCount - sellCount
-            balance = balance + sellCount * firstClose * 0.998
-            b = 1
-            c = 0
+            balance = balance + sellCount * firstCount * 0.998
 
-            print("index=",index," s=",s,"买入second:", buyCount, " secondClose=", secondClose, " secondCount=", secondCount, " 卖出first:",
-                  sellCount," firstCount=",firstCount, " firstClose=", firstClose, " balance=", balance)
+            print("index=", index, "买入second:", buyCount, " secondClose=", secondClose, " secondCount=",
+                  secondCount, " 卖出first:",
+                  sellCount, " firstCount=", firstCount, " firstClose=", firstClose, " balance=", balance)
+
+        elif last < gap3 and concurent > gap3:#上穿gap3 mu - 0.2 * sd
+            print("卖出Y",index)
+            sellCount = secondCount;
+
+            secondCount = secondCount - sellCount
+            balance = balance + sellCount * secondClose * 0.998
+
+            print("index=", index, " 卖出second:",
+                  sellCount, " secondCount=", secondCount, " secondClose=", secondClose, " balance=", balance)
+
+
+        elif last > gap4 and concurent <gap4 :#下穿gap4 mu + 0.2 * sd
+            print("卖出X",index)
+            sellCount = firstCount;
+
+            firstCount = firstCount - sellCount
+            balance = balance + sellCount * firstClose * 0.998
+
+            print("index=", index, " 卖出first:",
+                  sellCount, " firstCount=", firstCount, " firstClose=", firstClose, " balance=", balance)
+
+        elif (last > gap1 and gap1 > concurent) or (last < gap6 and concurent >gap6): #上穿gap6 下穿gap1
+            print("全部卖出", index)
+            # firstCount = 0
+            # secondCount = 0
+            # balance = balance + firstCount * firstClose * 0.998 + secondCount * secondClose * 0.998
+            # print("index=", index, " 卖出first:",
+            #       sellCount, " firstCount=", firstCount, " firstClose=", firstClose, " 卖出second:",
+            #       sellCount, " secondCount=", secondCount, " secondClose=", secondClose," balance=", balance)
 
     balance = balance+firstCount*firstClose*0.998+secondCount*secondClose*0.998
     print("balance=",balance," firstCount=",firstCount," secondCount=",secondCount)

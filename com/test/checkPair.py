@@ -8,8 +8,8 @@ import HuobiService as huobi
 #输出两个交易对的相关信息
 if __name__ == '__main__':
 
-    firstLine = huobi.get_kline('xlmusdt', '1min', 2000)
-    secondLine = huobi.get_kline('omgusdt', '1min', 2000)
+    firstLine = huobi.get_kline('eosusdt', '1min', 2000)
+    secondLine = huobi.get_kline('iotausdt', '1min', 2000)
 
     # print(firstLine,first)
     # print(secondLine,second)
