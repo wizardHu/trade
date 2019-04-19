@@ -219,7 +219,7 @@ class PairTrading:
         adfSpread=ADF(resid)
         if adfSpread.pvalue>=0.05:
             print('''交易价格不具有协整关系.
-            P-value of ADF test: %f
+            P-value of ADF pair: %f
             Coefficients of regression:
             Intercept: %f
             Beta: %f
@@ -227,7 +227,7 @@ class PairTrading:
             return(None)
         else:
             print('''交易价格具有协整关系.
-            P-value of ADF test: %f
+            P-value of ADF pair: %f
             Coefficients of regression:
             Intercept: %f
             Beta: %f
