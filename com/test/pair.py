@@ -46,9 +46,9 @@ if __name__ == '__main__':
             # if count == 5:
             #     break
             # count = count + 1
-
-            firstLine = huobi.get_kline(first, '1min', 2000)
-            secondLine = huobi.get_kline(second, '1min', 2000)
+            #1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year
+            firstLine = huobi.get_kline(first, '15min', 2000)
+            secondLine = huobi.get_kline(second, '15min', 2000)
 
             # print(firstLine,first)
             # print(secondLine,second)

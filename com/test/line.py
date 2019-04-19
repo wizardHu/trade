@@ -9,8 +9,8 @@ def zscore(series):
 
 
 if __name__ == '__main__':
-    firstLine = huobi.get_kline('eosusdt', '1min', 2000)
-    secondLine = huobi.get_kline('iotausdt', '1min', 2000)
+    firstLine = huobi.get_kline('ontusdt', '15min', 2000)
+    secondLine = huobi.get_kline('btsusdt', '15min', 2000)
 
     firstLine['data'].reverse()
     secondLine['data'].reverse()
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # plt.show()
 
     # ratios = np.log(Y) - 0.0870 * np.log(X)
-    ratios = Y - 0.0621 * X
+    ratios = Y - 0.0421 * X
 
     adfSpread = ADF(ratios)
     print(adfSpread.summary().as_text())

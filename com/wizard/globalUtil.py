@@ -120,8 +120,13 @@ def canSellv2(evn,price):
 
             return  listPrice
 
-
     for transaction in buyPackage:
+
+        state = getOrderStatus(evn, transaction.orderId)  # 先判断订单的状态
+
+        if state != 'filled':
+            continue
+
         transactionPrice = transaction.price;
 
         gap = price - float(transactionPrice)

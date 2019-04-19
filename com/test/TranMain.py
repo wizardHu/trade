@@ -8,8 +8,8 @@ def zscore(series):
     return (series - series.mean()) / np.std(series)
 
 if __name__ == '__main__':
-    firstLine = huobi.get_kline('eosusdt', '1min', 2000)
-    secondLine = huobi.get_kline('iotausdt', '1min', 2000)
+    firstLine = huobi.get_kline('ctxcusdt', '15min', 2000)
+    secondLine = huobi.get_kline('hcusdt', '15min', 2000)
 
     firstLine['data'].reverse()
     secondLine['data'].reverse()
@@ -35,8 +35,8 @@ if __name__ == '__main__':
     gap5 = 0
     gap6 = 0
 
-    beat = 0.0753
-    times = 10
+    beat = 3.5170
+    times = 100
 
     for index in range(min(len(firstLine['data']), len(secondLine['data']))):
 
@@ -53,6 +53,7 @@ if __name__ == '__main__':
         Y = pd.Series(secondData, name='Y')
 
         spreadf = Y - beat * X
+        # spreadf = np.log(Y) - beat*np.log(X)
         if len(firstData) == 1000:
             adfSpread = ADF(spreadf)
             mu = np.mean(spreadf)
@@ -65,8 +66,6 @@ if __name__ == '__main__':
             gap6 = mu + 2.5 * sd
             print(mu,sd)
         # ratios = X / Y
-
-        # ratios = np.log(Y) - 24.3042*np.log(X)
 
         concurent = spreadf[len(spreadf)-1]
         last = spreadf[len(spreadf)-2]
