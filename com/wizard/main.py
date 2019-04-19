@@ -31,7 +31,7 @@ lastJ = 50
 buy = 0
 
 
-def get_KDJ(i,index,evn):
+def get_KDJ(i,index,evn,symbols):
     global lastBuy
     global packageBuy
     global buynum
@@ -66,7 +66,7 @@ def get_KDJ(i,index,evn):
     kdjFlag = tac.judgeBuy(i,index)
     lowest = tacAmount.isLowest(i['close']);
     rsiflag = tacRsi.rsiJudgeBuy(i, index, 12)
-    allGap = constant.juideAllGap(i['close'],evn)
+    allGap = constant.juideAllGap(i['close'],evn,symbols)
     risk = tacAmount.judgeRisk(index)
     gap = constant.juideGap()
     boll = tacBoll.judgeBoll(i['close'])
@@ -84,18 +84,18 @@ def get_KDJ(i,index,evn):
     if constant.nextBuy == 1:
         constant.nextBuy = 0
         if gap:
-            shouldBuy = constant.getShouldByAmount(i['close'])
+            shouldBuy = constant.getShouldByAmount(i['close'],symbols)
             if shouldBuy > 0:
-                constant.sendBuy(evn, shouldBuy, i['close'], 'eosusdt')
+                constant.sendBuy(evn, shouldBuy, i['close'], symbols)
                 logging.info(('购买  {} {}个 index= {}').format(i['close'],shouldBuy, index))
                 lastBuy = i['close']
                 constant.writeTradeRecord(('1 {} {} {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
 
     elif avgFlag and buy == 0 and allGap and isHighPrice:
         if kdjFlag and rsiflag :
-            shouldBuy = constant.getShouldByAmount(i['close'])
+            shouldBuy = constant.getShouldByAmount(i['close'],symbols)
             if shouldBuy > 0:
-                constant.sendBuy(evn, shouldBuy, i['close'], 'eosusdt')
+                constant.sendBuy(evn, shouldBuy, i['close'], symbols)
                 logging.info(('购买  {} {}个 index= {}').format(i['close'], shouldBuy, index))
                 lastBuy = i['close']
                 constant.writeTradeRecord(('1 {} {} {}').format(i['close'], shouldBuy,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
@@ -108,11 +108,11 @@ def get_KDJ(i,index,evn):
     
     if ckeckSell:
         
-        transactions = constant.canSellv2(evn,i['close'])
+        transactions = constant.canSellv2(evn,i['close'],symbols)
         logging.info("transactions={}".format(transactions))
         
         if len(transactions) > 0:
-            constant.sell(evn,transactions)
+            constant.sell(evn,transactions,symbols)
         
             buy = 0
             sendx.append(index)
@@ -143,26 +143,26 @@ def check_sell(K,D,J,lastK,lastD,lastJ,buy):
     return isSend
 
 if __name__ == '__main__':
-   
-    test = huobi.get_kline('eosusdt','1min',1000)
+    symbols = 'eosusdt'
+    test = huobi.get_kline(symbols,'1min',1000)
     test['data'].reverse()
     for i in test['data']:  
-        get_KDJ(i,test['data'].index(i),'init')
+        get_KDJ(i,test['data'].index(i),'init',symbols)
 
     lastId = 0
     count = 0
-    lastDate = huobi.get_kline('eosusdt', '1min', 1)
+    lastDate = huobi.get_kline(symbols, '1min', 1)
 
     while True:
          
         try:
-            test = huobi.get_kline('eosusdt','1min',1)
+            test = huobi.get_kline(symbols,'1min',1)
             test['data'].reverse()
             logging.info(test['data'])
 
             if lastId != test['data'][0]['id']:
                 logging.info(lastDate['data'])
-                get_KDJ(lastDate['data'][0], count, 'pro')
+                get_KDJ(lastDate['data'][0], count, 'pro',symbols)
                 count += 1
 
             lastId = test['data'][0]['id']

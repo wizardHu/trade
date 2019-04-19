@@ -56,18 +56,20 @@ def getBuyPackage(symbol):
 def getOrderStatus(evn,orderId):
     
     if evn == 'pro':
+        if orderId == 0:
+            return 'error'
         return myHuo.getOrderStatus(orderId)
     else:
         return 'filled'
 
 
 #判断是否可卖
-def canSell(evn,price):
+def canSell(evn,price,symbols):
     global wait
     global ma10
     global closeGap
     
-    buyPackage = getBuyPackage('eosusdt')#查询购买历史
+    buyPackage = getBuyPackage(symbols)#查询购买历史
     
     listPrice = []
     
@@ -103,11 +105,11 @@ def canSell(evn,price):
     
     return listPrice
 
-def canSellv2(evn,price):
-    buyPackage = getBuyPackage('eosusdt')  # 查询购买历史
+def canSellv2(evn,price,symbols):
+    buyPackage = getBuyPackage(symbols)  # 查询购买历史
 
     listPrice = []
-    avgPrice = getBuyPriceAVG();
+    avgPrice = getBuyPriceAVG(symbols);
 
     if avgPrice > 0:
         avgGap = price - avgPrice;
@@ -140,12 +142,12 @@ def canSellv2(evn,price):
 
 
 #挂卖单
-def sell(evn,transactions):
+def sell(evn,transactions,symbols):
     
     for transaction in transactions:
         
         if evn == 'pro':
-            myHuo.sendOrder(transaction.amount, transaction.sellPrice, 'eosusdt', 'sell-limit')
+            myHuo.sendOrder(transaction.amount, transaction.sellPrice, symbols, 'sell-limit')
         
         delMsgFromFile(transaction.getValue())
         writeTradeRecord(('0 {} {} {} {}').format(transaction.price, transaction.amount,transaction.sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())));
@@ -183,8 +185,8 @@ def juideGap():
     return False
 
 #拿当前价格和以往买过的对比，差距在0.5%内的不买
-def juideAllGap(price,evn):
-    buyPackage = getBuyPackage( 'eosusdt')#查询购买历史 #查询购买历史
+def juideAllGap(price,evn,symbols):
+    buyPackage = getBuyPackage( symbols)#查询购买历史 #查询购买历史
     
     for transaction in buyPackage:
         
@@ -198,8 +200,8 @@ def juideAllGap(price,evn):
     return True
 
 #得到所有购买的平均值
-def getBuyPriceAVG():
-    buyPackage = getBuyPackage('eosusdt')  # 查询购买历史 #查询购买历史
+def getBuyPriceAVG(symbols):
+    buyPackage = getBuyPackage(symbols)  # 查询购买历史 #查询购买历史
 
     price = 0.0;
     count = 0.0;
@@ -217,8 +219,8 @@ def getBuyPriceAVG():
     return price/count;
 
 #根据收盘价和历史购买的平均值，确定这一期要买几个
-def getShouldByAmount(close):
-    avgPrice = getBuyPriceAVG();
+def getShouldByAmount(close,symbols):
+    avgPrice = getBuyPriceAVG(symbols);
 
     if avgPrice == 0:#意味着还没买过
         return 1;
@@ -305,8 +307,8 @@ def delMsgFromFile(msg):
 
 
 if __name__ == '__main__':
-    print(huobi.get_accounts())
-    # myHuo.sendOrder(1,0.2570,'xrpusdt','buy-limit')
+    print(getOrderStatus('pro',0))
+
     # myHuo.sendOrder(1,0.5,'xrpusdt','sell-limit')
 #     write("qw1,er1,121")
 #     write("qw2,er2,122")
