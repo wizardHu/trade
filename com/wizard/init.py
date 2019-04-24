@@ -258,8 +258,8 @@ def check_sell(K,D,J,lastK,lastD,lastJ,close,buy):
 if __name__ == '__main__':
    
     fig = plt.figure()
-    symbols = 'htusdt'
-    test = huobi.get_kline(symbols,'15min',1000)
+    symbols = 'btmusdt'
+    test = huobi.get_kline(symbols,'1min',2000)
     # test = aa.test0
     
     test['data'].reverse()
