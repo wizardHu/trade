@@ -23,6 +23,8 @@ if __name__ == '__main__':
     K = []
     D = []
     J = []
+    sellX = []
+    sellY = []
 
     for data in test['data']:
         index = test['data'].index(data)
@@ -34,6 +36,13 @@ if __name__ == '__main__':
         D.append(KDJ.getLastD())
         J.append(KDJ.getLastJ())
 
+        flag = KDJ.judgeSell(index);
+        if flag:
+            sellX.append(index)
+            sellY.append(data['close'])
+
+
+
     xmajorLocator = MultipleLocator(50);
 
     #三行一列 获取第 1 行 第 0 列的图表，占一列，两行
@@ -44,6 +53,7 @@ if __name__ == '__main__':
     # ax3 = fig.add_subplot(313)
 
     ax1.plot(dataListX,dataList)
+    ax1.scatter(sellX, sellY, label='1', color='red')
     ax1.xaxis.set_major_locator(xmajorLocator)
     ax1.grid(linestyle='--')
 

@@ -45,7 +45,7 @@ def getLastJ():
     global lastJ
     return lastJ[-1]
 
-def judgeSell():
+def judgeSell(index):
     global lastK
     global lastD
     global lastJ
@@ -58,14 +58,17 @@ def judgeSell():
     lk = lastK[-2]
     ld = lastD[-2]
 
-    p1 = point.Point(1, lk)
-    p2 = point.Point(2, ck)
-    line1 = point.Line(p1, p2)
+    if cd > ck and ld < lk :#下穿
+        p1 = point.Point(1, lk)
+        p2 = point.Point(2, ck)
+        line1 = point.Line(p1, p2)
 
-    p3 = point.Point(1, ld)
-    p4 = point.Point(2, cd)
-    line2 = point.Line(p3, p4)
+        p3 = point.Point(1, ld)
+        p4 = point.Point(2, cd)
+        line2 = point.Line(p3, p4)
 
-    pointXY = point.GetCrossPoint(line1, line2)
-    if pointXY.y < 60:
-        isBuy = True
+        pointXY = point.GetCrossPoint(line1, line2)
+        if pointXY.y > 70:
+            return True
+
+    return False
