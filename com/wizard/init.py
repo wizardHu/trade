@@ -258,14 +258,14 @@ def check_sell(K,D,J,lastK,lastD,lastJ,close,buy):
 if __name__ == '__main__':
    
     fig = plt.figure()
-    symbols = 'btmusdt'
-    test = huobi.get_kline(symbols,'1min',2000)
+    symbols = 'eosusdt'
+    test = huobi.get_kline(symbols,'1min',1000)
     # test = aa.test0
     
     test['data'].reverse()
 #     test = client.getKline(1200,"eos_usdt")
     
-    xmajorLocator = MultipleLocator(10);
+    xmajorLocator = MultipleLocator(100);
   
     klineXY = get_kline_xy(test['data'])
     klinex = klineXY[0]

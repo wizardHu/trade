@@ -53,10 +53,12 @@ def judgeSell(index):
     #当前的K值
     ck = lastK[-1]
     cd = lastD[-1]
+    cj = lastJ[-1]
 
     #上一个的K值
     lk = lastK[-2]
     ld = lastD[-2]
+    lj = lastJ[-2]
 
     if cd > ck and ld < lk :#下穿
         p1 = point.Point(1, lk)
@@ -70,5 +72,11 @@ def judgeSell(index):
         pointXY = point.GetCrossPoint(line1, line2)
         if pointXY.y > 70:
             return True
+
+    # if ck > 80 and cd >70:
+    #     return True
+
+    # if len(lastJ)>3 and cj > 100 and lj >100 and lastJ[-3]>100:
+    #     return True
 
     return False
