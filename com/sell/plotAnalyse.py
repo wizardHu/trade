@@ -5,6 +5,7 @@ from matplotlib.ticker import  MultipleLocator
 import KDJ as KDJ
 import priceUtil as priceUtil
 import MA as MA
+import Boll as Boll
 
 if __name__ == '__main__':
 
@@ -44,8 +45,11 @@ if __name__ == '__main__':
         D.append(KDJ.getLastD())
         J.append(KDJ.getLastJ())
 
-        flag = KDJ.judgeSell(index);
-        if flag:
+        bollFlag = True
+        kdjFlag = True
+        kdjFlag = KDJ.judgeSell(index)
+        bollFlag = Boll.judgeBoll(close)
+        if kdjFlag and bollFlag:
             sellX.append(index)
             sellY.append(close)
 
@@ -69,8 +73,8 @@ if __name__ == '__main__':
     # ax3 = fig.add_subplot(313)
 
     ax1.plot(dataListX,dataList)
-    ax1.plot(ma10x, ma10y)
-    ax1.plot(ma60x, ma60y)
+    # ax1.plot(ma10x, ma10y)
+    # ax1.plot(ma60x, ma60y)
     ax1.scatter(sellX, sellY, label='1', color='red')
     ax1.xaxis.set_major_locator(xmajorLocator)
     ax1.grid(linestyle='--')
