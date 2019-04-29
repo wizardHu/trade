@@ -21,14 +21,17 @@ def calBoll(period,times):
     return boll
 
 
-def judgeBoll(price):
+def judgeBoll(data,index):
+    price = data['close']
+    low = data['low']
+
     boll = calBoll(20, 2)
     if len(boll) < 2:
         return False
 
     upBBand = boll[0]
 
-    if upBBand < price:
+    if upBBand < low:
         return True
 
     return False

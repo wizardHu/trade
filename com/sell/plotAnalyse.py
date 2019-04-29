@@ -6,12 +6,13 @@ import KDJ as KDJ
 import priceUtil as priceUtil
 import MA as MA
 import Boll as Boll
+import Amount as Amount
 
 if __name__ == '__main__':
 
     fig = plt.figure()
     symbols = 'eosusdt'
-    test = huobi.get_kline(symbols, '1min', 1000)
+    test = huobi.get_kline(symbols, '1min', 1440)
 
     test['data'].reverse()
 
@@ -31,12 +32,15 @@ if __name__ == '__main__':
     ma60x = []
     ma60y = []
 
+    amounts = []
+
     for data in test['data']:
         index = test['data'].index(data)
         close = data['close']
 
         dataList.append(close)
         dataListX.append(index)
+        amounts.append(data['amount'])
 
         priceUtil.add(data,index)
 
@@ -47,9 +51,11 @@ if __name__ == '__main__':
 
         bollFlag = True
         kdjFlag = True
-        kdjFlag = KDJ.judgeSell(index)
-        bollFlag = Boll.judgeBoll(close)
-        if kdjFlag and bollFlag:
+        amountFlag = True
+        # kdjFlag = KDJ.judgeSell(index)
+        bollFlag = Boll.judgeBoll(data,index)
+        amountFlag = Amount.judgeAmount(data,index)
+        if kdjFlag and bollFlag and amountFlag:
             sellX.append(index)
             sellY.append(close)
 
@@ -78,6 +84,8 @@ if __name__ == '__main__':
     ax1.scatter(sellX, sellY, label='1', color='red')
     ax1.xaxis.set_major_locator(xmajorLocator)
     ax1.grid(linestyle='--')
+
+    # ax2.bar(dataListX, amounts, 1, label="rainfall", color="#87CEFA")
 
     # ax2.plot(dataListX,K, color="red")
     # ax2.plot(dataListX,D, color='blue')
