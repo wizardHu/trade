@@ -25,13 +25,15 @@ def judgeBoll(data,index):
     price = data['close']
     low = data['low']
 
+    avg = (price+low)/2
+
     boll = calBoll(20, 2)
     if len(boll) < 2:
         return False
 
     upBBand = boll[0]
 
-    if upBBand < low:
+    if upBBand < avg:
         return True
 
     return False

@@ -7,12 +7,14 @@ import priceUtil as priceUtil
 import MA as MA
 import Boll as Boll
 import Amount as Amount
+from TradeModel import TradeModel
+import fileUtil as fileUtil
 
 if __name__ == '__main__':
 
     fig = plt.figure()
     symbols = 'eosusdt'
-    test = huobi.get_kline(symbols, '1min', 1440)
+    test = huobi.get_kline(symbols, '1min', 2000)
 
     test['data'].reverse()
 
@@ -58,6 +60,9 @@ if __name__ == '__main__':
         if kdjFlag and bollFlag and amountFlag:
             sellX.append(index)
             sellY.append(close)
+            tradeModel = TradeModel(close,10,0,index,symbols)
+            fileUtil.write(tradeModel.getValue(),"sell")
+
 
         m10 = MA.getMa(10)
         if m10 != 0:
