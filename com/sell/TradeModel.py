@@ -6,7 +6,7 @@ class TradeModel:
     amount = 0.0
     orderId = 0
     sellAmount = 0
-    sellPrice = 0
+    buyPrice = 0
     symbol = ''
 
     def __init__(self, price, index, amount, orderId,symbol):
@@ -23,12 +23,12 @@ class TradeModel:
         return "{},{},{},{},{}".format(self.price, self.amount, self.orderId, self.index,self.symbol)
 
     def printTradeModel(self):
-        print('price={} index={} amount={} orderId={} sellAmount={} sellPrice={} symbol={}'.format(self.price,
+        print('price={} index={} amount={} orderId={} sellAmount={} buyPrice={} symbol={}'.format(self.price,
                                                                                                       self.index,
                                                                                                       self.amount,
                                                                                                       self.orderId,
                                                                                                       self.sellAmount,
-                                                                                                      self.sellPrice,self.symbol))
+                                                                                                      self.buyPrice,self.symbol))
 
     def __str__(self):
         return "{}".format(self.price)

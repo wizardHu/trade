@@ -9,6 +9,7 @@ import Boll as Boll
 import Amount as Amount
 from TradeModel import TradeModel
 import fileUtil as fileUtil
+import  TradeUtil as TradeUtil
 
 if __name__ == '__main__':
 
@@ -27,6 +28,9 @@ if __name__ == '__main__':
     J = []
     sellX = []
     sellY = []
+
+    buyX = []
+    buyY = []
 
     ma10x = []
     ma10y = []
@@ -57,11 +61,18 @@ if __name__ == '__main__':
         # kdjFlag = KDJ.judgeSell(index)
         bollFlag = Boll.judgeBoll(data,index)
         amountFlag = Amount.judgeAmount(data,index)
-        if kdjFlag and bollFlag and amountFlag:
+        sellFlag = TradeUtil.canSell(symbols,close)
+        if kdjFlag and bollFlag and amountFlag and sellFlag:
             sellX.append(index)
             sellY.append(close)
             tradeModel = TradeModel(close,10,0,index,symbols)
-            fileUtil.write(tradeModel.getValue(),"sell")
+            fileUtil.write(tradeModel.getValue(),"sell"+symbols)
+
+        canBuyLists = TradeUtil.getBuyModel(symbols,close,"dev")
+
+        for buyRecord in canBuyLists:
+            buyX.append(index)
+            buyY.append(close)
 
 
         m10 = MA.getMa(10)
@@ -87,6 +98,7 @@ if __name__ == '__main__':
     # ax1.plot(ma10x, ma10y)
     # ax1.plot(ma60x, ma60y)
     ax1.scatter(sellX, sellY, label='1', color='red')
+    ax1.scatter(buyX, buyY, label='1', marker = 'x', color = 'm')
     ax1.xaxis.set_major_locator(xmajorLocator)
     ax1.grid(linestyle='--')
 

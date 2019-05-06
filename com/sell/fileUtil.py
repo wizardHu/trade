@@ -1,9 +1,9 @@
 from TradeModel import TradeModel
 
 # 从文件中读取卖出记录
-def getOrderFromFile():
+def getOrderFromFile(fileName):
     sellPackage = []
-    sells = readAll()
+    sells = readAll(fileName)
 
     for order in sells:
 
