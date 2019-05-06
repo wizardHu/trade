@@ -44,7 +44,7 @@ def readAll(fileName):
 def delMsgFromFile(msg,fileName):
     msg = "{0}\n".format(msg)
     lines = []
-    f = open('buy', encoding='utf-8')
+    f = open(fileName, encoding='utf-8')
     for line in f:
         if line != msg:
             lines.append(line.replace('\n', ''))
@@ -53,4 +53,4 @@ def delMsgFromFile(msg,fileName):
     f.close()
 
     for line in lines:
-        write(line)
+        write(line,fileName)

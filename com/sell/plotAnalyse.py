@@ -9,13 +9,14 @@ import Boll as Boll
 import Amount as Amount
 from TradeModel import TradeModel
 import fileUtil as fileUtil
-import  TradeUtil as TradeUtil
+import TradeUtil as TradeUtil
+import time
 
 if __name__ == '__main__':
 
     fig = plt.figure()
     symbols = 'eosusdt'
-    test = huobi.get_kline(symbols, '1min', 2000)
+    test = huobi.get_kline(symbols, '15min', 2000)
 
     test['data'].reverse()
 
@@ -67,13 +68,16 @@ if __name__ == '__main__':
             sellY.append(close)
             tradeModel = TradeModel(close,10,0,index,symbols)
             fileUtil.write(tradeModel.getValue(),"sell"+symbols)
+            fileUtil.write(('0 {} {} {}').format(close, 10,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())),"record"+symbols)
 
         canBuyLists = TradeUtil.getBuyModel(symbols,close,"dev")
 
         for buyRecord in canBuyLists:
             buyX.append(index)
             buyY.append(close)
-
+            fileUtil.delMsgFromFile(buyRecord.getValue(),"sell"+symbols)
+            fileUtil.write(('1 {} {} {} {}').format(buyRecord.price,close, 10, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())),
+                           "record" + symbols)
 
         m10 = MA.getMa(10)
         if m10 != 0:
