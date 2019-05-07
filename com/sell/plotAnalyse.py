@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     fig = plt.figure()
     symbols = 'eosusdt'
-    test = huobi.get_kline(symbols, '15min', 2000)
+    test = huobi.get_kline(symbols, '1min', 1000)
 
     test['data'].reverse()
 
@@ -66,7 +66,7 @@ if __name__ == '__main__':
         if kdjFlag and bollFlag and amountFlag and sellFlag:
             sellX.append(index)
             sellY.append(close)
-            tradeModel = TradeModel(close,10,0,index,symbols)
+            tradeModel = TradeModel(close,index,10,0,symbols)
             fileUtil.write(tradeModel.getValue(),"sell"+symbols)
             fileUtil.write(('0 {} {} {}').format(close, 10,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())),"record"+symbols)
 
