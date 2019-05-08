@@ -184,7 +184,7 @@ def juideGap():
     
     return False
 
-#拿当前价格和以往买过的对比，差距在0.5%内的不买
+#拿当前价格和以往买过的对比，差距在1.5%内的不买
 def juideAllGap(price,evn,symbols):
     buyPackage = getBuyPackage( symbols)#查询购买历史 #查询购买历史
     
@@ -194,7 +194,7 @@ def juideAllGap(price,evn,symbols):
         
         gap = abs(buyPrice-price)
         times = gap/buyPrice
-        if times < 0.005:
+        if times < 0.015:
             return False
     
     return True

@@ -38,7 +38,7 @@ def getBuyModel(symbol,close,env):
         gap = float(price) - close
         times = gap / float(price)
 
-        if times >= 0.015:
+        if times >= 0.01:
             tradeModel.buyPrice = close;
             listPrice.append(tradeModel)
 

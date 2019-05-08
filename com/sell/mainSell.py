@@ -3,8 +3,6 @@ import KDJ as KDJ
 import priceUtil as priceUtil
 import Boll as Boll
 import Amount as Amount
-from TradeModel import TradeModel
-import fileUtil as fileUtil
 import TradeUtil as TradeUtil
 import time
 import logging
@@ -18,67 +16,64 @@ logging.basicConfig(filename='./my.log',                                        
 
 if __name__ == '__main__':
     symbols = 'eosusdt'
-    env = "dev"
-    test = huobi.get_kline(symbols, '60min', 2000)
+    env = "pro"
+    test = huobi.get_kline(symbols, '1min', 1000)
     test['data'].reverse()
 
-    a = test['data'][:1000]
-    b = test['data'][1000:]
+    # a = test['data'][:1000]
+    # b = test['data'][1000:]
 
-    # for data in test['data']:
-    #     index = test['data'].index(data)
-    #     close = data['close']
-    #
-    #     priceUtil.add(data, index)
-    #     KDJ.calKDJ(data, index)
-
-    for data in a:
-        index = a.index(data)
+    for data in test['data']:
+        index = test['data'].index(data)
         close = data['close']
 
         priceUtil.add(data, index)
         KDJ.calKDJ(data, index)
 
+    # for data in a:
+    #     index = a.index(data)
+    #     close = data['close']
+    #
+    #     priceUtil.add(data, index)
+    #     KDJ.calKDJ(data, index)
+
     lastId = 0
     count = 0
     lastDate = huobi.get_kline(symbols, '1min', 1)
 
-    # while True:
-    for data in b:
+    while True:
+    # for data in b:
         try:
-            # test = huobi.get_kline(symbols, '1min', 1)
-            # test['data'].reverse()
-            # logging.info(test['data'])
-            #
-            # data = test['data'][0]
-            #
-            # if lastId != data['id']:
+            test = huobi.get_kline(symbols, '1min', 1)
+            test['data'].reverse()
+            logging.info(test['data'])
 
-            close = data['close']
+            data = test['data'][0]
 
-            bollFlag = True
-            kdjFlag = True
-            amountFlag = True
-            # kdjFlag = KDJ.judgeSell(index)
-            bollFlag = Boll.judgeBoll(data, count)
-            amountFlag = Amount.judgeAmount(data, count)
-            sellFlag = TradeUtil.canSell(symbols, close)
-            if kdjFlag and bollFlag and amountFlag and sellFlag:
-                TradeUtil.sell(env,symbols,close)
-                print("sell")
+            if lastId != data['id']:
 
-            canBuyLists = TradeUtil.getBuyModel(symbols, close, env)
+                close = data['close']
+                bollFlag = True
+                kdjFlag = True
+                amountFlag = True
+                priceUtil.add(data, count)
+                # kdjFlag = KDJ.judgeSell(index)
+                bollFlag = Boll.judgeBoll(data, count)
+                amountFlag = Amount.judgeAmount(data, count)
+                sellFlag = TradeUtil.canSell(symbols, close)
+                if kdjFlag and bollFlag and amountFlag and sellFlag:
+                    TradeUtil.sell(env,symbols,close)
 
-            for buyRecord in canBuyLists:
-                #买入
-                TradeUtil.sendBuy(env,buyRecord)
-                print("buy")
+                canBuyLists = TradeUtil.getBuyModel(symbols, close, env)
 
-            count += 1
+                for buyRecord in canBuyLists:
+                    #买入
+                    TradeUtil.sendBuy(env,buyRecord)
 
-            lastId = data['id']
-            # lastDate = test
-            # time.sleep(1)
+                count += 1
+
+                lastId = data['id']
+                time.sleep(1)
         except Exception as err:
             logging.info('connect https error,retry...', err)
             time.sleep(1)
