@@ -2,8 +2,9 @@ from TradeModel import TradeModel
 import fileUtil as fileUtil
 import MyHuobiService as myHuo
 import time
+import HuobiService as huobi
 
-def canSell(symbol,close):
+def canSell(symbol,close,bi):
     tradeModels = fileUtil.getOrderFromFile("sell"+symbol)
 
     for tradeModel in tradeModels:
@@ -18,6 +19,11 @@ def canSell(symbol,close):
 
         if times < 0.015:
             return False
+
+    balance = getBalance(bi)
+
+    if balance < 50:
+        return False
 
     return True
 
@@ -80,3 +86,14 @@ def sell(evn, symbols,price):
     fileUtil.write(
         ('0 {} {} {}').format(price, 10, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())),
         "record" + symbols)
+
+def getBalance(bi):
+    balance = huobi.get_balance()
+    data = balance['data']
+    list = data['list']
+    for account in list:
+        currency = account['currency']
+        accountBalance = account['balance']
+        type = account['type']
+        if currency == bi and type == 'trade':
+            return accountBalance
