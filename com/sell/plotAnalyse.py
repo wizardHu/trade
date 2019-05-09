@@ -16,10 +16,12 @@ if __name__ == '__main__':
 
     fig = plt.figure()
     symbols = 'eosusdt'
+    bi = 'eos'
+    env = 'dev'
     test = huobi.get_kline(symbols, '1min', 1000)
 
     test['data'].reverse()
-
+    print(len(test['data']))
     dataList = []
     dataListX = []
 
@@ -62,7 +64,8 @@ if __name__ == '__main__':
         # kdjFlag = KDJ.judgeSell(index)
         bollFlag = Boll.judgeBoll(data,index)
         amountFlag = Amount.judgeAmount(data,index)
-        sellFlag = TradeUtil.canSell(symbols,close)
+        sellFlag = TradeUtil.canSell(symbols,close,bi,env)
+        print(index," bollFlag=",bollFlag," amountFlag=",amountFlag," sellFlag=",sellFlag," close=",close)
         if kdjFlag and bollFlag and amountFlag and sellFlag:
             sellX.append(index)
             sellY.append(close)

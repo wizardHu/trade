@@ -4,7 +4,7 @@ import MyHuobiService as myHuo
 import time
 import HuobiService as huobi
 
-def canSell(symbol,close,bi):
+def canSell(symbol,close,bi,env):
     tradeModels = fileUtil.getOrderFromFile("sell"+symbol)
 
     for tradeModel in tradeModels:
@@ -20,10 +20,11 @@ def canSell(symbol,close,bi):
         if times < 0.015:
             return False
 
-    balance = getBalance(bi)
+    if 'pro' == env:
+        balance = float(getBalance(bi))
 
-    if balance < 50:
-        return False
+        if balance < 50:
+            return False
 
     return True
 
@@ -77,11 +78,12 @@ def sendBuy(evn, tradeModel):
 # 挂卖单
 def sell(evn, symbols,price):
 
+    orderId = 0
     if evn == 'pro':
-        myHuo.sendOrder(10, price, symbols, 'sell-limit')
+        orderId = myHuo.sendOrder(10, price, symbols, 'sell-limit')
 
     index = int(round(time.time() * 1000))
-    tradeModel = TradeModel(price, index, 10, 0, symbols)
+    tradeModel = TradeModel(price, index, 10, orderId, symbols)
     fileUtil.write(tradeModel.getValue(), "sell" + symbols)
     fileUtil.write(
         ('0 {} {} {}').format(price, 10, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())),
@@ -97,3 +99,6 @@ def getBalance(bi):
         type = account['type']
         if currency == bi and type == 'trade':
             return accountBalance
+
+if __name__ == '__main__':
+    print(getOrderStatus("pro",12))

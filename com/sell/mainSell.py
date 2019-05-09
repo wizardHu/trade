@@ -61,7 +61,7 @@ if __name__ == '__main__':
                 # kdjFlag = KDJ.judgeSell(index)
                 bollFlag = Boll.judgeBoll(data, count)
                 amountFlag = Amount.judgeAmount(data, count)
-                sellFlag = TradeUtil.canSell(symbols, close,bi)
+                sellFlag = TradeUtil.canSell(symbols, close,bi,env)
                 logging.info(('bollFlag={} amountFlag={} sellFlag={} \n').format(bollFlag,amountFlag,sellFlag))
                 if kdjFlag and bollFlag and amountFlag and sellFlag:
                     TradeUtil.sell(env,symbols,close)
