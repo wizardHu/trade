@@ -223,7 +223,7 @@ def getShouldByAmount(close,symbols):
     avgPrice = getBuyPriceAVG(symbols);
 
     if avgPrice == 0:#意味着还没买过
-        return 1;
+        return 5;
 
     if avgPrice <= close:
         return 0;
@@ -232,9 +232,9 @@ def getShouldByAmount(close,symbols):
     rang = gap/avgPrice;
 
     if rang <= 0.015:
-        return 1;
+        return 5;
     elif rang <= 0.03:
-        return 2;
+        return 5;
     else:
         return 5;
 

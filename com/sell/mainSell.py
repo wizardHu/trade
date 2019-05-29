@@ -17,8 +17,8 @@ logging.basicConfig(filename='./my.log',                                        
 if __name__ == '__main__':
     symbols = 'eosusdt'
     bi = 'eos'
-    env = "pro"
-    test = huobi.get_kline(symbols, '1min', 1000)
+    env = "dev"
+    test = huobi.get_kline(symbols, '1min', 2000)
     test['data'].reverse()
 
     # a = test['data'][:1000]
@@ -42,6 +42,11 @@ if __name__ == '__main__':
     count = 0
     lastDate = huobi.get_kline(symbols, '1min', 1)
 
+    while len(lastDate['data']) == 0:
+        lastDate = huobi.get_kline(symbols, '1min', 1)
+
+    lastDate = lastDate['data'][0]
+
     while True:
     # for data in b:
         try:
@@ -53,15 +58,17 @@ if __name__ == '__main__':
 
             if lastId != data['id']:
 
-                close = data['close']
+                close = lastDate['close']
                 bollFlag = True
                 kdjFlag = True
                 amountFlag = True
-                priceUtil.add(data, count)
+                priceUtil.add(lastDate, count)
                 # kdjFlag = KDJ.judgeSell(index)
-                bollFlag = Boll.judgeBoll(data, count)
-                amountFlag = Amount.judgeAmount(data, count)
+                bollFlag = Boll.judgeBoll(lastDate, count)
+                amountFlag = Amount.judgeAmount(lastDate, count)
                 sellFlag = TradeUtil.canSell(symbols, close,bi,env)
+
+                logging.info(priceUtil.amounts[-5:])
                 logging.info(('bollFlag={} amountFlag={} sellFlag={} \n').format(bollFlag,amountFlag,sellFlag))
                 if kdjFlag and bollFlag and amountFlag and sellFlag:
                     TradeUtil.sell(env,symbols,close)
@@ -75,6 +82,7 @@ if __name__ == '__main__':
                 count += 1
 
             lastId = data['id']
+            lastDate = data
             time.sleep(1)
         except Exception as err:
             logging.info('connect https error,retry...', err)
