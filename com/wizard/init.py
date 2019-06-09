@@ -12,7 +12,6 @@ import TacticsBoll as tacBoll
 import CalAmount as calAmounts
 import globalUtil as constant
 import aaa as aa
-import Client as client
 import time
 
 balance = 0
