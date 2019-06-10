@@ -28,7 +28,7 @@ class SpotAPI(Client):
     #    return self._request_with_params(GET, SPOT_LEDGER_RECORD + str(symbol) + '/ledger', params, cursor=True)
 
     # take order
-    def take_order(self, otype, side, instrument_id, size, margin_trading=1, client_oid='', price='', funds='',order_type = ''):
+    def take_order(self, otype, side, instrument_id, size, margin_trading=1, client_oid='', price='', funds='',order_type = '0'):
         params = {'type': otype, 'side': side, 'instrument_id': instrument_id, 'size': size, 'client_oid': client_oid,
                   'price': price, 'funds': funds, 'margin_trading': margin_trading,'order_type':order_type}
         print(params)

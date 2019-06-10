@@ -1,6 +1,15 @@
 import numpy as np
+import HuobiService as huobi
 
 if __name__ == '__main__':
-    list = [1,1,1.1]
-    print(np.mean(list))
-    print(np.mean(np.std(list, ddof=1)))
+    symbols = huobi.get_symbols();
+    datas = symbols['data']
+
+    symbolsList = []
+
+    for data in datas:
+        quote_currency = data['quote-currency']
+        if quote_currency == 'usdt':
+            symbolsList.append(data['symbol'])
+
+    print(symbolsList)
