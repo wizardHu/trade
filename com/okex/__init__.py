@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
 
     spotAPI = spot.SpotAPI(api_key, seceret_key, passphrase, True)
-    amount = 10.0
+    amount = 2.0
 
     symbol = "btmusdt"
     symbol2 = "BTM-USDT"
@@ -35,8 +35,8 @@ if __name__ == '__main__':
             okClose = float(okexResult['last'])
             huoBiClose = float(huobiResult['tick']['close'])
 
-            okCharge = okClose*amount*0.0015
-            huoBiCharge = huoBiClose * amount * 0.002
+            okCharge = okClose*0.0015
+            huoBiCharge = huoBiClose * 0.002
             charge = okCharge + huoBiCharge
 
             logging.info(('okClose={} huoBiClose={} charge={}').format(okClose, huoBiClose, charge))
@@ -45,13 +45,13 @@ if __name__ == '__main__':
                 result = spotAPI.take_order('limit', 'sell', symbol2,amount, price=str(okClose))
                 if result['result']:
                     huobi.send_order(amount, "api", symbol, 'buy-limit', huoBiClose)
-                    write(('sellok {} buyhuobi {} charge {} profit {}').format(okClose, huoBiClose, charge,okClose - huoBiClose-charge),symbol)
+                    write(('sellok {} buyhuobi {} charge {} profit {}').format(okClose, huoBiClose, charge,(okClose - huoBiClose-charge)*amount),symbol)
 
             if (huoBiClose - okClose ) > charge:#OK买入 火币卖出
                 result = huobi.send_order(amount, "api", symbol, 'sell-limit', huoBiClose)
                 if result['status'] == 'ok':
                     spotAPI.take_order('limit', 'buy', symbol2, amount, price=str(okClose))
-                    write(('sellhuobi {} buyok {} charge {} profit {}').format(huoBiClose, okClose, charge,huoBiClose - okClose - charge),symbol)
+                    write(('sellhuobi {} buyok {} charge {} profit {}').format(huoBiClose, okClose, charge,(huoBiClose - okClose - charge)*amount),symbol)
 
         except Exception as err:
             logging.info('connect https error,retry...',err)

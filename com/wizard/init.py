@@ -258,7 +258,7 @@ if __name__ == '__main__':
    
     fig = plt.figure()
     symbols = 'eosusdt'
-    test = huobi.get_kline(symbols,'1min',1000)
+    test = huobi.get_kline(symbols,'1min',2000)
     # test = aa.test0
     
     test['data'].reverse()
