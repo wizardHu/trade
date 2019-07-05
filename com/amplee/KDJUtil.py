@@ -3,7 +3,7 @@ import Point as point
 
 kdjDict={}
 
-def addJDK(data,symbol):
+def add(data,symbol):
     global kdjDict
 
     Cn = data['close']
@@ -68,3 +68,5 @@ def judgeBuy(symbol):
 
     if KDJModelList[-3].J < 0 and lastJ < 0 and J < 0:
             return True
+
+    return  False

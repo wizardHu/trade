@@ -5,14 +5,14 @@ maDice={}
 
 def getThisMa(symbol,pre):
     maList = maDice.get(symbol + str(pre), [0])
-    return maList[-1:]
+    return maList[-1]
 
 def maJudgeBuy(data, symbol):
-    Cn = data['close']
+    Cn = float(data['close'])
 
-    ma10 = getThisMa(10)
-    ma30 = getThisMa(30)
-    ma60 = getThisMa(60)
+    ma10 = getThisMa(symbol,10)
+    ma30 = getThisMa(symbol,30)
+    ma60 = getThisMa(symbol,60)
 
     # print ("index=",index," ma10=",ma10," ma30=",ma30," ma60=",ma60)
 
@@ -43,9 +43,10 @@ def add(symbol,pre):
     maDice[symbol + str(pre)]=maList
 
 
-for i in range(20):
-    klineUtil.add({'close': i+1, 'amount': 1}, "eosusdt")
+if __name__ == '__main__':
+    for i in range(20):
+        klineUtil.add({'close': i+1, 'amount': 1}, "eosusdt")
 
-add("eosusdt",2)
-print(getThisMa("eosusdt",2))
+    add("eosusdt",2)
+    print(getThisMa("eosusdt",2))
 
