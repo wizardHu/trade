@@ -33,7 +33,6 @@ def juideLowest(price,symbol):
     low = min(lastPrice)
 
     if price <= low:
-        print(price)
         return True
 
     return False

@@ -39,17 +39,12 @@ if __name__ == '__main__':
 
             sellFlag = kDJUtil.judgeSell(transactionModel.symbol)
 
-            if data['id'] == 1562337900:
-                lowFlag = True
-                print(kdjFlag,rSIFlag,maFlag,avgFlag,highFlag,lowFlag,bollFlag,kDJUtil.kdjDict.get(transactionModel.symbol)[-1].K,kDJUtil.kdjDict.get(transactionModel.symbol)[-1].D,kDJUtil.kdjDict.get(transactionModel.symbol)[-1].J)
-
             price = float(data['close'])
 
             if commonUtil.nextBuy and avgFlag:
                 amount = round(float(transactionModel.everyExpense) / price, 2)
                 biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'])
                 commonUtil.nextBuy = False
-                print("222222")
 
             elif kdjFlag and rSIFlag and maFlag and avgFlag and highFlag:
                 amount = round(float(transactionModel.everyExpense)/price,2)
