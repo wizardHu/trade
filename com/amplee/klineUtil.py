@@ -14,7 +14,7 @@ def add(data,symbol):
     amount = data['amount']
     amountList.append(amount)
 
-    if len(priceList) > 1000:
+    if len(priceList) > 720:
         priceList = priceList[1:]
         amountList = amountList[1:]
 

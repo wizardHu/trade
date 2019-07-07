@@ -33,6 +33,31 @@ def add(data,symbol):
 
     kdjDict[symbol] = KDJModelList
 
+def judgeSell(symbol):
+    global kdjDict
+
+    KDJModelList = kdjDict.get(symbol, [KDJModel(50, 50, 50)])
+    if len(KDJModelList) < 2:
+        return False
+
+    thisModel = KDJModelList[-1]
+    lastModel = KDJModelList[-2]
+
+    K = thisModel.K
+    D = thisModel.D
+    J = thisModel.J
+
+    lastK = lastModel.K
+    lastD = lastModel.D
+    lastJ = lastModel.J
+
+    if (D < K and lastK < lastD or J > 100):
+        return True
+
+    if J < lastJ and J > 50 and J > K:
+        return True
+
+    return False
 
 def judgeBuy(symbol):
     global kdjDict
@@ -52,6 +77,7 @@ def judgeBuy(symbol):
     lastK = lastModel.K
     lastD = lastModel.D
     lastJ = lastModel.J
+    isBuy = False
 
     if K < D and lastK > lastD and D - K > 1 and lastK - lastD > 1:  # 普通下穿
         p1 = point.Point(1, lastK)
@@ -64,9 +90,12 @@ def judgeBuy(symbol):
 
         pointXY = point.GetCrossPoint(line1, line2)
         if pointXY.y < 60:
-            return True
+            isBuy = True
 
     if KDJModelList[-3].J < 0 and lastJ < 0 and J < 0:
-            return True
+            isBuy = True
 
-    return  False
+    if K>55 and D>55 or abs(J-lastJ)<30:
+        isBuy = False
+
+    return isBuy
