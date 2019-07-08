@@ -3,6 +3,10 @@ import klineUtil as klineUtil
 #{'eosusdt10':[1,2,3,4],'eosusdt20':[1,3,4,5],'xrpusdt20':[1,3,4,5],'xrpusdt30':[1,3,4,5]}
 maDice={}
 
+def delSymbol(symbol,pre):
+    global maDice
+    maDice[symbol + str(pre)] = []
+
 def getThisMa(symbol,pre):
     maList = maDice.get(symbol + str(pre), [0])
     return maList[-1]

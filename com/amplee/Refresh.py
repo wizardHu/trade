@@ -1,13 +1,36 @@
 # -*- coding: utf-8 -*-
 import modelUtil as modelUtil
-from TransactionModel import TransactionModel
+import HuobiService as huobi
+import klineUtil as klineUtil
+import KDJUtil as kDJUtil
+import RSIUtil as rSIUtil
+import MAUtil as mAUtil
 import time
+import logUtil
 
 lastRefreshTime = 0
 pairs = []
 
+def delSymbol(needDel):
+    logUtil.info("needDel={}".format(needDel))
+    for model in needDel:
+        logUtil.info("begin del={}".format(model))
+        klineUtil.delSymbol(model.symbol)
+        kDJUtil.delSymbol(model.symbol)
+        rSIUtil.delSymbol(model.symbol,12)
+        mAUtil.delSymbol(model.symbol,10)
+        mAUtil.delSymbol(model.symbol,30)
+        mAUtil.delSymbol(model.symbol,60)
+        logUtil.info("end del={}".format(model))
+
+def addSymbol(needAdd):
+    logUtil.info("needAdd={}".format(needAdd))
+
 def contains(pairsModel,symbol):
-    for o in list:
+    for model in pairsModel:
+        if model.symbol == symbol:
+            return True
+    return False
 
 def getAllPairAndRefresh():
     global lastRefreshTime
@@ -25,22 +48,21 @@ def getAllPairAndRefresh():
         needDel = []
 
         for newModel in pairsModel:
-            for oldModel in pairs:
-                if oldModel.symbol == newModel.symbol:
-                    continue
-            needAdd.append(newModel)
+            if not contains(pairs,newModel.symbol):
+                needAdd.append(newModel)
 
         for oldModel in pairs:
-            for newModel in pairsModel:
-                if oldModel.symbol == newModel.symbol:
-                    continue
-            needDel.append(newModel)
+            if not contains(pairsModel, oldModel.symbol):
+                needDel.append(oldModel)
 
-        print("needAdd",needAdd)
-        print("needDel",needDel)
+        delSymbol(needDel)
+        addSymbol(needAdd)
+
         pairs = pairsModel
 
     return pairs
+
+
 
 if __name__ == '__main__':
     print(getAllPairAndRefresh())

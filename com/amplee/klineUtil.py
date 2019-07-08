@@ -20,3 +20,10 @@ def add(data,symbol):
 
     prices[symbol] = priceList
     amounts[symbol] = amountList
+
+def delSymbol(symbol):
+    global prices
+    global amount
+
+    prices[symbol] = []
+    amounts[symbol] = []

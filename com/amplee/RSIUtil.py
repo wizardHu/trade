@@ -2,6 +2,10 @@ import klineUtil as klineUtil
 
 rsiDice={}
 
+def delSymbol(symbol,pre):
+    global rsiDice
+    rsiDice[symbol + str(pre)] = []
+
 def rsiJudgeBuy(symbol,pre):
     rsiList = rsiDice.get(symbol + str(pre), [50])
 

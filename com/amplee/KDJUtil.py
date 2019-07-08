@@ -3,6 +3,10 @@ import Point as point
 
 kdjDict={}
 
+def delSymbol(symbol):
+    global kdjDict
+    kdjDict[symbol] = []
+
 def add(data,symbol):
     global kdjDict
 
