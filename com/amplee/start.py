@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import HuobiService as huobi
 import modelUtil as modelUtil
-import klineUtil as klineUtil
 import KDJUtil as kDJUtil
 import RSIUtil as rSIUtil
 import MAUtil as mAUtil
@@ -16,18 +15,13 @@ if __name__ == '__main__':
 
     for transactionModel in transactionModels:
         print(transactionModel)
-        kline = huobi.get_kline(transactionModel.symbol, transactionModel.period, 2000)
+        kline = huobi.get_kline(transactionModel.symbol, transactionModel.period, 1000)
 
         datas = kline['data']
         datas.reverse()
 
         for data in datas:
-            klineUtil.add(data, transactionModel.symbol)
-            kDJUtil.add(data,transactionModel.symbol)
-            rSIUtil.add(transactionModel.symbol,12)
-            mAUtil.add(transactionModel.symbol,10)
-            mAUtil.add(transactionModel.symbol, 30)
-            mAUtil.add(transactionModel.symbol, 60)
+            commonUtil.addSymbol(data ,transactionModel)
 
             kdjFlag = kDJUtil.judgeBuy(transactionModel.symbol)
             rSIFlag = rSIUtil.rsiJudgeBuy(transactionModel.symbol,12)

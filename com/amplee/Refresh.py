@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 import modelUtil as modelUtil
 import HuobiService as huobi
-import klineUtil as klineUtil
-import KDJUtil as kDJUtil
-import RSIUtil as rSIUtil
-import MAUtil as mAUtil
 import time
 import logUtil
+import commonUtil as commonUtil
 
 lastRefreshTime = 0
 pairs = []
@@ -15,16 +12,19 @@ def delSymbol(needDel):
     logUtil.info("needDel={}".format(needDel))
     for model in needDel:
         logUtil.info("begin del={}".format(model))
-        klineUtil.delSymbol(model.symbol)
-        kDJUtil.delSymbol(model.symbol)
-        rSIUtil.delSymbol(model.symbol,12)
-        mAUtil.delSymbol(model.symbol,10)
-        mAUtil.delSymbol(model.symbol,30)
-        mAUtil.delSymbol(model.symbol,60)
+        commonUtil.delSymbol(model.symbol)
         logUtil.info("end del={}".format(model))
 
 def addSymbol(needAdd):
     logUtil.info("needAdd={}".format(needAdd))
+    for model in needAdd:
+        logUtil.info("begin add={}".format(model))
+        kline = huobi.get_kline(model.symbol, model.period, 1000)
+        datas = kline['data']
+        datas.reverse()
+        for data in datas:
+            commonUtil.addSymbol(data,model)
+        logUtil.info("end add={}".format(model))
 
 def contains(pairsModel,symbol):
     for model in pairsModel:

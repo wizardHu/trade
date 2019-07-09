@@ -1,5 +1,8 @@
 import modelUtil as modelUtil
 import klineUtil as klineUtil
+import KDJUtil as kDJUtil
+import RSIUtil as rSIUtil
+import MAUtil as mAUtil
 
 nextBuy = False
 
@@ -63,6 +66,22 @@ def canSell(price,symbol,minIncome,env):
         print("commonUtil--canSell"+err)
 
     return sellPackage
+
+def addSymbol(data,transactionModel):
+    klineUtil.add(data, transactionModel.symbol)
+    kDJUtil.add(data, transactionModel.symbol)
+    rSIUtil.add(transactionModel.symbol, 12)
+    mAUtil.add(transactionModel.symbol, 10)
+    mAUtil.add(transactionModel.symbol, 30)
+    mAUtil.add(transactionModel.symbol, 60)
+
+def delSymbol(transactionModel):
+    klineUtil.delSymbol(transactionModel.symbol)
+    kDJUtil.delSymbol(transactionModel.symbol)
+    rSIUtil.delSymbol(transactionModel.symbol, 12)
+    mAUtil.delSymbol(transactionModel.symbol, 10)
+    mAUtil.delSymbol(transactionModel.symbol, 30)
+    mAUtil.delSymbol(transactionModel.symbol, 60)
 
 if __name__ == '__main__':
     print(juideHighest(7,"eosusdt"))
