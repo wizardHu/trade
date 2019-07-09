@@ -270,7 +270,7 @@ def write(msg):
     f.close()
     
 def writeTradeRecord(msg):
-    f = open('tradeRecord','a',encoding='utf-8')
+    f = open('tradeRecord2','a',encoding='utf-8')
     f.write("{0}\n".format(msg))
     f.flush()
     f.close()
