@@ -8,14 +8,17 @@ import commonUtil as commonUtil
 import BiTradeUtil as biTradeUtil
 import fileOperUtil as fileOperUtil
 import BollUtil as bollUtil
+import AmountUtil as amountUtil
+import logUtil
 
 if __name__ == '__main__':
     transactionModels = modelUtil.getAllPair()
     env = "dev"
+    lastIndex = 0
 
     for transactionModel in transactionModels:
-        print(transactionModel)
-        kline = huobi.get_kline(transactionModel.symbol, transactionModel.period, 1000)
+        logUtil.info(transactionModel)
+        kline = huobi.get_kline(transactionModel.symbol, transactionModel.period, 2000)
 
         datas = kline['data']
         datas.reverse()
@@ -30,10 +33,16 @@ if __name__ == '__main__':
             highFlag = commonUtil.juideHighest(data['close'],transactionModel.symbol)
             bollFlag = bollUtil.judgeBoll(data['close'],transactionModel.symbol)
             lowFlag = commonUtil.juideLowest(data['close'],transactionModel.symbol)
+            riskFlag = amountUtil.judgeRisk(transactionModel.symbol)
 
             sellFlag = kDJUtil.judgeSell(transactionModel.symbol)
 
             price = float(data['close'])
+
+            if 1562683380 == data['id']:
+                logUtil.info(kdjFlag,rSIFlag,maFlag,avgFlag,highFlag,bollFlag,lowFlag,riskFlag,lastIndex)
+
+            lastIndex = data['id']
 
             if commonUtil.nextBuy and avgFlag:
                 amount = round(float(transactionModel.everyExpense) / price, 2)
@@ -44,7 +53,7 @@ if __name__ == '__main__':
                 amount = round(float(transactionModel.everyExpense)/price,2)
                 biTradeUtil.buy(env,price,amount,transactionModel.symbol,data['id'])
 
-            elif avgFlag and lowFlag and bollFlag:
+            elif avgFlag and lowFlag and bollFlag and riskFlag and highFlag:
                 commonUtil.nextBuy = True
 
             if sellFlag:
@@ -53,7 +62,7 @@ if __name__ == '__main__':
                     for buyModel in sellPackage:
                         biTradeUtil.sell("dev",price,data['id'],buyModel,transactionModel.symbol)
 
-        print(rSIUtil.rsiDice)
-        fileOperUtil.delAll(transactionModel.symbol+"buy")
+        logUtil.info(rSIUtil.rsiDice)
+        fileOperUtil.delAll("buy/"+transactionModel.symbol+"buy")
 
 

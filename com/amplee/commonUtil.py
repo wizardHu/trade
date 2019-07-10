@@ -3,6 +3,8 @@ import klineUtil as klineUtil
 import KDJUtil as kDJUtil
 import RSIUtil as rSIUtil
 import MAUtil as mAUtil
+import AmountUtil as amountUtil
+import logUtil
 
 nextBuy = False
 
@@ -48,22 +50,17 @@ def canSell(price,symbol,minIncome,env):
         buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
 
         for buyModel in buyPackage:
-            state = 'filled'
 
-            if "pro" == env:
-                print(state)
+            buyModelPrice = buyModel.price;
 
-            if state == 'filled':
-                buyModelPrice = buyModel.price;
+            gap = price - float(buyModelPrice)
+            gap = gap / float(buyModelPrice)
 
-                gap = price - float(buyModelPrice)
-                gap = gap / float(buyModelPrice)
-
-                if gap >= float(minIncome):
-                    sellPackage.append(buyModel)
+            if gap >= float(minIncome):
+                sellPackage.append(buyModel)
 
     except Exception as err:
-        print("commonUtil--canSell"+err)
+        logUtil.info("commonUtil--canSell"+err)
 
     return sellPackage
 
@@ -74,6 +71,7 @@ def addSymbol(data,transactionModel):
     mAUtil.add(transactionModel.symbol, 10)
     mAUtil.add(transactionModel.symbol, 30)
     mAUtil.add(transactionModel.symbol, 60)
+    amountUtil.add(data,transactionModel.symbol)
 
 def delSymbol(transactionModel):
     klineUtil.delSymbol(transactionModel.symbol)
@@ -82,6 +80,7 @@ def delSymbol(transactionModel):
     mAUtil.delSymbol(transactionModel.symbol, 10)
     mAUtil.delSymbol(transactionModel.symbol, 30)
     mAUtil.delSymbol(transactionModel.symbol, 60)
+    amountUtil.delSymbol(transactionModel.symbol)
 
 if __name__ == '__main__':
-    print(juideHighest(7,"eosusdt"))
+    logUtil.info(juideHighest(7,"eosusdt"))

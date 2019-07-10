@@ -22,7 +22,7 @@ def getAllPair():
     return pairs
 
 def getBuyModel(symbol):
-    lines = fileOperUtil.readAll(symbol+"buy")
+    lines = fileOperUtil.readAll("buy/"+symbol+"buy")
     models = []
 
     for model in lines:
@@ -40,4 +40,4 @@ def getBuyModel(symbol):
     return models
 
 if __name__ == '__main__':
-    print(getBuyModel("eosusdt"))
+    print(getBuyModel("buy/"+"eosusdt"))
