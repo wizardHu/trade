@@ -10,7 +10,8 @@ def readAll(fileName):
 
         f.close()
     except Exception as err:
-        print()
+        f = open(fileName, 'a', encoding='utf-8')
+        f.close()
     return lines
 
 def write(msg,fileName):
