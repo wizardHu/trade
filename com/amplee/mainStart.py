@@ -52,7 +52,6 @@ def dealData(data,transactionModel,env):
     except Exception as err:
         logUtil.info('deal error', err)
 
-    logUtil.info(data)
 
 if __name__ == '__main__':
 
@@ -61,8 +60,8 @@ if __name__ == '__main__':
     while True:
         transactionModels = refresh.getAllPairAndRefresh()
 
-        lastIdDict = {}
-        lastDataDict = {}
+        lastDataDict = commonUtil.lastDataDict
+        lastIdDict = commonUtil.lastIdDict
 
         try:
 

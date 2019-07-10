@@ -12,7 +12,7 @@ def delSymbol(needDel):
     logUtil.info("needDel={}".format(needDel))
     for model in needDel:
         logUtil.info("begin del={}".format(model))
-        commonUtil.delSymbol(model.symbol)
+        commonUtil.delSymbol(model)
         logUtil.info("end del={}".format(model))
 
 def addSymbol(needAdd):

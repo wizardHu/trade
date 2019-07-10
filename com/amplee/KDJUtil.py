@@ -15,6 +15,10 @@ def add(data,symbol):
     Hn = data['high']
 
     KDJModelList = kdjDict.get(symbol,[KDJModel(50,50,50)])
+
+    if len(KDJModelList) == 0:
+        KDJModelList.append(KDJModel(50,50,50))
+
     lastModel = KDJModelList[-1]
 
     if Ln == Hn:

@@ -6,6 +6,6 @@ logging.basicConfig(filename='./my.log',                                        
                     datefmt='%Y-%m-%d %H:%M:%S',                                         # 时间格式
                     format='%(asctime)s Line:%(lineno)s==>%(message)s')    # 日志写入格式
 
-def info(msg):
-    #logging.info(msg)
-    print(msg)
+def info(*msg):
+    logging.info(msg)
+    # print(msg)

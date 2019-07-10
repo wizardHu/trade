@@ -7,6 +7,8 @@ import AmountUtil as amountUtil
 import logUtil
 
 nextBuy = False
+lastIdDict = {}
+lastDataDict = {}
 
 def juideAllGap(price,symbol,tradeGap):
     buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
@@ -81,6 +83,8 @@ def delSymbol(transactionModel):
     mAUtil.delSymbol(transactionModel.symbol, 30)
     mAUtil.delSymbol(transactionModel.symbol, 60)
     amountUtil.delSymbol(transactionModel.symbol)
+    lastDataDict[transactionModel.symbol] = []
+    lastIdDict[transactionModel.symbol] = 0
 
 if __name__ == '__main__':
     logUtil.info(juideHighest(7,"eosusdt"))
