@@ -3,6 +3,7 @@ import fileOperUtil as fileOperUtil
 import time
 import HuobiService as huobi
 import logUtil
+import sys
 
 def buy(env,buyPrice,amount,symbol,index):
     try:
@@ -11,6 +12,8 @@ def buy(env,buyPrice,amount,symbol,index):
             result = huobi.send_order(amount, "api", symbol, "buy-limit", buyPrice)
             if result['status'] == 'ok':
                 orderId = result['data']
+            else:
+                return
 
         buyModel = BuyModel(buyPrice,index,amount,orderId)
         fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
@@ -34,4 +37,8 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
 
     except Exception as err:
         logUtil.info("BiTradeUtil--sell"+err)
+
+if __name__ == '__main__':
+    data = huobi.get_kline(sys.argv[0], "1min", 1)
+    print(data)
 
