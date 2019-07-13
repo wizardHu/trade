@@ -67,6 +67,8 @@ def canSell(price,symbol,minIncome,env):
     return sellPackage
 
 def addSymbol(data,transactionModel):
+    logUtil.info(data, "new data-----",transactionModel.symbol)
+
     klineUtil.add(data, transactionModel.symbol)
     kDJUtil.add(data, transactionModel.symbol)
     rSIUtil.add(transactionModel.symbol, 12)

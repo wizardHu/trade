@@ -31,11 +31,14 @@ def dealData(data,transactionModel,env):
         if commonUtil.nextBuy and avgFlag:
             amount = round(float(transactionModel.everyExpense) / price, 2)
             biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'])
+            logUtil.info(("is next buy symbol={},price={},data['id']={}").format(transactionModel.symbol,price,data['id']))
+
             commonUtil.nextBuy = False
 
         elif kdjFlag and rSIFlag and maFlag and avgFlag and highFlag:
             amount = round(float(transactionModel.everyExpense) / price, 2)
             biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'])
+            logUtil.info(("is first buy symbol={},price={},data['id']={}").format(transactionModel.symbol, price, data['id']))
 
         elif avgFlag and lowFlag and bollFlag and riskFlag and highFlag:
             commonUtil.nextBuy = True
@@ -77,7 +80,7 @@ if __name__ == '__main__':
                 logUtil.info(thisData['data'],transactionModel.symbol)
 
                 if lastId != thisData['data'][0]['id']:
-                    logUtil.info(lastData['data'],"new data-----")
+                    commonUtil.addSymbol(lastData['data'][0],transactionModel)
                     dealData(thisData['data'][0],transactionModel,env)
 
                 lastDataDict[transactionModel.symbol] = thisData
