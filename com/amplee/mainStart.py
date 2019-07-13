@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
                 if lastId != thisData['data'][0]['id']:
                     commonUtil.addSymbol(lastData['data'][0],transactionModel)
-                    dealData(thisData['data'][0],transactionModel,env)
+                    dealData(lastData['data'][0],transactionModel,env)
 
                 lastDataDict[transactionModel.symbol] = thisData
                 lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
