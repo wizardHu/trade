@@ -44,7 +44,7 @@ def dealData(data,transactionModel,env):
             commonUtil.nextBuy = True
 
         if sellFlag:
-            sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, "dev")
+            sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, env)
 
             logUtil.info(sellPackage)
 
@@ -58,7 +58,7 @@ def dealData(data,transactionModel,env):
 
 if __name__ == '__main__':
 
-    env = "dev"
+    env = "pro"
 
     while True:
         transactionModels = refresh.getAllPairAndRefresh()
@@ -83,8 +83,8 @@ if __name__ == '__main__':
                     commonUtil.addSymbol(lastData['data'][0],transactionModel)
                     dealData(lastData['data'][0],transactionModel,env)
 
-                lastDataDict[transactionModel.symbol] = thisData
-                lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
+                commonUtil.lastDataDict[transactionModel.symbol] = thisData
+                commonUtil.lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
 
         except Exception as err:
             logUtil.info('connect https error,retry...', err)
