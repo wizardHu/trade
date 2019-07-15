@@ -31,17 +31,20 @@ def dealData(data,transactionModel,env):
         if commonUtil.nextBuy and avgFlag:
             amount = round(float(transactionModel.everyExpense) / price, 2)
             biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'])
+            logUtil.info(("is next buy symbol={},price={},data['id']={}").format(transactionModel.symbol,price,data['id']))
+
             commonUtil.nextBuy = False
 
         elif kdjFlag and rSIFlag and maFlag and avgFlag and highFlag:
             amount = round(float(transactionModel.everyExpense) / price, 2)
             biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'])
+            logUtil.info(("is first buy symbol={},price={},data['id']={}").format(transactionModel.symbol, price, data['id']))
 
         elif avgFlag and lowFlag and bollFlag and riskFlag and highFlag:
             commonUtil.nextBuy = True
 
         if sellFlag:
-            sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, "dev")
+            sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, env)
 
             logUtil.info(sellPackage)
 
@@ -55,7 +58,7 @@ def dealData(data,transactionModel,env):
 
 if __name__ == '__main__':
 
-    env = "dev"
+    env = "pro"
 
     while True:
         transactionModels = refresh.getAllPairAndRefresh()
@@ -77,11 +80,11 @@ if __name__ == '__main__':
                 logUtil.info(thisData['data'],transactionModel.symbol)
 
                 if lastId != thisData['data'][0]['id']:
-                    logUtil.info(lastData['data'],"new data-----")
-                    dealData(thisData['data'][0],transactionModel,env)
+                    commonUtil.addSymbol(lastData['data'][0],transactionModel)
+                    dealData(lastData['data'][0],transactionModel,env)
 
-                lastDataDict[transactionModel.symbol] = thisData
-                lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
+                commonUtil.lastDataDict[transactionModel.symbol] = thisData
+                commonUtil.lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
 
         except Exception as err:
             logUtil.info('connect https error,retry...', err)

@@ -10,6 +10,7 @@ def buy(env,buyPrice,amount,symbol,index):
         orderId = "0000"
         if "pro" == env:
             result = huobi.send_order(amount, "api", symbol, "buy-limit", buyPrice)
+            logUtil.info("buy result",result)
             if result['status'] == 'ok':
                 orderId = result['data']
             else:
