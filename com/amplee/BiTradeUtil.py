@@ -40,6 +40,6 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
         logUtil.info("BiTradeUtil--sell"+err)
 
 if __name__ == '__main__':
-    data = huobi.get_kline(sys.argv[1], "1min", 1)
+    data = huobi.get_kline(sys.argv[1], sys.argv[2], sys.argv[3])
     print(data)
 

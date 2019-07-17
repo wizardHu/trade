@@ -15,8 +15,9 @@ def getAllPair():
             tradeGap = params[2]
             minIncome = params[3]
             period = params[4]
+            precision = params[5]
 
-            tradeModel = TransactionModel(symbol, everyExpense, tradeGap, minIncome, period)
+            tradeModel = TransactionModel(symbol, everyExpense, tradeGap, minIncome, period,precision)
             pairs.append(tradeModel)
 
     return pairs

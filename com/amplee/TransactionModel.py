@@ -15,13 +15,18 @@ class TransactionModel:
     #K线周期
     period = '1min'
 
-    def __init__(self,symbol,everyExpense,tradeGap,minIncome,period):
+    # 小数点精度
+    precision = 2
+
+    def __init__(self,symbol,everyExpense,tradeGap,minIncome,period,precision):
         self.symbol = symbol
         self.everyExpense = everyExpense
         self.tradeGap = tradeGap
         self.tradeGap = tradeGap
         self.minIncome = minIncome
         self.period = period
+        self.precision = precision
+
 
     def __str__(self):
         return "{},{},{},{},{}".format(self.symbol,self.everyExpense,self.tradeGap,self.minIncome,self.period)
