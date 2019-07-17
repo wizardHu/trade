@@ -45,13 +45,15 @@ if __name__ == '__main__':
             lastIndex = data['id']
 
             if commonUtil.nextBuy and avgFlag:
-                amount = round(float(transactionModel.everyExpense) / price, float(transactionModel.precision))
+                amount = round(float(transactionModel.everyExpense) / price, int(transactionModel.precision))
                 biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'])
                 commonUtil.nextBuy = False
+                print("111111111")
 
             elif kdjFlag and rSIFlag and maFlag and avgFlag and highFlag:
-                amount = round(float(transactionModel.everyExpense)/price,float(transactionModel.precision))
+                amount = round(float(transactionModel.everyExpense)/price,int(transactionModel.precision))
                 biTradeUtil.buy(env,price,amount,transactionModel.symbol,data['id'])
+                print("2222222")
 
             elif avgFlag and lowFlag and bollFlag and riskFlag and highFlag:
                 commonUtil.nextBuy = True
