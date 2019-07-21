@@ -5,7 +5,7 @@ import HuobiService as huobi
 import logUtil
 import sys
 
-def buy(env,buyPrice,amount,symbol,index):
+def buy(env,buyPrice,amount,symbol,index,minIncome):
     try:
         orderId = "0000"
         if "pro" == env:
@@ -16,7 +16,7 @@ def buy(env,buyPrice,amount,symbol,index):
             else:
                 return
 
-        buyModel = BuyModel(buyPrice,index,amount,orderId)
+        buyModel = BuyModel(buyPrice,index,amount,orderId,minIncome)
         fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
         fileOperUtil.write(('1,{},{},{},{},{}').format(int(time.time()),buyPrice, amount, index,
                                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index))),"record/"+symbol + "-record")

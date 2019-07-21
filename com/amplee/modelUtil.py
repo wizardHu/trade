@@ -34,8 +34,9 @@ def getBuyModel(symbol):
             amount = params[1]
             orderId = params[2]
             index = params[3]
+            minIncome = params[4]
 
-            buyModel = BuyModel(price, index, amount, orderId)
+            buyModel = BuyModel(price, index, amount, orderId,minIncome)
             models.append(buyModel)
 
     return models

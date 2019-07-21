@@ -58,7 +58,7 @@ def canSell(price,symbol,minIncome,env):
             gap = price - float(buyModelPrice)
             gap = gap / float(buyModelPrice)
 
-            if gap >= float(minIncome):
+            if gap >= float(minIncome) and gap >= float(buyModel.minIncome):
                 sellPackage.append(buyModel)
 
     except Exception as err:
