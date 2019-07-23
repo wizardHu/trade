@@ -41,5 +41,11 @@ def getBuyModel(symbol):
 
     return models
 
+def modBuyModel(oldBuyModel,newBuyModel,symbol):
+    fileOperUtil.delMsgFromFile(oldBuyModel, "buy/" + symbol + "buy")
+    fileOperUtil.write(newBuyModel, "buy/" + symbol + "buy")
+
 if __name__ == '__main__':
-    print(getBuyModel("buy/"+"eosusdt"))
+    buyModel = BuyModel(1, 2, 3, 4,6)
+    newBuyModel = BuyModel(1, 2, 3, 4,5)
+    modBuyModel(buyModel,newBuyModel,"htusdt")

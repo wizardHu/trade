@@ -24,6 +24,7 @@ def juideAllGap(price,symbol,tradeGap):
 
     return True
 
+#判断能不能买
 def juideHighest(price,symbol):
     lastPrice = klineUtil.prices.get(symbol, [])
 
@@ -88,5 +89,43 @@ def delSymbol(transactionModel):
     lastDataDict[transactionModel.symbol] = []
     lastIdDict[transactionModel.symbol] = 0
 
+#判断是否最大
+def isHighest(price,symbol):
+    lastPrice = klineUtil.prices.get(symbol, [])
+
+    if len(lastPrice) < 360:
+        return False
+
+    high = max(lastPrice[-360:])
+    if price >= high :
+        return True
+
+    return False
+
+#找到已购买的最大的那个去卖  至少堆积了5个，并且最大的那个与现在相差10%
+def findHighToSell(price,symbol):
+    try:
+        buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
+
+        if len(buyPackage) < 5:
+            return None
+
+        buyPackage.sort(key=lambda buyModel: buyModel.price, reverse=True)
+
+        buyModel = buyPackage[0]
+
+        buyModelPrice = buyModel.price;
+
+        gap = float(buyModelPrice) - price
+        gap = gap / float(buyModelPrice)
+
+        if gap >= float(0.1):
+            return buyModel
+
+    except Exception as err:
+        logUtil.info("commonUtil--findHighToSell" + err)
+
+    return None
+
 if __name__ == '__main__':
-    logUtil.info(juideHighest(7,"eosusdt"))
+    print(findHighToSell(9.1,"htusdt") == None)
