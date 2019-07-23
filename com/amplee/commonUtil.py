@@ -107,19 +107,23 @@ def findHighToSell(price,symbol):
     try:
         buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
 
-        if len(buyPackage) < 5:
+        buyList = []
+        for model in buyPackage:
+            if float(model.minIncome) != 1:
+                buyList.append(model)
+
+        if len(buyList) < 5:
             return None
 
-        buyPackage.sort(key=lambda buyModel: buyModel.price, reverse=True)
-
-        buyModel = buyPackage[0]
+        buyList.sort(key=lambda buyModel:float(buyModel.price), reverse=True)
+        buyModel = buyList[0]
 
         buyModelPrice = buyModel.price;
 
         gap = float(buyModelPrice) - price
         gap = gap / float(buyModelPrice)
 
-        if gap >= float(0.1):
+        if gap >= 0.1:
             return buyModel
 
     except Exception as err:
@@ -128,4 +132,4 @@ def findHighToSell(price,symbol):
     return None
 
 if __name__ == '__main__':
-    print(findHighToSell(9.1,"htusdt") == None)
+    print(findHighToSell(8.1,"htusdt"))
