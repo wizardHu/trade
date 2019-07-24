@@ -1,9 +1,11 @@
 from BuyModel import BuyModel
+from UrgentSellModel import UrgentSellModel
 import fileOperUtil as fileOperUtil
 import time
 import HuobiService as huobi
 import logUtil
 import sys
+import modelUtil as modelUtil
 
 def buy(env,buyPrice,amount,symbol,index,minIncome):
     try:
@@ -41,13 +43,22 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
     except Exception as err:
         logUtil.info("BiTradeUtil--sell"+err)
 
-def urgentSell(env,sellPrice,sellIndex,buyModel,symbol):
+def urgentSell(env,sellPrice,sellIndex,buyModel,symbol,minIncome):
     try:
+        orderId = "0000"
         if "pro" == env:
             result = huobi.send_order(buyModel.amount, "api", symbol, 'sell-limit', sellPrice)
+            logUtil.info("urgentSell result", result, symbol, buyModel.amount, sellPrice)
+            if result['status'] == 'ok':
+                orderId = result['data']
+            else:
+                return
 
-        fileOperUtil.write(buyModel, "sell/" + symbol + "sell")
-        fileOperUtil.write(('0,{},{},{},{},{},{}').format(int(time.time()),buyModel.price, buyModel.amount,sellPrice,sellIndex,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex))),"urgentRecord/"+symbol+"-record")
+        newBuyModel = BuyModel(buyModel.price,buyModel.index,buyModel.amount,buyModel.orderId,1)
+        urgentSellModel = UrgentSellModel(buyModel,sellIndex,orderId,sellPrice,minIncome)
+        fileOperUtil.write(urgentSellModel, "sell/" + symbol + "sell")
+        fileOperUtil.write(('0,{},{},{},{},{},{}').format(int(time.time()),buyModel.price, buyModel.amount,sellPrice,sellIndex,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex))),"urgentRecord/"+symbol+"-recordLog")
+        modelUtil.modBuyModel(buyModel,newBuyModel,symbol)
 
     except Exception as err:
         logUtil.info("BiTradeUtil--urgentSell"+err)
