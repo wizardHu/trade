@@ -63,6 +63,27 @@ def urgentSell(env,sellPrice,sellIndex,buyModel,symbol,minIncome):
     except Exception as err:
         logUtil.info("BiTradeUtil--urgentSell"+err)
 
+
+def urgentBuy(env,buyPrice,buyIndex,urgentSellModel,symbol):
+    try:
+        if "pro" == env:
+            result = huobi.order_info(urgentSellModel.orderId)
+            data = result['data']
+            state = data['state']
+            if state == 'filled':
+                result = huobi.send_order(urgentSellModel.amount, "api", symbol, 'buy-limit', buyPrice)
+            else:
+                return
+
+        buyModel = urgentSellModel.buyModel
+        oldBuyModel = BuyModel(buyModel.price, buyModel.index, buyModel.amount, buyModel.orderId, 1)
+        fileOperUtil.delMsgFromFile(urgentSellModel,"sell/"+symbol+"sell")
+        fileOperUtil.write(('1,{},{},{},{},{},{}').format(int(time.time()), buyModel.price, buyModel.amount, buyPrice, buyIndex,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(buyIndex))), "urgentRecord/" + symbol + "-recordLog")
+        modelUtil.modBuyModel(oldBuyModel, buyModel, symbol)
+
+    except Exception as err:
+        logUtil.info("BiTradeUtil--sell"+err)
+
 if __name__ == '__main__':
     data = huobi.get_kline(sys.argv[1], sys.argv[2], sys.argv[3])
     print(data)

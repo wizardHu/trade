@@ -131,5 +131,26 @@ def findHighToSell(price,symbol):
 
     return None
 
+def canUrgentBuy(price,symbol,env):
+    canBuyPackage = []
+
+    try:
+        sellPackage = modelUtil.getUrgentSellModel(symbol)  # 查询卖出历史
+
+        for sellModel in sellPackage:
+
+            sellModelPrice = sellModel.sellPrice;
+
+            gap = float(sellModelPrice) - price
+            gap = gap / float(sellModelPrice)
+
+            if gap >= float(sellModel.minIncome):
+                canBuyPackage.append(sellModel)
+
+    except Exception as err:
+        logUtil.info("commonUtil--canUrgentBuy" + err)
+
+    return canBuyPackage
+
 if __name__ == '__main__':
-    print(findHighToSell(8.1,"htusdt"))
+    print(canUrgentBuy(0.87,"htusdt","dev"))
