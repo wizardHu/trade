@@ -82,7 +82,7 @@ def urgentBuy(env,buyPrice,buyIndex,urgentSellModel,symbol):
         modelUtil.modBuyModel(oldBuyModel, buyModel, symbol)
 
     except Exception as err:
-        logUtil.info("BiTradeUtil--sell"+err)
+        logUtil.info("BiTradeUtil--urgentBuy"+err)
 
 if __name__ == '__main__':
     data = huobi.get_kline(sys.argv[1], sys.argv[2], sys.argv[3])

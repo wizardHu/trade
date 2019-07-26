@@ -153,4 +153,4 @@ def canUrgentBuy(price,symbol,env):
     return canBuyPackage
 
 if __name__ == '__main__':
-    print(canUrgentBuy(0.87,"htusdt","dev"))
+    print(findHighToSell(0.87,"htusdt"))
