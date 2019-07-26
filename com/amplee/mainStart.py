@@ -52,6 +52,19 @@ def dealData(data,transactionModel,env):
                 for buyModel in sellPackage:
                     biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
 
+        isHighest = commonUtil.isHighest(price, transactionModel.symbol)
+        if isHighest:
+            buyModel = commonUtil.findHighToSell(price, transactionModel.symbol)
+            if buyModel is not None:
+                biTradeUtil.urgentSell(env,price,data['id'],buyModel, transactionModel.symbol,0.025)
+
+        canBuyPackage = commonUtil.canUrgentBuy(price, transactionModel.symbol,env)
+        if len(canBuyPackage) > 0:
+            for canBuy in canBuyPackage:
+                logUtil.info("can urgent buy ",canBuy)
+                biTradeUtil.urgentBuy(env,price,data['id'],canBuy,transactionModel.symbol)
+
+
     except Exception as err:
         logUtil.info('deal error', err)
 

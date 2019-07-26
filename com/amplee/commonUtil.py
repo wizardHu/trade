@@ -98,6 +98,7 @@ def isHighest(price,symbol):
 
     high = max(lastPrice[-360:])
     if price >= high :
+        logUtil.info("symbol=",symbol," price=",price," isHighest")
         return True
 
     return False
