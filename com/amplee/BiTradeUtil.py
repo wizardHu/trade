@@ -70,9 +70,9 @@ def urgentBuy(env,buyPrice,buyIndex,urgentSellModel,symbol):
             result = huobi.order_info(urgentSellModel.orderId)
             data = result['data']
             state = data['state']
-            logUtil.info("urgentBuy result", result, symbol)
             if state == 'filled':
-                result = huobi.send_order(urgentSellModel.amount, "api", symbol, 'buy-limit', buyPrice)
+                result = huobi.send_order(urgentSellModel.buyModel.amount, "api", symbol, 'buy-limit', buyPrice)
+                logUtil.info("urgentBuy result", result, symbol)
             else:
                 return
 

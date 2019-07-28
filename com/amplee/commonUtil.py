@@ -9,6 +9,7 @@ import logUtil
 nextBuy = False
 lastIdDict = {}
 lastDataDict = {}
+highCount = {}
 
 def juideAllGap(price,symbol,tradeGap):
     buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
@@ -88,20 +89,27 @@ def delSymbol(transactionModel):
     amountUtil.delSymbol(transactionModel.symbol)
     lastDataDict[transactionModel.symbol] = []
     lastIdDict[transactionModel.symbol] = 0
+    highCount[transactionModel.symbol] = 0
 
 #判断是否最大
 def isHighest(price,symbol):
     lastPrice = klineUtil.prices.get(symbol, [])
+    count = highCount.get(symbol, 0)
+
+    count = float(count)
 
     if len(lastPrice) < 360:
         return False
 
     high = max(lastPrice[-360:])
     if price >= high :
+        count = count + 1
         logUtil.info("symbol=",symbol," price=",price," isHighest")
-        return True
+    else:
+        count = count - 1
 
-    return False
+    highCount[symbol] = count
+    return count >= 3
 
 #找到已购买的最大的那个去卖  至少堆积了5个，并且最大的那个与现在相差10%
 def findHighToSell(price,symbol):
