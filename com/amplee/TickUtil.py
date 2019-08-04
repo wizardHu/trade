@@ -11,11 +11,15 @@ lastTickId = {}
 # {'amount': 41.6557, 'ts': 1564407470567, 'id': 10164540014842590788489, 'price': 4.2258, 'direction': 'buy'}
 # ]}}
 def add(data,symbol):
+    global tickDict
+    global lastTickId
+
     if data and "ok" == data['status']:
         for tick in data['tick']['data']:
             lastId = lastTickId.get(symbol,0)
             nowId = tick['id']
+            ts = tick['ts']
 
             if lastId != nowId:
                 lastTickId[symbol] = nowId
-                print(tick['amount'],tick['price'],tick['direction'],symbol)
+                print(tick['amount'],tick['price'],tick['direction'],symbol,nowId,ts)

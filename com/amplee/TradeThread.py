@@ -6,22 +6,24 @@ import Refresh as refresh
 import TickUtil as tickUtil
 
 class TradeThread(Thread):
+    transactionModel = None
 
-    def __init__(self, name="tradeThread"):
+    def __init__(self,transactionModel, name="tradeThread"):
         super().__init__()
         self.name = name
+        self.transactionModel = transactionModel
 
     def run(self):
         try:
-            transactionModels = refresh.getAllPairAndRefresh()
             while True:
-                for transactionModel in transactionModels:
-                    result = huobi.get_trade(transactionModel.symbol)
-                    tickUtil.add(result,transactionModel.symbol)
+                result = huobi.get_trade(self.transactionModel.symbol)
+                tickUtil.add(result,self.transactionModel.symbol)
 
         except Exception as err:
             logUtil.info('TradeThread error', err)
 
 if __name__ == '__main__':
-    thread_01 = TradeThread()
-    thread_01.start()
+    transactionModels = refresh.getAllPairAndRefresh()
+    for transactionModel in transactionModels:
+        thread01 = TradeThread(transactionModel)
+        thread01.start()
