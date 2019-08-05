@@ -16,10 +16,18 @@ def add(data,symbol):
 
     if data and "ok" == data['status']:
         for tick in data['tick']['data']:
-            lastId = lastTickId.get(symbol,0)
+            lastIds = lastTickId.get(symbol,[0])
             nowId = tick['id']
             ts = tick['ts']
 
-            if lastId != nowId:
-                lastTickId[symbol] = nowId
+            if len(lastIds) == 0 or nowId not in lastIds:
+                lastIds.append(nowId)
+
+                curTs = str(int(ts/1000))
+
+                symbolTickDict[curTs] = 
                 print(tick['amount'],tick['price'],tick['direction'],symbol,nowId,ts)
+                if len(lastIds) > 20:
+                    lastIds = lastIds[1:]
+
+                lastTickId[symbol] = lastIds
