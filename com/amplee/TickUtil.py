@@ -1,4 +1,6 @@
 import logUtil
+import TickModel
+import time
 
 tickDict = {}
 lastTickId = {}
@@ -17,17 +19,34 @@ def add(data,symbol):
     if data and "ok" == data['status']:
         for tick in data['tick']['data']:
             lastIds = lastTickId.get(symbol,[0])
+
             nowId = tick['id']
             ts = tick['ts']
 
-            if len(lastIds) == 0 or nowId not in lastIds:
+            if len(lastIds) == 0 or nowId not in lastIds:#该交易id未处理过
                 lastIds.append(nowId)
 
-                curTs = str(int(ts/1000))
+                curTs = str(int(ts / 1000))
 
-                symbolTickDict[curTs] = 
-                print(tick['amount'],tick['price'],tick['direction'],symbol,nowId,ts)
+                ticks = tickDict.get(symbol, {})#得到该交易对的所有交易数据
+                tickModel = ticks.get(curTs, TickModel(0,0))#根据秒时间戳得到对应的交易量
+
+                if tick['direction'] == 'buy':
+                    tickModel.buySum = tickModel.buySum + float(tick['amount'])
+                elif tick['direction'] == 'sell':
+                    tickModel.sellSum = tickModel.sellSum + float(tick['amount'])
+
+                ticks[curTs] = tickModel
+
+                #过滤掉2天前的数据
+                p2 = dict((key, value) for key, value in ticks.items() if int(key)-int(time.time()) > 60*60*48)
+
+                tickDict[symbol] = p2
+
+                #交易id每个交易对只保留最近20个
                 if len(lastIds) > 20:
                     lastIds = lastIds[1:]
 
                 lastTickId[symbol] = lastIds
+
+                print(tickDict)
