@@ -1,4 +1,4 @@
-class TickUtil:
+class TickModel:
     buySum = 0.0
     sellSum = 0.0
 

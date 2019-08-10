@@ -1,6 +1,6 @@
 import logUtil
-import TickModel
 import time
+from TickModel import TickModel
 
 tickDict = {}
 lastTickId = {}
