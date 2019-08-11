@@ -38,8 +38,8 @@ def add(data,symbol):
 
                 ticks[curTs] = tickModel
 
-                #过滤掉2天前的数据
-                p2 = dict((key, value) for key, value in ticks.items() if int(key)-int(time.time()) > 60*60*48)
+                #只要2天内的数据
+                p2 = dict((key, value) for key, value in ticks.items() if int(key)-int(time.time()) <= 60*60*48)
 
                 tickDict[symbol] = p2
 
