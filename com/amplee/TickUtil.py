@@ -26,7 +26,7 @@ def add(data,symbol):
             if len(lastIds) == 0 or nowId not in lastIds:#该交易id未处理过
                 lastIds.append(nowId)
 
-                curTs = str(int(ts / 1000))
+                curTs = str(int(ts / 1000/60))
 
                 ticks = tickDict.get(symbol, {})#得到该交易对的所有交易数据
                 tickModel = ticks.get(curTs, TickModel(0,0))#根据秒时间戳得到对应的交易量
@@ -39,7 +39,7 @@ def add(data,symbol):
                 ticks[curTs] = tickModel
 
                 #只要2天内的数据
-                p2 = dict((key, value) for key, value in ticks.items() if int(key)-int(time.time()) <= 60*60*48)
+                p2 = dict((key, value) for key, value in ticks.items() if int(time.time())/60 - int(key) < 60*48)
 
                 tickDict[symbol] = p2
 

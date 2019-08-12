@@ -14,13 +14,14 @@ class TradeThread(Thread):
         self.transactionModel = transactionModel
 
     def run(self):
-        try:
-            while True:
+
+        while True:
+            try:
                 result = huobi.get_trade(self.transactionModel.symbol)
                 tickUtil.add(result,self.transactionModel.symbol)
 
-        except Exception as err:
-            logUtil.info('TradeThread error', err)
+            except Exception as err:
+                logUtil.info('TradeThread error', err)
 
 if __name__ == '__main__':
     transactionModels = refresh.getAllPairAndRefresh()
