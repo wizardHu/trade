@@ -107,6 +107,8 @@ def isHighest(price,symbol):
         logUtil.info("symbol=",symbol," price=",price," isHighest")
     else:
         count = count - 1
+        if count < 0:
+            count = 0
 
     highCount[symbol] = count
     return count >= 3
