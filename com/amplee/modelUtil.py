@@ -72,5 +72,16 @@ def getUrgentSellModel(symbol):
 
     return models
 
+def getAllPairAvgBuyExpense():
+    pairsModel = getAllPair()
+
+    count = 0
+
+    for model in pairsModel:
+        expense = model.everyExpense
+        count += float(expense)
+
+    return float(count/len(pairsModel))
+
 if __name__ == '__main__':
-   print(getUrgentSellModel("htusdt"))
+   print(getAllPairAvgBuyExpense())

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import modelUtil as modelUtil
 import klineUtil as klineUtil
 import KDJUtil as kDJUtil
@@ -162,6 +163,13 @@ def canUrgentBuy(price,symbol,env):
         logUtil.info("commonUtil--canUrgentBuy" + err)
 
     return canBuyPackage
+
+def canAddToSellQueue():
+    avgExpense = modelUtil.getAllPairAvgBuyExpense()
+    if avgExpense < 2:# 防止误操作导致全部卖掉
+        return False
+
+
 
 if __name__ == '__main__':
     print(findHighToSell(0.87,"htusdt"))
