@@ -5,6 +5,7 @@ import KDJUtil as kDJUtil
 import RSIUtil as rSIUtil
 import MAUtil as mAUtil
 import AmountUtil as amountUtil
+import presentUsdt as presentUsdt
 import logUtil
 
 nextBuy = False
@@ -164,12 +165,48 @@ def canUrgentBuy(price,symbol,env):
 
     return canBuyPackage
 
+#判断能不能紧急卖
+#条件1 比上一次紧急卖多 minIncome
+def canUrgentSell(price,symbol,minIncome):
+    #得到卖的记录
+    try:
+        sellPackage = modelUtil.getUrgentSellModel(symbol)  # 查询卖出历史
+        high = 0
+
+        for sellModel in sellPackage:
+
+            sellModelPrice = float(sellModel.sellPrice)
+            if high < sellModelPrice:
+                high = sellModelPrice
+
+        if high == 0:
+            return False
+
+        gap = price - float(high)
+        gap = gap / float(high)
+
+        if gap >= float(minIncome):
+            return True
+
+    except Exception as err:
+        logUtil.info("commonUtil--canUrgentSell" + err)
+
+    return False
+
 def canAddToSellQueue():
     avgExpense = modelUtil.getAllPairAvgBuyExpense()
     if avgExpense < 2:# 防止误操作导致全部卖掉
         return False
 
+    presentUsdtAmount = float(presentUsdt.getBalance())
+
+    times = presentUsdtAmount/avgExpense
+
+    if times < 2:
+        return True
+
+    return False
 
 
 if __name__ == '__main__':
-    print(findHighToSell(0.87,"htusdt"))
+    print(canUrgentSell(1.91,"htusdt",0.015))
