@@ -173,6 +173,9 @@ def canUrgentSell(price,symbol,minIncome):
         sellPackage = modelUtil.getUrgentSellModel(symbol)  # 查询卖出历史
         high = 0
 
+        if len(sellPackage) == 0:
+            return True
+
         for sellModel in sellPackage:
 
             sellModelPrice = float(sellModel.sellPrice)
