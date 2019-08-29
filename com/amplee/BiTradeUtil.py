@@ -43,6 +43,7 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
     except Exception as err:
         logUtil.info("BiTradeUtil--sell"+err)
 
+#紧急卖是读queue目录下的，因此卖成功后就要删掉记录
 def urgentSell(env,sellPrice,sellIndex,buyModel,symbol,minIncome):
     try:
         orderId = "0000"
@@ -54,11 +55,10 @@ def urgentSell(env,sellPrice,sellIndex,buyModel,symbol,minIncome):
             else:
                 return
 
-        newBuyModel = BuyModel(buyModel.price,buyModel.index,buyModel.amount,buyModel.orderId,1)
         urgentSellModel = UrgentSellModel(buyModel,sellIndex,orderId,sellPrice,minIncome)
         fileOperUtil.write(urgentSellModel, "sell/" + symbol + "sell")
         fileOperUtil.write(('0,{},{},{},{},{},{}').format(int(time.time()),buyModel.price, buyModel.amount,sellPrice,sellIndex,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex))),"urgentRecord/"+symbol+"-recordLog")
-        modelUtil.modBuyModel(buyModel,newBuyModel,symbol)
+        fileOperUtil.delMsgFromFile(buyModel,"queue/"+symbol+"queue")#卖掉成功后就删除队列
 
     except Exception as err:
         logUtil.info("BiTradeUtil--urgentSell"+err)

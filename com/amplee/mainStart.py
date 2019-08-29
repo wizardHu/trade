@@ -11,6 +11,7 @@ import logUtil
 import Refresh as refresh
 import time
 
+
 def dealData(data,transactionModel,env):
     try:
         kdjFlag = kDJUtil.judgeBuy(transactionModel.symbol)
@@ -54,11 +55,13 @@ def dealData(data,transactionModel,env):
 
         isHighest = commonUtil.isHighest(price, transactionModel.symbol)
         if isHighest:
-            buyModel = commonUtil.findHighToSell(price, transactionModel.symbol)
+            buyModel = commonUtil.findHighToSell(price, transactionModel.symbol,False) #先读取buy目录下的buyModel
             if buyModel is not None:
                 canSell = commonUtil.canUrgentSell(price, transactionModel.symbol,transactionModel.minIncome)
                 if canSell:
-                    biTradeUtil.urgentSell(env,price,data['id'],buyModel, transactionModel.symbol,0.025)
+                    commonUtil.addToSellQueue(buyModel,transactionModel.symbol) # 将该buyModel加入待紧急卖队列 并且修改状态
+                    newBuyModel = commonUtil.findHighToSell(price, transactionModel.symbol, True) # 从队列中找到最合适的
+                    biTradeUtil.urgentSell(env,price,data['id'],newBuyModel, transactionModel.symbol,0.025) #卖掉 并且删除队列记录
 
         canBuyPackage = commonUtil.canUrgentBuy(price, transactionModel.symbol,env)
         if len(canBuyPackage) > 0:

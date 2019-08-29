@@ -7,6 +7,8 @@ import MAUtil as mAUtil
 import AmountUtil as amountUtil
 import presentUsdt as presentUsdt
 import logUtil
+import fileOperUtil as fileOperUtil
+from BuyModel import BuyModel
 
 nextBuy = False
 lastIdDict = {}
@@ -116,9 +118,12 @@ def isHighest(price,symbol):
     return count >= 3
 
 #找到已购买的最大的那个去卖  至少堆积了5个，并且最大的那个与现在相差10%
-def findHighToSell(price,symbol):
+def findHighToSell(price,symbol,isFromQueue):
     try:
-        buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
+        if isFromQueue:
+            buyPackage = modelUtil.getBuyModelFromQueue(symbol)  # 查询购买历史 #查询购买历史
+        else:
+            buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
 
         buyList = []
         for model in buyPackage:
@@ -209,6 +214,12 @@ def canAddToSellQueue():
         return True
 
     return False
+
+#加完队列后就改原始的状态
+def addToSellQueue(buyModel,symbol):
+    fileOperUtil.write(buyModel, "queue/" + symbol + "queue")
+    newBuyModel = BuyModel(buyModel.price, buyModel.index, buyModel.amount, buyModel.orderId, 1)
+    modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
 
 
 if __name__ == '__main__':

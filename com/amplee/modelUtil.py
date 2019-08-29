@@ -83,5 +83,24 @@ def getAllPairAvgBuyExpense():
 
     return float(count/len(pairsModel))
 
+def getBuyModelFromQueue(symbol):
+    lines = fileOperUtil.readAll("queue/"+symbol+"queue")
+    models = []
+
+    for model in lines:
+
+        if model != '' and model != '\n':
+            params = model.split(',')
+            price = params[0]
+            amount = params[1]
+            orderId = params[2]
+            index = params[3]
+            minIncome = params[4]
+
+            buyModel = BuyModel(price, index, amount, orderId,minIncome)
+            models.append(buyModel)
+
+    return models
+
 if __name__ == '__main__':
    print(getAllPairAvgBuyExpense())
