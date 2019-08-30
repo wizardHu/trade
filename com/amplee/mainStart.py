@@ -19,7 +19,7 @@ def dealData(data,transactionModel,env):
         maFlag = mAUtil.maJudgeBuy(data, transactionModel.symbol)
         avgFlag = commonUtil.juideAllGap(data['close'], transactionModel.symbol, transactionModel.tradeGap)
         highFlag = commonUtil.juideHighest(data['close'], transactionModel.symbol)
-        bollFlag = bollUtil.judgeBoll(data['close'], transactionModel.symbol)
+        bollFlag = bollUtil.judgeBollBuy(data['close'], transactionModel.symbol)
         lowFlag = commonUtil.juideLowest(data['close'], transactionModel.symbol)
         riskFlag = amountUtil.judgeRisk(transactionModel.symbol)
 

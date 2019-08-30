@@ -23,7 +23,7 @@ def getBoll(period, times,symbol):
     return boll
 
 
-def judgeBoll(price,symbol):
+def judgeBollBuy(price,symbol):
     boll = getBoll(20, 2,symbol)
     if len(boll) < 2:
         return False
@@ -31,6 +31,22 @@ def judgeBoll(price,symbol):
     bollDown = boll[1]
 
     if bollDown > price:
+        return True
+
+    return False
+
+def judgeBollSell(data,symbol):
+    price = data['close']
+    low = data['low']
+    boll = getBoll(20, 2,symbol)
+    if len(boll) < 2:
+        return False
+
+    avg = (price + low) / 2
+
+    upBBand = boll[0]
+
+    if upBBand < avg:
         return True
 
     return False
