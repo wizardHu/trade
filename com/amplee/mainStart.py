@@ -94,7 +94,12 @@ if __name__ == '__main__':
                     lastData = huobi.get_kline(transactionModel.symbol, transactionModel.period, 1)
 
                 thisData = huobi.get_kline(transactionModel.symbol, transactionModel.period, 1)
-                thisData['data'].reverse()
+
+                if thisData['status'] == 'ok' and thisData['data'] and len(thisData['data']) >= 1:
+                    thisData['data'].reverse()
+                else:
+                    continue
+
                 logUtil.info(thisData['data'],transactionModel.symbol)
 
                 if lastId != thisData['data'][0]['id']:

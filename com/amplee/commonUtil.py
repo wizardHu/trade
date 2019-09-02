@@ -121,20 +121,23 @@ def isHighest(price,symbol):
 def findHighToSell(price,symbol,isFromQueue):
     try:
         if isFromQueue:
-            buyPackage = modelUtil.getBuyModelFromQueue(symbol)  # 查询购买历史 #查询购买历史
+            buyPackage = modelUtil.getBuyModelFromQueue(symbol)  # 查询购买历史
         else:
-            buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
+            buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史
 
         buyList = []
         for model in buyPackage:
             if float(model.minIncome) != 1:
                 buyList.append(model)
 
-        if len(buyList) < 5:
+        if len(buyList) < 5 and not isFromQueue:
             return None
 
         buyList.sort(key=lambda buyModel:float(buyModel.price), reverse=True)
         buyModel = buyList[0]
+
+        if isFromQueue:
+            return buyModel
 
         buyModelPrice = buyModel.price;
 
