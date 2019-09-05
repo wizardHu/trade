@@ -1,4 +1,5 @@
 import klineUtil as klineUtil
+import numpy as np
 
 uplowDict = {}
 
@@ -85,6 +86,22 @@ def judgeRisk(symbol):
         return False
 
     if risk == 0 or risk > 5:
+        return True
+
+    return False
+
+def judgeUrgentSell(symbol):
+    amounts = klineUtil.amounts.get(symbol, [])
+    if len(amounts) < 5:
+        return False
+
+    list = [amounts[-1], amounts[-2], amounts[-3], amounts[-4],
+            amounts[-5]]
+
+    mean = np.mean(list)
+    std = np.std(list)
+
+    if std > mean:
         return True
 
     return False

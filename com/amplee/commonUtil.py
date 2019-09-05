@@ -204,7 +204,7 @@ def canUrgentSell(price,symbol,minIncome):
 
     return False
 
-def canAddToSellQueue():
+def needAddToSellQueue():
     avgExpense = modelUtil.getAllPairAvgBuyExpense()
     if avgExpense < 2:# 防止误操作导致全部卖掉
         return False

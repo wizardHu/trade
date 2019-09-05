@@ -16,15 +16,17 @@ def buy(env,buyPrice,amount,symbol,index,minIncome):
             if result['status'] == 'ok':
                 orderId = result['data']
             else:
-                return
+                return False
 
         buyModel = BuyModel(buyPrice,index,amount,orderId,minIncome)
         fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
         fileOperUtil.write(('1,{},{},{},{},{}').format(int(time.time()),buyPrice, amount, index,
                                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index))),"record/"+symbol + "-record")
 
+        return True
     except Exception as err:
         logUtil.info("BiTradeUtil--buy"+err)
+    return False
 
 def sell(env,sellPrice,sellIndex,buyModel,symbol):
     try:
