@@ -100,6 +100,8 @@ def isHighest(price,symbol):
     lastPrice = klineUtil.prices.get(symbol, [])
     count = highCount.get(symbol, 0)
 
+    flag = False
+
     count = float(count)
 
     if len(lastPrice) < 360:
@@ -114,8 +116,13 @@ def isHighest(price,symbol):
         if count < 0:
             count = 0
 
+    if count >= 3:
+        flag = True
+        count = 0
+
     highCount[symbol] = count
-    return count >= 3
+
+    return flag
 
 #找到已购买的最大的那个去卖  至少堆积了5个，并且最大的那个与现在相差10%
 def findHighToSell(price,symbol,isFromQueue):
