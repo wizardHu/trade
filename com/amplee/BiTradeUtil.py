@@ -36,6 +36,8 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
             state = data['state']
             if state == 'filled':
                 result = huobi.send_order(buyModel.amount, "api", symbol, 'sell-limit', sellPrice)
+                if result['status'] == "error":
+                    return
             else:
                 return
 

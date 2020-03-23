@@ -22,6 +22,7 @@ def juideAllGap(price,symbol,tradeGap):
 
         buyPrice = float(model.price)
 
+        #计算当前价格与以往每次的差值
         gap = abs(buyPrice - price)
         times = gap / buyPrice
         if times < float(tradeGap):
