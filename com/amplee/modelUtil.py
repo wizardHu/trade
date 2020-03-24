@@ -1,7 +1,6 @@
 import fileOperUtil as fileOperUtil
 from TransactionModel import TransactionModel
 from BuyModel import BuyModel
-from UrgentSellModel import UrgentSellModel
 
 def getAllPair():
     lines = fileOperUtil.readAll("config")
@@ -46,31 +45,6 @@ def modBuyModel(oldBuyModel,newBuyModel,symbol):
     fileOperUtil.delMsgFromFile(oldBuyModel, "buy/" + symbol + "buy")
     fileOperUtil.write(newBuyModel, "buy/" + symbol + "buy")
 
-def getUrgentSellModel(symbol):
-    lines = fileOperUtil.readAll("sell/"+symbol+"sell")
-    models = []
-
-    for model in lines:
-
-        if model != '' and model != '\n':
-            params = model.split(',')
-            price = params[0]
-            amount = params[1]
-            orderId = params[2]
-            index = params[3]
-            minIncome = params[4]
-            sellIndex = params[5]
-            sellOrderId = params[6]
-            sellPrice = params[7]
-            sellMinIncome = params[8]
-
-            buyModel = BuyModel(price, index, amount, orderId,minIncome)
-
-            urgentSellModel = UrgentSellModel(buyModel,sellIndex,sellOrderId,sellPrice,sellMinIncome)
-
-            models.append(urgentSellModel)
-
-    return models
 
 def getAllPairAvgBuyExpense():
     pairsModel = getAllPair()
