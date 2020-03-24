@@ -1,11 +1,9 @@
 from BuyModel import BuyModel
-from UrgentSellModel import UrgentSellModel
 import fileOperUtil as fileOperUtil
 import time
 import HuobiService as huobi
 import logUtil
 import sys
-import modelUtil as modelUtil
 
 def buy(env,buyPrice,amount,symbol,index,minIncome):
     try:
@@ -47,49 +45,6 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
     except Exception as err:
         logUtil.info("BiTradeUtil--sell"+err)
 
-#紧急卖是读queue目录下的，因此卖成功后就要删掉记录
-def urgentSell(env,sellPrice,sellIndex,buyModel,symbol,minIncome):
-    try:
-        orderId = "0000"
-        if "pro" == env:
-            result = huobi.send_order(buyModel.amount, "api", symbol, 'sell-limit', sellPrice)
-            logUtil.info("urgentSell result", result, symbol, buyModel.amount, sellPrice)
-            if result['status'] == 'ok':
-                orderId = result['data']
-            else:
-                return
-
-        urgentSellModel = UrgentSellModel(buyModel,sellIndex,orderId,sellPrice,minIncome)
-        fileOperUtil.write(urgentSellModel, "sell/" + symbol + "sell")
-        fileOperUtil.write(('0,{},{},{},{},{},{}').format(int(time.time()),buyModel.price, buyModel.amount,sellPrice,sellIndex,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex))),"urgentRecord/"+symbol+"-recordLog")
-        fileOperUtil.delMsgFromFile(buyModel,"queue/"+symbol+"queue")#卖掉成功后就删除队列
-
-    except Exception as err:
-        logUtil.info("BiTradeUtil--urgentSell"+err)
-
-
-def urgentBuy(env,buyPrice,buyIndex,urgentSellModel,symbol):
-    try:
-        if "pro" == env:
-            result = huobi.order_info(urgentSellModel.orderId)
-            data = result['data']
-            state = data['state']
-            if state == 'filled':
-                result = huobi.send_order(urgentSellModel.buyModel.amount, "api", symbol, 'buy-limit', buyPrice)
-                logUtil.info("urgentBuy result", result, symbol)
-                if result['status'] != 'ok':
-                    return
-            else:
-                return
-
-        buyModel = urgentSellModel.buyModel
-        oldBuyModel = BuyModel(buyModel.price, buyModel.index, buyModel.amount, buyModel.orderId, 1)
-        fileOperUtil.delMsgFromFile(urgentSellModel,"sell/"+symbol+"sell")
-        fileOperUtil.write(('1,{},{},{},{},{},{}').format(int(time.time()), buyModel.price, buyModel.amount, buyPrice, buyIndex,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(buyIndex))), "urgentRecord/" + symbol + "-recordLog")
-        modelUtil.modBuyModel(oldBuyModel, buyModel, symbol)
-
-    except Exception as err:
-        logUtil.info("BiTradeUtil--urgentBuy"+err)
 
 if __name__ == '__main__':
     data = huobi.get_kline(sys.argv[1], sys.argv[2], sys.argv[3])

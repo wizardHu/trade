@@ -11,14 +11,6 @@ import logUtil
 import Refresh as refresh
 import time
 
-def addQueue(price,transactionModel):
-    isCanAddToSellQueue = commonUtil.needAddToSellQueue()  # 是否需要加入卖的队列
-    if isCanAddToSellQueue:
-        buyModel = commonUtil.findHighToSell(price, transactionModel.symbol, False)  # 先读取buy目录下的buyModel
-        if buyModel is not None:
-            commonUtil.addToSellQueue(buyModel, transactionModel.symbol)  # 将该buyModel加入待紧急卖队列 并且修改状态
-            logUtil.info(("add to queue {} symbol={}").format(buyModel, transactionModel.symbol))
-
 def dealData(data,transactionModel,env):
     try:
         kdjFlag = kDJUtil.judgeBuy(transactionModel.symbol)
@@ -43,15 +35,12 @@ def dealData(data,transactionModel,env):
 
             if isSuccess:
                commonUtil.nextBuy = False
-               addQueue(price, transactionModel)
 
         elif kdjFlag and rSIFlag and maFlag and avgFlag and highFlag:
             amount = round(float(transactionModel.everyExpense) / price, int(transactionModel.precision))
             isSuccess = biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'],transactionModel.minIncome)
             logUtil.info(("is first buy symbol={},price={},data['id']={} issuccess={}").format(transactionModel.symbol, price, data['id'],isSuccess))
 
-            if isSuccess:
-               addQueue(price, transactionModel)
 
         elif avgFlag and lowFlag and bollFlag and riskFlag and highFlag:
             commonUtil.nextBuy = True
@@ -65,39 +54,13 @@ def dealData(data,transactionModel,env):
                 for buyModel in sellPackage:
                     biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
 
-        # 当前最高价紧急卖策略
-        isHighest = commonUtil.isHighest(price, transactionModel.symbol)
-        canSell = commonUtil.canUrgentSell(price, transactionModel.symbol, transactionModel.minIncome)
-        if isHighest and canSell:
-            buyModel = commonUtil.findHighToSell(price, transactionModel.symbol,False) #先读取buy目录下的buyModel
-            if buyModel is not None:
-                commonUtil.addToSellQueue(buyModel,transactionModel.symbol) # 将该buyModel加入待紧急卖队列 并且修改状态
-                newBuyModel = commonUtil.findHighToSell(price, transactionModel.symbol, True) # 从队列中找到最合适的
-                biTradeUtil.urgentSell(env,price,data['id'],newBuyModel, transactionModel.symbol,0.025) #卖掉 并且删除队列记录
-
-        # 买回来
-        canBuyPackage = commonUtil.canUrgentBuy(price, transactionModel.symbol,env)
-        if len(canBuyPackage) > 0:
-            for canBuy in canBuyPackage:
-                logUtil.info("can urgent buy ",canBuy)
-                biTradeUtil.urgentBuy(env,price,data['id'],canBuy,transactionModel.symbol)
-
-        # 读取队列卖
-        amountUrgentBuy = amountUtil.judgeUrgentSell(transactionModel.symbol)
-        bollUrgentBuy = bollUtil.judgeBollSell(data,transactionModel.symbol)
-        logUtil.info(("amountUrgentBuy={}, bollUrgentBuy={}").format(amountUrgentBuy, bollUrgentBuy))
-
-        if amountUrgentBuy and bollUrgentBuy and canSell:
-            newBuyModel = commonUtil.findHighToSell(price, transactionModel.symbol, True)  # 从队列中找到最合适的
-            biTradeUtil.urgentSell(env, price, data['id'], newBuyModel, transactionModel.symbol, 0.015)  # 卖掉 并且删除队列记录
-
     except Exception as err:
         logUtil.info('deal error', err)
 
 
 if __name__ == '__main__':
 
-    env = "pro"
+    env = "dev"
 
     while True:
         transactionModels = refresh.getAllPairAndRefresh()

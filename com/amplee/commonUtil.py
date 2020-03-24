@@ -5,10 +5,7 @@ import KDJUtil as kDJUtil
 import RSIUtil as rSIUtil
 import MAUtil as mAUtil
 import AmountUtil as amountUtil
-import presentUsdt as presentUsdt
 import logUtil
-import fileOperUtil as fileOperUtil
-from BuyModel import BuyModel
 
 nextBuy = False
 lastIdDict = {}
@@ -160,78 +157,6 @@ def findHighToSell(price,symbol,isFromQueue):
 
     return None
 
-def canUrgentBuy(price,symbol,env):
-    canBuyPackage = []
-
-    try:
-        sellPackage = modelUtil.getUrgentSellModel(symbol)  # 查询卖出历史
-
-        for sellModel in sellPackage:
-
-            sellModelPrice = sellModel.sellPrice;
-
-            gap = float(sellModelPrice) - price
-            gap = gap / float(sellModelPrice)
-
-            if gap >= float(sellModel.minIncome):
-                canBuyPackage.append(sellModel)
-
-    except Exception as err:
-        logUtil.info("commonUtil--canUrgentBuy" + err)
-
-    return canBuyPackage
-
-#判断能不能紧急卖
-#条件1 比上一次紧急卖多 minIncome
-def canUrgentSell(price,symbol,minIncome):
-    #得到卖的记录
-    try:
-        sellPackage = modelUtil.getUrgentSellModel(symbol)  # 查询卖出历史
-        high = 0
-
-        if len(sellPackage) == 0:
-            return True
-
-        for sellModel in sellPackage:
-
-            sellModelPrice = float(sellModel.sellPrice)
-            if high < sellModelPrice:
-                high = sellModelPrice
-
-        if high == 0:
-            return False
-
-        gap = price - float(high)
-        gap = gap / float(high)
-
-        if gap >= float(minIncome):
-            return True
-
-    except Exception as err:
-        logUtil.info("commonUtil--canUrgentSell" + err)
-
-    return False
-
-def needAddToSellQueue():
-    avgExpense = modelUtil.getAllPairAvgBuyExpense()
-    if avgExpense < 2:# 防止误操作导致全部卖掉
-        return False
-
-    presentUsdtAmount = float(presentUsdt.getBalance())
-
-    times = presentUsdtAmount/avgExpense
-
-    if times < 2:
-        return True
-
-    return False
-
-#加完队列后就改原始的状态
-def addToSellQueue(buyModel,symbol):
-    fileOperUtil.write(buyModel, "queue/" + symbol + "queue")
-    newBuyModel = BuyModel(buyModel.price, buyModel.index, buyModel.amount, buyModel.orderId, 1)
-    modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
-
 
 if __name__ == '__main__':
-    print(canUrgentSell(1.91,"htusdt",0.015))
+    print(1)
