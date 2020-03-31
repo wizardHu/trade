@@ -18,7 +18,10 @@ class TransactionModel:
     # 小数点精度
     precision = 2
 
-    def __init__(self,symbol,everyExpense,tradeGap,minIncome,period,precision):
+    #止损点
+    stopLoss = 0.05
+
+    def __init__(self,symbol,everyExpense,tradeGap,minIncome,period,precision,stopLoss):
         self.symbol = symbol
         self.everyExpense = everyExpense
         self.tradeGap = tradeGap
@@ -26,6 +29,7 @@ class TransactionModel:
         self.minIncome = minIncome
         self.period = period
         self.precision = precision
+        self.stopLoss = stopLoss
 
 
     def __str__(self):

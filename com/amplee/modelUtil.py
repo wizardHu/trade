@@ -16,8 +16,9 @@ def getAllPair():
             minIncome = params[3]
             period = params[4]
             precision = params[5]
+            stopLoss = params[6]
 
-            tradeModel = TransactionModel(symbol, everyExpense, tradeGap, minIncome, period,precision)
+            tradeModel = TransactionModel(symbol, everyExpense, tradeGap, minIncome, period,precision,stopLoss)
             pairs.append(tradeModel)
 
     return pairs
@@ -45,7 +46,7 @@ def modBuyModel(oldBuyModel,newBuyModel,symbol):
     fileOperUtil.delMsgFromFile(oldBuyModel, "buy/" + symbol + "buy")
     fileOperUtil.write(newBuyModel, "buy/" + symbol + "buy")
 
-
+# 得到每次买需要的平均花费
 def getAllPairAvgBuyExpense():
     pairsModel = getAllPair()
 
@@ -77,4 +78,4 @@ def getBuyModelFromQueue(symbol):
     return models
 
 if __name__ == '__main__':
-   print(getAllPairAvgBuyExpense())
+   print(getAllPair())

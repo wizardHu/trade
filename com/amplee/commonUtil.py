@@ -93,69 +93,6 @@ def delSymbol(transactionModel):
     lastIdDict[transactionModel.symbol] = 0
     highCount[transactionModel.symbol] = 0
 
-#判断是否最大
-def isHighest(price,symbol):
-    lastPrice = klineUtil.prices.get(symbol, [])
-    count = highCount.get(symbol, 0)
-
-    flag = False
-
-    count = float(count)
-
-    if len(lastPrice) < 360:
-        return False
-
-    high = max(lastPrice[-360:])
-    if price >= high :
-        count = count + 1
-        logUtil.info("symbol=",symbol," price=",price," isHighest")
-    else:
-        count = count - 1
-        if count < 0:
-            count = 0
-
-    if count >= 3:
-        flag = True
-        count = 0
-
-    highCount[symbol] = count
-
-    return flag
-
-#找到已购买的最大的那个去卖  至少堆积了5个，并且最大的那个与现在相差10%
-def findHighToSell(price,symbol,isFromQueue):
-    try:
-        if isFromQueue:
-            buyPackage = modelUtil.getBuyModelFromQueue(symbol)  # 查询购买历史
-        else:
-            buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史
-
-        buyList = []
-        for model in buyPackage:
-            if float(model.minIncome) != 1:
-                buyList.append(model)
-
-        if len(buyList) < 5 and not isFromQueue:
-            return None
-
-        buyList.sort(key=lambda buyModel:float(buyModel.price), reverse=True)
-        buyModel = buyList[0]
-
-        if isFromQueue:
-            return buyModel
-
-        buyModelPrice = buyModel.price;
-
-        gap = float(buyModelPrice) - price
-        gap = gap / float(buyModelPrice)
-
-        if gap >= 0.1:
-            return buyModel
-
-    except Exception as err:
-        logUtil.info("commonUtil--findHighToSell" + err)
-
-    return None
 
 
 if __name__ == '__main__':
