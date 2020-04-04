@@ -93,7 +93,30 @@ def delSymbol(transactionModel):
     lastIdDict[transactionModel.symbol] = 0
     highCount[transactionModel.symbol] = 0
 
+def getStopLossBuyModel(price,symbol,stopLoss):
+    stopLossPackage = []
 
+    try:
+        buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史
+
+        for buyModel in buyPackage:
+
+            buyModelPrice = float(buyModel.price)
+            minIncome = float(buyModel.minIncome)
+
+            if minIncome == 1:
+                continue
+
+            gap = buyModelPrice - price
+            gap = gap / buyModelPrice
+
+            if gap >= float(stopLoss):
+                stopLossPackage.append(buyModel)
+
+    except Exception as err:
+        logUtil.info("commonUtil--getStopLossBuyModel" + err)
+
+    return stopLossPackage
 
 if __name__ == '__main__':
-    print(1)
+    print(getStopLossBuyModel(4.2258,"htusdt",0.05))
