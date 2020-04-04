@@ -3,7 +3,9 @@ import fileOperUtil as fileOperUtil
 import time
 import HuobiService as huobi
 import logUtil
-import sys
+import modelUtil as modelUtil
+from StopLossModel import StopLossModel
+
 
 def buy(env,buyPrice,amount,symbol,index,minIncome):
     try:
@@ -16,7 +18,7 @@ def buy(env,buyPrice,amount,symbol,index,minIncome):
             else:
                 return False
 
-        buyModel = BuyModel(buyPrice,index,amount,orderId,minIncome)
+        buyModel = BuyModel(buyPrice,buyPrice,index,amount,orderId,minIncome)
         fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
         fileOperUtil.write(('1,{},{},{},{},{}').format(int(time.time()),buyPrice, amount, index,
                                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index))),"record/"+symbol + "-record")
@@ -32,9 +34,10 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
             result = huobi.order_info(buyModel.orderId)
             data = result['data']
             state = data['state']
+            logUtil.info("sell result", result, symbol)
             if state == 'filled':
                 result = huobi.send_order(buyModel.amount, "api", symbol, 'sell-limit', sellPrice)
-                if result['status'] == "error":
+                if result['status'] != 'ok':
                     return
             else:
                 return
@@ -45,8 +48,89 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
     except Exception as err:
         logUtil.info("BiTradeUtil--sell"+err)
 
+#达到止损点就要卖出
+def stopLossSell(env,sellPrice,buyModel,symbol):
+    try:
+        orderId = "0000"
+        if "pro" == env:
+            result = huobi.order_info(buyModel.orderId)
+            data = result['data']
+            state = data['state']
+            logUtil.info("stopLossSell result", result, symbol)
+            if state == 'filled':
+                result = huobi.send_order(buyModel.amount, "api", symbol, 'sell-limit', sellPrice)
+                if result['status'] == 'ok':
+                    orderId = result['data']
+                else:
+                    return
+            else:
+                return
+
+        newBuyModel = BuyModel(buyModel.price,buyModel.oriPrice, buyModel.index, buyModel.amount, buyModel.orderId, 1)
+        modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
+        #在{什么时候} 以 {什么价格} 卖出 {原价是什么} 的 {多少个} {原来的orderId} {这次的orderId}
+        fileOperUtil.write(
+            ('{},{},{},{},{},{}').format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),sellPrice, buyModel.price, buyModel.amount, buyModel.orderId,orderId)
+            ,"stopLossSell/" + symbol + "-sell")
+
+        #记录日志
+        # 在{什么时候} 以 {什么价格} 卖出 {原价是什么} 的 {多少个} {原来的orderId} {这次的orderId}
+        fileOperUtil.write(
+            ('0,{},{},{},{},{},{}').format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
+                                         sellPrice, buyModel.price, buyModel.amount, buyModel.orderId, orderId)
+            , "stopLossSellRecoed/" + symbol + "-sellRecord")
+
+
+    except Exception as err:
+        logUtil.info("BiTradeUtil--stopLossSell"+err)
+
+
+#买入因止损卖出的
+def stopLossBuy(env,price,stopLossModel,symbol,minInCome):
+    try:
+        orderId = "0000"
+        if "pro" == env:
+            result = huobi.send_order(stopLossModel.oriAmount, "api", symbol, "buy-limit", price)
+            logUtil.info("buy result", result, symbol, stopLossModel.oriAmount, price)
+            if result['status'] == 'ok':
+                orderId = result['data']
+            else:
+                return False
+
+        oldBuyModel = modelUtil.getBuyModelByOrderId(symbol,stopLossModel.oriOrderId)
+
+        # 计算新的价格
+        newPrice = (float(price) + float(oldBuyModel.price))/2
+
+        newBuyModel = BuyModel(newPrice,oldBuyModel.oriPrice, oldBuyModel.index, oldBuyModel.amount, oldBuyModel.orderId, minInCome)
+        modelUtil.modBuyModel(oldBuyModel, newBuyModel, symbol)
+        fileOperUtil.delMsgFromFile(stopLossModel, "stopLossSell/"+symbol+"-sell")
+
+        #记录日志
+        # 在{什么时候} 以 {什么价格} 买入 {原价是什么} 的 {多少个} {原来的orderId} {这次的orderId}
+        fileOperUtil.write(
+            ('1,{},{},{},{},{},{}').format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
+                                         price, stopLossModel.oriPrice, stopLossModel.oriAmount, stopLossModel.oriOrderId, orderId)
+            , "stopLossSellRecoed/" + symbol + "-sellRecord")
+
+
+    except Exception as err:
+        logUtil.info("BiTradeUtil--stopLossSell"+err)
 
 if __name__ == '__main__':
-    data = huobi.get_kline(sys.argv[1], sys.argv[2], sys.argv[3])
-    print(data)
+
+    #验证买
+    buy("dev", 6500, 0.002, "btcusdt", 123, 0.015);
+
+    # 验证卖
+    # buyModel = BuyModel(6500,6500,123,0.002,"0000",0.015)
+    # sell("dev",6600,123456,buyModel,"btcusdt")
+
+    #验证止损卖
+    # buyModel = BuyModel(6500,6500,123,0.002,"0000",0.015)
+    # stopLossSell("dev",6000,buyModel,"btcusdt")
+
+    # 验证止损买
+    # stopLossModel = StopLossModel("2020-04-04 20:03:08",6000,6500,0.002,"0000","0000")
+    # stopLossBuy("dev", 5800, stopLossModel, "btcusdt", 0.015)
 

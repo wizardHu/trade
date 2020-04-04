@@ -118,5 +118,28 @@ def getStopLossBuyModel(price,symbol,stopLoss):
 
     return stopLossPackage
 
+#判断之前因为止损卖出的  现在可不可以买回来
+def getCanBuyStopLoss(price,symbol):
+    stopLossPackage = []
+
+    try:
+        sellPackage = modelUtil.getStopLossModel(symbol)  # 查询卖出历史
+
+        for stopLossModel in sellPackage:
+
+            sellPrice = float(stopLossModel.sellPrice)
+            minIncome = 0.02#暂定 2个百分点
+
+            gap = sellPrice - price
+            gap = gap / sellPrice
+
+            if gap >= float(minIncome):
+                stopLossPackage.append(stopLossModel)
+
+    except Exception as err:
+        logUtil.info("commonUtil--getCanBuyStopLoss" + err)
+
+    return stopLossPackage
+
 if __name__ == '__main__':
-    print(getStopLossBuyModel(4.2258,"htusdt",0.05))
+    print(getCanBuyStopLoss(13.72,"eosusdt"))

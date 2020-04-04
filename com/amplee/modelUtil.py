@@ -1,6 +1,7 @@
 import fileOperUtil as fileOperUtil
 from TransactionModel import TransactionModel
 from BuyModel import BuyModel
+from StopLossModel import  StopLossModel
 
 def getAllPair():
     lines = fileOperUtil.readAll("config")
@@ -32,12 +33,13 @@ def getBuyModel(symbol):
         if model != '' and model != '\n':
             params = model.split(',')
             price = params[0]
-            amount = params[1]
-            orderId = params[2]
-            index = params[3]
-            minIncome = params[4]
+            oriPrice = params[1]
+            index = params[2]
+            amount = params[3]
+            orderId = params[4]
+            minIncome = params[5]
 
-            buyModel = BuyModel(price, index, amount, orderId,minIncome)
+            buyModel = BuyModel(price,oriPrice, index, amount, orderId,minIncome)
             models.append(buyModel)
 
     return models
@@ -58,5 +60,45 @@ def getAllPairAvgBuyExpense():
 
     return float(count/len(pairsModel))
 
+def getStopLossModel(symbol):
+    lines = fileOperUtil.readAll("stopLossSell/"+symbol+"-sell")
+    models = []
+
+    for model in lines:
+
+        if model != '' and model != '\n':
+            params = model.split(',')
+            time = params[0]
+            sellPrice = params[1]
+            oriPrice = params[2]
+            oriAmount = params[3]
+            oriOrderId = params[4]
+            orderId = params[5]
+
+            stopLossModel = StopLossModel(time, sellPrice, oriPrice, oriAmount,oriOrderId,orderId)
+            models.append(stopLossModel)
+
+    return models
+
+def getBuyModelByOrderId(symbol,oriOrderId):
+    lines = fileOperUtil.readAll("buy/"+symbol+"buy")
+
+    for model in lines:
+
+        if model != '' and model != '\n':
+            params = model.split(',')
+            price = params[0]
+            oriPrice = params[1]
+            index = params[2]
+            amount = params[3]
+            orderId = params[4]
+            minIncome = params[5]
+
+            if str(oriOrderId) == str(orderId):
+                buyModel = BuyModel(price,oriPrice, index, amount, orderId,minIncome)
+                return buyModel
+
+    return None
+
 if __name__ == '__main__':
-   print(getAllPair())
+   print(getBuyModelByOrderId("eosusdt","111121"))
