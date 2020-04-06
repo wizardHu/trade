@@ -19,7 +19,7 @@ def buy(env,buyPrice,amount,symbol,index,minIncome):
             else:
                 return False
 
-        buyModel = BuyModel(buyPrice,buyPrice,index,amount,orderId,minIncome)
+        buyModel = BuyModel(buyPrice,buyPrice,index,amount,orderId,minIncome,buyPrice)
         fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
         fileOperUtil.write(('1,{},{},{},{},{}').format(int(time.time()),buyPrice, amount, index,
                                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index))),"record/"+symbol + "-record")
@@ -67,7 +67,7 @@ def stopLossSell(env,sellPrice,buyModel,symbol):
             else:
                 return
 
-        newBuyModel = BuyModel(buyModel.price,buyModel.oriPrice, buyModel.index, buyModel.amount, buyModel.orderId, 1)
+        newBuyModel = BuyModel(buyModel.price,buyModel.oriPrice, buyModel.index, buyModel.amount, buyModel.orderId, 1,buyModel.lastPrice)
         modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
         #在{什么时候} 以 {什么价格} 卖出 {原价是什么} 的 {多少个} {原来的orderId} {这次的orderId}
         fileOperUtil.write(
@@ -103,7 +103,7 @@ def stopLossBuy(env,price,stopLossModel,symbol,minInCome):
         # 计算新的价格
         newPrice = float(oldBuyModel.price) - (float(stopLossModel.sellPrice)-float(price))
 
-        newBuyModel = BuyModel(newPrice,oldBuyModel.oriPrice, oldBuyModel.index, oldBuyModel.amount, oldBuyModel.orderId, minInCome)
+        newBuyModel = BuyModel(newPrice,oldBuyModel.oriPrice, oldBuyModel.index, oldBuyModel.amount, oldBuyModel.orderId, minInCome,price)
         modelUtil.modBuyModel(oldBuyModel, newBuyModel, symbol)
         fileOperUtil.delMsgFromFile(stopLossModel, "stopLossSell/"+symbol+"-sell")
 

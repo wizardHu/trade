@@ -38,8 +38,9 @@ def getBuyModel(symbol):
             amount = params[3]
             orderId = params[4]
             minIncome = params[5]
+            lastPrice = params[6]
 
-            buyModel = BuyModel(price,oriPrice, index, amount, orderId,minIncome)
+            buyModel = BuyModel(price,oriPrice, index, amount, orderId,minIncome,lastPrice)
             models.append(buyModel)
 
     return models
@@ -93,9 +94,10 @@ def getBuyModelByOrderId(symbol,oriOrderId):
             amount = params[3]
             orderId = params[4]
             minIncome = params[5]
+            lastPrice = params[6]
 
             if str(oriOrderId) == str(orderId):
-                buyModel = BuyModel(price,oriPrice, index, amount, orderId,minIncome)
+                buyModel = BuyModel(price,oriPrice, index, amount, orderId,minIncome,lastPrice)
                 return buyModel
 
     return None

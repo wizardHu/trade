@@ -106,7 +106,7 @@ if __name__ == '__main__':
                 else:
                     continue
 
-                logUtil.info(thisData['data'],transactionModel.symbol)
+                # logUtil.info(thisData['data'],transactionModel.symbol)
 
                 dealStopLoss(lastData['data'][0],transactionModel,env)#止损模块处理
 
@@ -120,4 +120,4 @@ if __name__ == '__main__':
         except Exception as err:
             logUtil.info('connect https error,retry...', err)
 
-        time.sleep(1)
+        # time.sleep(1)

@@ -6,6 +6,7 @@ import RSIUtil as rSIUtil
 import MAUtil as mAUtil
 import AmountUtil as amountUtil
 import logUtil
+from BuyModel import BuyModel
 
 nextBuy = False
 lastIdDict = {}
@@ -96,21 +97,31 @@ def delSymbol(transactionModel):
 def getStopLossBuyModel(price,symbol,stopLoss):
     stopLossPackage = []
 
+    stopLoss = float(stopLoss)
     try:
         buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史
 
         for buyModel in buyPackage:
 
             buyModelPrice = float(buyModel.price)
+            buyModelOriPrice = float(buyModel.oriPrice)
             minIncome = float(buyModel.minIncome)
+            stopLosssTemp = stopLoss
 
             if minIncome == 1:
                 continue
 
+            #判断有没有进行过止损
+            #有的话就用最后一次交易的价格进行止损点判断
+            #因为止损卖出后 与再买入的价格相差不大的话，很容易再次触发止损卖
+            if buyModelPrice != buyModelOriPrice:
+                stopLosssTemp = stopLoss/2
+                buyModelPrice = float(buyModel.lastPrice)
+
             gap = buyModelPrice - price
             gap = gap / buyModelPrice
 
-            if gap >= float(stopLoss):
+            if gap >= stopLosssTemp:
                 stopLossPackage.append(buyModel)
 
     except Exception as err:
@@ -142,4 +153,24 @@ def getCanBuyStopLoss(price,symbol):
     return stopLossPackage
 
 if __name__ == '__main__':
-    print(getCanBuyStopLoss(13.72,"eosusdt"))
+    # print(getCanBuyStopLoss(13.72,"eosusdt"))
+    stopLoss = "0.1"
+    buyModel = BuyModel(1.9005999999999992,3.0606,1583763360,1.63,1089804598,0.015,1.4044)
+    buyModelPrice = float(buyModel.price)
+    buyModelOriPrice = float(buyModel.oriPrice)
+    minIncome = float(buyModel.minIncome)
+    stopLoss = float(stopLoss)
+
+    # 判断有没有进行过止损
+    # 有的话就用最后一次交易的价格进行止损点判断
+    # 因为止损卖出后 与再买入的价格相差不大的话，很容易再次触发止损卖
+    if buyModelPrice != buyModelOriPrice:
+        stopLoss = stopLoss / 2
+        buyModelPrice = float(buyModel.lastPrice)
+
+    gap = buyModelPrice - 1.401
+    gap = gap / buyModelPrice
+
+    if gap >= stopLoss:
+        print(1)
+    print(2)
