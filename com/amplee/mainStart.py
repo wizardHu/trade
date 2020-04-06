@@ -11,6 +11,7 @@ import logUtil
 import Refresh as refresh
 import time
 
+#策略模块
 def dealData(data,transactionModel,env):
     try:
         kdjFlag = kDJUtil.judgeBuy(transactionModel.symbol)
@@ -54,23 +55,30 @@ def dealData(data,transactionModel,env):
                 for buyModel in sellPackage:
                     biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
 
-        neesStopLossPackage = commonUtil.getStopLossBuyModel(data['close'],transactionModel.symbol,transactionModel.stopLoss)
-        if len(neesStopLossPackage) > 0:#价格到达止损点
-            for buyModel in neesStopLossPackage:
-                logUtil.info("can stop loss ", buyModel)
-                biTradeUtil.stopLossSell(env,price,buyModel,transactionModel.symbol)
-
-        if kdjFlag and rSIFlag:
-            stopLossPackage = commonUtil.getCanBuyStopLoss(data['close'],transactionModel.symbol)
-            if len(stopLossPackage) > 0:
-                for stopLoss in stopLossPackage:
-                    logUtil.info("buy stop loss ", stopLoss)
-                    biTradeUtil.stopLossBuy(env, price, stopLoss, transactionModel.symbol,transactionModel.minIncome)
-
-
     except Exception as err:
         logUtil.info('deal error', err)
 
+#止损模块
+def dealStopLoss(data,transactionModel,env):
+    try:
+
+        price = float(data['close'])
+        neesStopLossPackage = commonUtil.getStopLossBuyModel(data['close'], transactionModel.symbol,
+                                                             transactionModel.stopLoss)
+        if len(neesStopLossPackage) > 0:  # 价格到达止损点
+            for buyModel in neesStopLossPackage:
+                logUtil.info("can stop loss ", buyModel)
+                biTradeUtil.stopLossSell(env, price, buyModel, transactionModel.symbol)
+
+        stopLossPackage = commonUtil.getCanBuyStopLoss(data['close'], transactionModel.symbol)
+        if len(stopLossPackage) > 0:
+            for stopLoss in stopLossPackage:
+                logUtil.info("buy stop loss ", stopLoss)
+                biTradeUtil.stopLossBuy(env, price, stopLoss, transactionModel.symbol,
+                                        transactionModel.minIncome)
+
+    except Exception as err:
+        logUtil.info('dealStopLoss error', err)
 
 if __name__ == '__main__':
 
@@ -100,7 +108,9 @@ if __name__ == '__main__':
 
                 logUtil.info(thisData['data'],transactionModel.symbol)
 
-                if lastId != thisData['data'][0]['id']:
+                dealStopLoss(lastData['data'][0],transactionModel,env)#止损模块处理
+
+                if lastId != thisData['data'][0]['id']: #策略模块处理
                     commonUtil.addSymbol(lastData['data'][0],transactionModel)
                     dealData(lastData['data'][0],transactionModel,env)
 

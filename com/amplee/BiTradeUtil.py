@@ -5,11 +5,12 @@ import HuobiService as huobi
 import logUtil
 import modelUtil as modelUtil
 from StopLossModel import StopLossModel
+import random
 
 
 def buy(env,buyPrice,amount,symbol,index,minIncome):
     try:
-        orderId = "0000"
+        orderId = random.randint(0,1999999999)
         if "pro" == env:
             result = huobi.send_order(amount, "api", symbol, "buy-limit", buyPrice)
             logUtil.info("buy result",result,symbol,amount,buyPrice)
@@ -51,7 +52,7 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
 #达到止损点就要卖出
 def stopLossSell(env,sellPrice,buyModel,symbol):
     try:
-        orderId = "0000"
+        orderId = random.randint(0,1999999999)
         if "pro" == env:
             result = huobi.order_info(buyModel.orderId)
             data = result['data']
@@ -88,7 +89,7 @@ def stopLossSell(env,sellPrice,buyModel,symbol):
 #买入因止损卖出的
 def stopLossBuy(env,price,stopLossModel,symbol,minInCome):
     try:
-        orderId = "0000"
+        orderId = random.randint(0,1999999999)
         if "pro" == env:
             result = huobi.send_order(stopLossModel.oriAmount, "api", symbol, "buy-limit", price)
             logUtil.info("buy result", result, symbol, stopLossModel.oriAmount, price)
@@ -100,7 +101,7 @@ def stopLossBuy(env,price,stopLossModel,symbol,minInCome):
         oldBuyModel = modelUtil.getBuyModelByOrderId(symbol,stopLossModel.oriOrderId)
 
         # 计算新的价格
-        newPrice = (float(price) + float(oldBuyModel.price))/2
+        newPrice = float(oldBuyModel.price) - (float(stopLossModel.sellPrice)-float(price))
 
         newBuyModel = BuyModel(newPrice,oldBuyModel.oriPrice, oldBuyModel.index, oldBuyModel.amount, oldBuyModel.orderId, minInCome)
         modelUtil.modBuyModel(oldBuyModel, newBuyModel, symbol)
