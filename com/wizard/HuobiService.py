@@ -4,7 +4,7 @@
 # @Author  : KlausQiu
 # @QQ      : 375235513
 # @github  : https://github.com/KlausQIU
-
+import linecache
 from Utils import *
 
 '''
@@ -12,21 +12,40 @@ Market data API
 '''
 
 
+# # 获取KLine
+# def get_kline(symbol, period, size=150):
+#     """
+#     :param symbol
+#     :param period: 可选值：{1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year }
+#     :param size: 可选值： [1,2000]
+#     :return:
+#     """
+#     params = {'symbol': symbol,
+#               'period': period,
+#               'size': size}
+#
+#     url = MARKET_URL + '/market/history/kline'
+#     return http_get_request(url, params)
+
 # 获取KLine
+count =1
+lastId = 0
 def get_kline(symbol, period, size=150):
-    """
-    :param symbol
-    :param period: 可选值：{1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year }
-    :param size: 可选值： [1,2000]
-    :return:
-    """
-    params = {'symbol': symbol,
-              'period': period,
-              'size': size}
-
-    url = MARKET_URL + '/market/history/kline'
-    return http_get_request(url, params)
-
+    global count
+    global lastId
+    try:
+        line = linecache.getline("eosusdt.txt", count)
+        line = '{"status":"ok","data":['+line+']}'
+        count = count + 1
+        ditc = eval(line)
+        id = ditc['data'][0]['id']
+        if id < lastId:
+            return eval('{"status":"error"}')
+        lastId = id
+        return ditc
+    except Exception as err:
+        print(err)
+    return eval('{"status":"error"}')
 
 # 获取marketdepth
 def get_depth(symbol, type):
