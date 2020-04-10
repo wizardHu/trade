@@ -94,6 +94,7 @@ def delSymbol(transactionModel):
     lastIdDict[transactionModel.symbol] = 0
     highCount[transactionModel.symbol] = 0
 
+#得到需要止损的
 def getStopLossBuyModel(price,symbol,stopLoss):
     stopLossPackage = []
 
@@ -106,17 +107,29 @@ def getStopLossBuyModel(price,symbol,stopLoss):
             buyModelPrice = float(buyModel.price)
             buyModelOriPrice = float(buyModel.oriPrice)
             minIncome = float(buyModel.minIncome)
+            lastPrice = float(buyModel.lastPrice)
             stopLosssTemp = stopLoss
 
-            if minIncome == 1:
+            if minIncome == 1 or buyModelPrice <= price:
                 continue
 
             #判断有没有进行过止损
-            #有的话就用最后一次交易的价格进行止损点判断
-            #因为止损卖出后 与再买入的价格相差不大的话，很容易再次触发止损卖
             if buyModelPrice != buyModelOriPrice:
-                stopLosssTemp = stopLoss/2
-                buyModelPrice = float(buyModel.lastPrice)
+                if price < lastPrice:
+                    stopLosssTemp = stopLoss / 2
+                    buyModelPrice = lastPrice
+                else:
+                    #与上一次买的价差率
+                    lastGap = price - lastPrice
+                    lastGap = lastGap/lastPrice
+
+                    #与当前价格的价差率
+                    nowGap = buyModelPrice - price
+                    nowGap = nowGap/buyModelPrice
+
+                    if lastGap < 0.02 or nowGap < stopLoss:
+                        continue
+
 
             gap = buyModelPrice - price
             gap = gap / buyModelPrice
@@ -153,24 +166,5 @@ def getCanBuyStopLoss(price,symbol):
     return stopLossPackage
 
 if __name__ == '__main__':
-    # print(getCanBuyStopLoss(13.72,"eosusdt"))
-    stopLoss = "0.1"
-    buyModel = BuyModel(1.9005999999999992,3.0606,1583763360,1.63,1089804598,0.015,1.4044)
-    buyModelPrice = float(buyModel.price)
-    buyModelOriPrice = float(buyModel.oriPrice)
-    minIncome = float(buyModel.minIncome)
-    stopLoss = float(stopLoss)
-
-    # 判断有没有进行过止损
-    # 有的话就用最后一次交易的价格进行止损点判断
-    # 因为止损卖出后 与再买入的价格相差不大的话，很容易再次触发止损卖
-    if buyModelPrice != buyModelOriPrice:
-        stopLoss = stopLoss / 2
-        buyModelPrice = float(buyModel.lastPrice)
-
-    gap = buyModelPrice - 1.401
-    gap = gap / buyModelPrice
-
-    if gap >= stopLoss:
-        print(1)
-    print(2)
+    #2.7919,2.846,1578493080,3.51,575060314,0.015,2.6496
+    print(getStopLossBuyModel(2.6496,"eosusdt",0.05))
