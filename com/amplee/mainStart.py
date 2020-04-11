@@ -116,6 +116,7 @@ if __name__ == '__main__':
 
                 commonUtil.lastDataDict[transactionModel.symbol] = thisData
                 commonUtil.lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
+                print(huobi.balance)
 
         except Exception as err:
             logUtil.info('connect https error,retry...', err)

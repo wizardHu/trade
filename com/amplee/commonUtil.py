@@ -18,7 +18,7 @@ def juideAllGap(price,symbol,tradeGap):
 
     for model in buyPackage:
 
-        buyPrice = float(model.price)
+        buyPrice = float(model.oriPrice)
 
         #计算当前价格与以往每次的差值
         gap = abs(buyPrice - price)
@@ -152,7 +152,7 @@ def getCanBuyStopLoss(price,symbol):
         for stopLossModel in sellPackage:
 
             sellPrice = float(stopLossModel.sellPrice)
-            minIncome = 0.02#暂定 2个百分点
+            minIncome = 0.03#暂定 2个百分点
 
             gap = sellPrice - price
             gap = gap / sellPrice

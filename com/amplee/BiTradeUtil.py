@@ -18,6 +18,8 @@ def buy(env,buyPrice,amount,symbol,index,minIncome):
                 orderId = result['data']
             else:
                 return False
+        else:
+            huobi.send_order_dev(amount, 1, buyPrice)
 
         buyModel = BuyModel(buyPrice,buyPrice,index,amount,orderId,minIncome,buyPrice)
         fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
@@ -42,6 +44,8 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
                     return
             else:
                 return
+        else:
+            huobi.send_order_dev(buyModel.amount, 0, sellPrice)
 
         fileOperUtil.delMsgFromFile(buyModel,"buy/"+symbol+"buy")
         fileOperUtil.write(('0,{},{},{},{},{},{}').format(int(time.time()),buyModel.price, buyModel.amount,sellPrice,sellIndex,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex))),"record/"+symbol+"-record")
@@ -66,6 +70,8 @@ def stopLossSell(env,sellPrice,buyModel,symbol):
                     return
             else:
                 return
+        else:
+            huobi.send_order_dev(buyModel.amount, 0, sellPrice)
 
         newBuyModel = BuyModel(buyModel.price,buyModel.oriPrice, buyModel.index, buyModel.amount, buyModel.orderId, 1,buyModel.lastPrice)
         modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
@@ -97,6 +103,8 @@ def stopLossBuy(env,price,stopLossModel,symbol,minInCome):
                 orderId = result['data']
             else:
                 return False
+        else:
+            huobi.send_order_dev(stopLossModel.oriAmount, 1, price)
 
         oldBuyModel = modelUtil.getBuyModelByOrderId(symbol,stopLossModel.oriOrderId)
 

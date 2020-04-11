@@ -44,7 +44,7 @@ def get_kline(symbol, period, size=150):
         lastId = id
         return ditc
     except Exception as err:
-        print(err)
+        print(balance)
     return eval('{"status":"error"}')
 
 # 获取marketdepth
@@ -169,6 +169,14 @@ def send_order(amount, source, symbol, _type, price=0):
     url = '/v1/order/orders/place'
     return api_key_post(params, url)
 
+balance = 10000
+# 创建并执行订单 dev
+def send_order_dev(amount,type, price):
+    global balance
+    if type == 1:
+        balance = balance - (float(amount) * price)
+    elif type == 0:
+        balance = balance + (float(amount) * price)
 
 # 查询所有当前帐号下未成交订单
 def open_orders(account_id, symbol, side='', size=10):
