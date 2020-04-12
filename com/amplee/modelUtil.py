@@ -1,4 +1,5 @@
 import fileOperUtil as fileOperUtil
+from JumpQueueModel import JumpQueueModel
 from TransactionModel import TransactionModel
 from BuyModel import BuyModel
 from StopLossModel import  StopLossModel
@@ -48,6 +49,11 @@ def getBuyModel(symbol):
 def modBuyModel(oldBuyModel,newBuyModel,symbol):
     fileOperUtil.delMsgFromFile(oldBuyModel, "buy/" + symbol + "buy")
     fileOperUtil.write(newBuyModel, "buy/" + symbol + "buy")
+
+def modJumpModel(oldJumpMode,newJumpMode,symbol):
+    fileOperUtil.delMsgFromFile(oldJumpMode, "queue/" + symbol + "-queue")
+    fileOperUtil.write(newJumpMode, "queue/" + symbol + "-queue")
+
 
 # 得到每次买需要的平均花费
 def getAllPairAvgBuyExpense():
@@ -101,6 +107,28 @@ def getBuyModelByOrderId(symbol,oriOrderId):
                 return buyModel
 
     return None
+
+def getJumpModel(symbol):
+    lines = fileOperUtil.readAll("queue/"+symbol+"-queue")
+    models = []
+
+    #type,orderId,lowPrice,highPrice,jumpPrice,jumpCount
+    for model in lines:
+
+        if model != '' and model != '\n':
+            params = model.split(',')
+            type = params[0]
+            orderId = params[1]
+            lowPrice = params[2]
+            highPrice = params[3]
+            jumpPrice = params[4]
+            jumpCount = params[5]
+            time = params[6]
+
+            jumpQueueModel = JumpQueueModel(type, orderId, lowPrice, highPrice,jumpPrice,jumpCount,time)
+            models.append(jumpQueueModel)
+
+    return models
 
 if __name__ == '__main__':
    print(getBuyModelByOrderId("eosusdt","111121"))

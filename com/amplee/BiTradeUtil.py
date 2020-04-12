@@ -6,6 +6,7 @@ import logUtil
 import modelUtil as modelUtil
 from StopLossModel import StopLossModel
 import random
+import commonUtil as commonUtil
 
 
 def buy(env,buyPrice,amount,symbol,index,minIncome):
@@ -109,7 +110,8 @@ def stopLossBuy(env,price,stopLossModel,symbol,minInCome):
         oldBuyModel = modelUtil.getBuyModelByOrderId(symbol,stopLossModel.oriOrderId)
 
         # 计算新的价格
-        newPrice = float(oldBuyModel.price) - (float(stopLossModel.sellPrice)-float(price))
+        length = commonUtil.calDecimal(price)
+        newPrice = round(float(oldBuyModel.price) - (float(stopLossModel.sellPrice)-float(price)), length)
 
         newBuyModel = BuyModel(newPrice,oldBuyModel.oriPrice, oldBuyModel.index, oldBuyModel.amount, oldBuyModel.orderId, minInCome,price)
         modelUtil.modBuyModel(oldBuyModel, newBuyModel, symbol)

@@ -110,7 +110,7 @@ def getStopLossBuyModel(price,symbol,stopLoss):
             lastPrice = float(buyModel.lastPrice)
             stopLosssTemp = stopLoss
 
-            if minIncome == 1 or buyModelPrice <= price:
+            if minIncome == 1 or minIncome == 2 or buyModelPrice <= price:
                 continue
 
             #判断有没有进行过止损
@@ -152,7 +152,7 @@ def getCanBuyStopLoss(price,symbol):
         for stopLossModel in sellPackage:
 
             sellPrice = float(stopLossModel.sellPrice)
-            minIncome = 0.03#暂定 2个百分点
+            minIncome = 0.03#暂定 3个百分点
 
             gap = sellPrice - price
             gap = gap / sellPrice
@@ -164,6 +164,16 @@ def getCanBuyStopLoss(price,symbol):
         logUtil.info("commonUtil--getCanBuyStopLoss" + err)
 
     return stopLossPackage
+
+#计算小数点后的位数
+def calDecimal(ori):
+    oriStr = str(ori)
+    index = oriStr.find(".")
+    length = 4
+    if index != -1:
+        priceStr = oriStr[index + 1:]
+        length = len(priceStr)
+    return length
 
 if __name__ == '__main__':
     #2.7919,2.846,1578493080,3.51,575060314,0.015,2.6496

@@ -80,6 +80,14 @@ def dealStopLoss(data,transactionModel,env):
     except Exception as err:
         logUtil.info('dealStopLoss error', err)
 
+
+#交割模块
+def doTrade(data,transactionModel,env):
+    try:
+        price = float(data['close'])
+    except Exception as err:
+        logUtil.info('doTrade error', err)
+
 if __name__ == '__main__':
 
     env = "dev"
