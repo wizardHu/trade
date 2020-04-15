@@ -7,6 +7,8 @@ import MAUtil as mAUtil
 import AmountUtil as amountUtil
 import logUtil
 from BuyModel import BuyModel
+import HuobiService as huobi
+import fileOperUtil as fileOperUtil
 
 nextBuy = False
 lastIdDict = {}
@@ -174,6 +176,72 @@ def calDecimal(ori):
         priceStr = oriStr[index + 1:]
         length = len(priceStr)
     return length
+
+# 判断订单的状态
+def checkOrderIsFilled(env,orderId):
+    if "pro" == env:
+        result = huobi.order_info(orderId)
+        data = result['data']
+        state = data['state']
+        if state == 'filled':
+            return True
+    else:
+        return True
+
+    return False
+
+def doMerge(env,list, transactionModel):
+
+    if len(list) < 1:
+        return None
+
+    price = 0.0
+    amount = 0.0
+    index = 0
+    orderId = 0
+    shouldDel = []
+
+    for buyModel in list:
+        if checkOrderIsFilled(env,buyModel.orderId):
+            shouldDel.append(buyModel)
+            price = price + float(buyModel.price)
+            amount = amount + float(buyModel.amount)
+            index = buyModel.index #这两个随便
+            orderId = buyModel.orderId
+
+    shouldDelLength = len(shouldDel)
+
+    if len(shouldDelLength) < 1:
+        return None
+
+    decimallength = calDecimal(price)
+    avgPrice = round(price/shouldDelLength,decimallength)
+    avgAmount = round(amount/shouldDelLength,int(transactionModel.precision))
+
+    newBuyModel = BuyModel(avgPrice, avgPrice, index, avgAmount, orderId,
+                           transactionModel.minIncome, avgPrice)
+
+    for shouldDelBuyModel in shouldDel:
+        fileOperUtil.delMsgFromFile(shouldDelBuyModel,"buy/"+transactionModel.symbol+"buy")
+
+    fileOperUtil.write(newBuyModel,"buy/"+transactionModel.symbol+"buy")
+
+    return newBuyModel
+
+    # 合并购买的
+def mergeBuyModel(env,buyModels,transactionModel):
+
+    list = []
+    resultList = []
+
+    if len(buyModels) > 0:
+        for buyModel in buyModels:
+            list.append(buyModel)
+            if len(list) == 3:#暂时是三合一
+                mergeBuyModel = doMerge(env,list,transactionModel)
+                resultList.append(mergeBuyModel)
+                list.clear()
+
 
 if __name__ == '__main__':
     #2.7919,2.846,1578493080,3.51,575060314,0.015,2.6496
