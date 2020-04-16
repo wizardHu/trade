@@ -66,7 +66,8 @@ def dealStopLoss(data,transactionModel,env):
         neesStopLossPackage = commonUtil.getStopLossBuyModel(data['close'], transactionModel.symbol,
                                                              transactionModel.stopLoss)
         if len(neesStopLossPackage) > 0:  # 价格到达止损点
-            for buyModel in neesStopLossPackage:
+            mergeBuyModel = commonUtil.mergeBuyModel(env,neesStopLossPackage,transactionModel,price)
+            for buyModel in mergeBuyModel:
                 logUtil.info("can stop loss ", buyModel)
                 biTradeUtil.stopLossSell(env, price, buyModel, transactionModel.symbol)
 

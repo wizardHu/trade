@@ -10,7 +10,10 @@ from TransactionModel import TransactionModel
 
 
 def doOper(price, transactionModel, jumpModel):
-    pass
+    type = int(jumpModel.type)
+
+    if type == 1:#正常买
+
 
 
 # 交割模块

@@ -9,6 +9,7 @@ import logUtil
 from BuyModel import BuyModel
 import HuobiService as huobi
 import fileOperUtil as fileOperUtil
+from TransactionModel import TransactionModel
 
 nextBuy = False
 lastIdDict = {}
@@ -195,6 +196,7 @@ def doMerge(env,list, transactionModel):
     if len(list) < 1:
         return None
 
+    decimallength = calDecimal(list[0].price)
     price = 0.0
     amount = 0.0
     index = 0
@@ -203,22 +205,21 @@ def doMerge(env,list, transactionModel):
 
     for buyModel in list:
         if checkOrderIsFilled(env,buyModel.orderId):
+            logUtil.info("doMerge=" ,buyModel)
             shouldDel.append(buyModel)
-            price = price + float(buyModel.price)
+            price = price + float(buyModel.price)*float(buyModel.amount)
             amount = amount + float(buyModel.amount)
             index = buyModel.index #这两个随便
             orderId = buyModel.orderId
 
-    shouldDelLength = len(shouldDel)
 
-    if len(shouldDelLength) < 1:
+    if len(shouldDel) < 2:
         return None
 
-    decimallength = calDecimal(price)
-    avgPrice = round(price/shouldDelLength,decimallength)
-    avgAmount = round(amount/shouldDelLength,int(transactionModel.precision))
+    amount = round(amount,int(transactionModel.precision))
+    avgPrice = round(price / amount, decimallength)
 
-    newBuyModel = BuyModel(avgPrice, avgPrice, index, avgAmount, orderId,
+    newBuyModel = BuyModel(avgPrice, avgPrice, index, amount, orderId,
                            transactionModel.minIncome, avgPrice)
 
     for shouldDelBuyModel in shouldDel:
@@ -229,20 +230,41 @@ def doMerge(env,list, transactionModel):
     return newBuyModel
 
     # 合并购买的
-def mergeBuyModel(env,buyModels,transactionModel):
+def mergeBuyModel(env,buyModels,transactionModel,price):
 
     list = []
     resultList = []
+    unDealList = []
+
+    everyBuyAmount = float(transactionModel.everyExpense) / price
 
     if len(buyModels) > 0:
         for buyModel in buyModels:
+
+            amount = float(buyModel.amount)
+            if amount > everyBuyAmount * 5:#合并过很多次就不处理了
+                unDealList.append(buyModel)
+                continue
+
             list.append(buyModel)
             if len(list) == 3:#暂时是三合一
                 mergeBuyModel = doMerge(env,list,transactionModel)
-                resultList.append(mergeBuyModel)
-                list.clear()
+                if mergeBuyModel != None:
+                    resultList.append(mergeBuyModel)
+                    list.clear()
 
+    if len(resultList) > 0:
+        if len(list) > 0:
+            resultList = resultList + list
+        if len(unDealList) > 0:
+            resultList = resultList + unDealList
+
+        return resultList
+
+    return buyModels
 
 if __name__ == '__main__':
-    #2.7919,2.846,1578493080,3.51,575060314,0.015,2.6496
-    print(getStopLossBuyModel(2.6496,"eosusdt",0.05))
+    buyModels = getStopLossBuyModel(1.0517,"eosusdt",0.1)
+    tradeModel = TransactionModel("eosusdt",10,0.015,0.015,"1min",2,0.05)
+    list = mergeBuyModel("dev",buyModels,tradeModel)
+    print(list)

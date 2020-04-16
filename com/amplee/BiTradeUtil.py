@@ -8,8 +8,32 @@ from StopLossModel import StopLossModel
 import random
 import commonUtil as commonUtil
 
-
+# 只是加入了跳跃队列
 def buy(env,buyPrice,amount,symbol,index,minIncome):
+    try:
+        orderId = random.randint(0,1999999999)
+        if "pro" == env:
+            result = huobi.send_order(amount, "api", symbol, "buy-limit", buyPrice)
+            logUtil.info("buy result",result,symbol,amount,buyPrice)
+            if result['status'] == 'ok':
+                orderId = result['data']
+            else:
+                return False
+        else:
+            huobi.send_order_dev(amount, 1, buyPrice)
+
+        buyModel = BuyModel(buyPrice,buyPrice,index,amount,orderId,minIncome,buyPrice)
+        fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
+        fileOperUtil.write(('1,{},{},{},{},{}').format(int(time.time()),buyPrice, amount, index,
+                                                       time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index))),"record/"+symbol + "-record")
+
+        return True
+    except Exception as err:
+        logUtil.info("BiTradeUtil--buy"+err)
+    return False
+
+# 这里才是真正实现买操作
+def jumpBuy(env,buyPrice,amount,symbol,index,minIncome):
     try:
         orderId = random.randint(0,1999999999)
         if "pro" == env:
