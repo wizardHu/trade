@@ -21,6 +21,10 @@ def juideAllGap(price,symbol,tradeGap):
 
     for model in buyPackage:
 
+        minIncome = float(model.minIncome)
+        if minIncome == 1 or minIncome == 2 or minIncome == 3:
+            continue
+
         buyPrice = float(model.oriPrice)
 
         #计算当前价格与以往每次的差值
@@ -60,6 +64,9 @@ def canSell(price,symbol,minIncome,env):
         buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
 
         for buyModel in buyPackage:
+
+            if minIncome == 1 or minIncome == 2 or minIncome == 3:
+                continue
 
             buyModelPrice = buyModel.price;
 
@@ -113,7 +120,7 @@ def getStopLossBuyModel(price,symbol,stopLoss):
             lastPrice = float(buyModel.lastPrice)
             stopLosssTemp = stopLoss
 
-            if minIncome == 1 or minIncome == 2 or buyModelPrice <= price:
+            if minIncome == 1 or minIncome == 2 or minIncome == 3 or buyModelPrice <= price:
                 continue
 
             #判断有没有进行过止损
@@ -154,6 +161,10 @@ def getCanBuyStopLoss(price,symbol):
 
         for stopLossModel in sellPackage:
 
+            status = int(stopLossModel.status)
+            if status == 1:
+                continue
+
             sellPrice = float(stopLossModel.sellPrice)
             minIncome = 0.03#暂定 3个百分点
 
@@ -176,6 +187,10 @@ def calDecimal(ori):
     if index != -1:
         priceStr = oriStr[index + 1:]
         length = len(priceStr)
+
+    if length <2:
+        length = 2
+
     return length
 
 # 判断订单的状态

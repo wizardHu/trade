@@ -54,6 +54,10 @@ def modJumpModel(oldJumpMode,newJumpMode,symbol):
     fileOperUtil.delMsgFromFile(oldJumpMode, "queue/" + symbol + "-queue")
     fileOperUtil.write(newJumpMode, "queue/" + symbol + "-queue")
 
+def modStopLossModel(oldStopLossModel,newStopLossModel,symbol):
+    fileOperUtil.delMsgFromFile(oldStopLossModel, "stopLossSell/" + symbol + "-sell")
+    fileOperUtil.write(newStopLossModel, "stopLossSell/" + symbol + "-sell")
+
 
 # 得到每次买需要的平均花费
 def getAllPairAvgBuyExpense():
@@ -81,11 +85,33 @@ def getStopLossModel(symbol):
             oriAmount = params[3]
             oriOrderId = params[4]
             orderId = params[5]
+            status = params[6]
 
-            stopLossModel = StopLossModel(time, sellPrice, oriPrice, oriAmount,oriOrderId,orderId)
+            stopLossModel = StopLossModel(time, sellPrice, oriPrice, oriAmount,oriOrderId,orderId,status)
             models.append(stopLossModel)
 
     return models
+
+def getStopLossModelByOrderId(symbol,selectOrderId):
+    lines = fileOperUtil.readAll("stopLossSell/" + symbol + "-sell")
+
+    for model in lines:
+
+        if model != '' and model != '\n':
+            params = model.split(',')
+            time = params[0]
+            sellPrice = params[1]
+            oriPrice = params[2]
+            oriAmount = params[3]
+            oriOrderId = params[4]
+            orderId = params[5]
+            status = params[6]
+
+            if str(orderId) == str(selectOrderId):
+                stopLossModel = StopLossModel(time, sellPrice, oriPrice, oriAmount, oriOrderId, orderId, status)
+                return stopLossModel
+
+    return None
 
 def getBuyModelByOrderId(symbol,oriOrderId):
     lines = fileOperUtil.readAll("buy/"+symbol+"buy")

@@ -10,6 +10,7 @@ import AmountUtil as amountUtil
 import logUtil
 import Refresh as refresh
 import time
+import JumpUtil as jumpUtil
 
 #策略模块
 def dealData(data,transactionModel,env):
@@ -31,7 +32,7 @@ def dealData(data,transactionModel,env):
 
         if commonUtil.nextBuy and avgFlag:
             amount = round(float(transactionModel.everyExpense) / price, int(transactionModel.precision))
-            isSuccess = biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'],transactionModel.minIncome)
+            isSuccess = biTradeUtil.buy( price, amount, transactionModel.symbol, data['id'])
             logUtil.info(("is next buy symbol={},price={},data['id']={} issuccess={}").format(transactionModel.symbol,price,data['id'],isSuccess))
 
             if isSuccess:
@@ -39,7 +40,7 @@ def dealData(data,transactionModel,env):
 
         elif kdjFlag and rSIFlag and maFlag and avgFlag and highFlag:
             amount = round(float(transactionModel.everyExpense) / price, int(transactionModel.precision))
-            isSuccess = biTradeUtil.buy(env, price, amount, transactionModel.symbol, data['id'],transactionModel.minIncome)
+            isSuccess = biTradeUtil.buy(price, amount, transactionModel.symbol, data['id'])
             logUtil.info(("is first buy symbol={},price={},data['id']={} issuccess={}").format(transactionModel.symbol, price, data['id'],isSuccess))
 
 
@@ -75,8 +76,7 @@ def dealStopLoss(data,transactionModel,env):
         if len(stopLossPackage) > 0:
             for stopLoss in stopLossPackage:
                 logUtil.info("buy stop loss ", stopLoss)
-                biTradeUtil.stopLossBuy(env, price, stopLoss, transactionModel.symbol,
-                                        transactionModel.minIncome)
+                biTradeUtil.stopLossBuy(env, price, stopLoss, transactionModel.symbol)
 
     except Exception as err:
         logUtil.info('dealStopLoss error', err)
@@ -86,6 +86,7 @@ def dealStopLoss(data,transactionModel,env):
 def doTrade(data,transactionModel,env):
     try:
         price = float(data['close'])
+        jumpUtil.doTrade(env,price,transactionModel)
     except Exception as err:
         logUtil.info('doTrade error', err)
 
@@ -122,6 +123,9 @@ if __name__ == '__main__':
                 if lastId != thisData['data'][0]['id']: #策略模块处理
                     commonUtil.addSymbol(lastData['data'][0],transactionModel)
                     dealData(lastData['data'][0],transactionModel,env)
+
+                #交割模块处理
+                doTrade(lastData['data'][0],transactionModel,env)
 
                 commonUtil.lastDataDict[transactionModel.symbol] = thisData
                 commonUtil.lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']

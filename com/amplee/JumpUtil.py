@@ -2,6 +2,7 @@
 import modelUtil as modelUtil
 import logUtil
 import commonUtil as commonUtil
+import BiTradeUtil as biTradeUtil
 
 
 # 执行操作
@@ -9,15 +10,21 @@ from JumpQueueModel import JumpQueueModel
 from TransactionModel import TransactionModel
 
 
-def doOper(price, transactionModel, jumpModel):
+def doOper(env,price, transactionModel, jumpModel):
     type = int(jumpModel.type)
 
     if type == 1:#正常买
+        biTradeUtil.jumpBuy(env,price,jumpModel,transactionModel)
 
+    if type == 2:#正常卖
+        biTradeUtil.jumpSell(env,price,jumpModel,transactionModel)
+
+    if type == 3:#买入因止损卖出的
+        biTradeUtil.stopLossJumpBuy(env,price,jumpModel,transactionModel)
 
 
 # 交割模块
-def doTrade(price, transactionModel):
+def doTrade(env,price, transactionModel):
     try:
         jumpModelList = modelUtil.getJumpModel(transactionModel.symbol)
 
@@ -31,7 +38,7 @@ def doTrade(price, transactionModel):
 
                 # 达到需要操作的价格区间
                 if (price >= lowPrice and price <= highPrice) or jumpCount >= 10:
-                    doOper(price, transactionModel, jumpModel)
+                    doOper(env,price, transactionModel, jumpModel)
                     continue
 
                 highGap = 0.008
