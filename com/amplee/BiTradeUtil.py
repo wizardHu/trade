@@ -8,11 +8,9 @@ from JumpQueueModel import JumpQueueModel
 from StopLossModel import StopLossModel
 import random
 import commonUtil as commonUtil
-
-# 只是加入了跳跃队列
 from TransactionModel import TransactionModel
 
-
+# 只是加入了跳跃队列
 def buy(buyPrice,amount,symbol,index):
     try:
         orderId = random.randint(0,1999999999)
@@ -21,7 +19,7 @@ def buy(buyPrice,amount,symbol,index):
 
         buyModel = BuyModel(buyPrice,buyPrice,index,amount,orderId,2,buyPrice)
         newJumpModel = JumpQueueModel(1, orderId, round(buyPrice*1.005,decimalLength), round(buyPrice*1.008,decimalLength), round(buyPrice*0.99,decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index)))
+                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index)),index)
 
         fileOperUtil.write(newJumpModel,"queue/"+symbol+"-queue")
         fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
@@ -32,25 +30,27 @@ def buy(buyPrice,amount,symbol,index):
     return False
 
 # 这里才是真正实现买操作
-def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel):
+def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
     try:
         symbol = transactionModel.symbol
         orderId = jumpQueueModel.orderId
         buyModel = modelUtil.getBuyModelByOrderId(symbol,orderId)
+        newAmount = round(float(transactionModel.everyExpense) / buyPrice, int(transactionModel.precision))
         if "pro" == env:
-            result = huobi.send_order(float(buyModel.amount), "api", symbol, "buy-limit", buyPrice)
+            result = huobi.send_order(newAmount, "api", symbol, "buy-limit", buyPrice)
             logUtil.info("buy result",result,symbol,buyModel.amount,buyPrice)
             if result['status'] == 'ok':
                 orderId = result['data']
             else:
                 return False
         else:
-            huobi.send_order_dev(buyModel.amount, 1, buyPrice)
+            huobi.send_order_dev(newAmount, 1, buyPrice)
 
-        newBuyModel = BuyModel(buyPrice,buyModel.price,buyModel.index,buyModel.amount,orderId,transactionModel.minIncome,buyPrice)
+        newBuyModel = BuyModel(buyPrice,buyModel.price,index,newAmount,orderId,transactionModel.minIncome,buyPrice)
         modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
         fileOperUtil.delMsgFromFile(jumpQueueModel,"queue/"+symbol+"-queue")
-        fileOperUtil.write(('1,{},{},{},{}').format(int(time.time()),buyPrice, buyModel.amount,
+        fileOperUtil.write(jumpQueueModel, "queue/" + symbol + "-queuerecord")
+        fileOperUtil.write(('1,{},{},{},{},{},{}').format(int(time.time()),index,buyPrice, buyModel.amount,orderId,
                                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol + "-record")
 
         return True
@@ -67,7 +67,7 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
         newBuyModel = BuyModel(buyModel.price, buyModel.oriPrice, buyModel.index, buyModel.amount, buyModel.orderId, 3, buyModel.lastPrice)
         newJumpModel = JumpQueueModel(2, buyModel.orderId, round(sellPrice * 0.992, decimalLength),
                                       round(sellPrice * 0.995, decimalLength), round(sellPrice * 1.01, decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex)))
+                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex)),sellIndex)
 
         fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
         modelUtil.modBuyModel(buyModel,newBuyModel,symbol)
@@ -76,7 +76,7 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
         logUtil.info("BiTradeUtil--sell"+err)
 
 # 这里才是真正实现卖操作
-def jumpSell(env,sellPrice,jumpQueueModel,transactionModel):
+def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
     try:
 
         symbol = transactionModel.symbol
@@ -98,7 +98,8 @@ def jumpSell(env,sellPrice,jumpQueueModel,transactionModel):
 
         fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
         fileOperUtil.delMsgFromFile(buyModel,"buy/"+symbol+"buy")
-        fileOperUtil.write(('0,{},{},{},{},{}').format(int(time.time()),buyModel.price, buyModel.amount,sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol+"-record")
+        fileOperUtil.write(jumpQueueModel, "queue/" + symbol + "-queuerecord")
+        fileOperUtil.write(('0,{},{},{},{},{},{},{}').format(int(time.time()),index,buyModel.price, buyModel.amount,buyModel.orderId,sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol+"-record")
 
     except Exception as err:
         logUtil.info("BiTradeUtil--jumpSell"+err)
@@ -143,7 +144,7 @@ def stopLossSell(env,sellPrice,buyModel,symbol):
 
 
 #买入因止损卖出的
-def stopLossBuy(env,price,stopLossModel,symbol):
+def stopLossBuy(env,price,stopLossModel,symbol,index):
     try:
 
         decimalLength = commonUtil.calDecimal(price)
@@ -151,7 +152,7 @@ def stopLossBuy(env,price,stopLossModel,symbol):
 
         newJumpModel = JumpQueueModel(3, stopLossModel.orderId, round(price * 1.005, decimalLength),
                                       round(price * 1.008, decimalLength), round(price * 0.99, decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
+                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())),index)
 
         fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
         modelUtil.modStopLossModel(stopLossModel,newStopLossModel,symbol)
@@ -162,7 +163,7 @@ def stopLossBuy(env,price,stopLossModel,symbol):
 
 
 #买入因止损卖出的  真正执行卖逻辑
-def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel):
+def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
     try:
         symbol = transactionModel.symbol
         orderId = jumpQueueModel.orderId

@@ -22,7 +22,7 @@ def juideAllGap(price,symbol,tradeGap):
     for model in buyPackage:
 
         minIncome = float(model.minIncome)
-        if minIncome == 1 or minIncome == 2 or minIncome == 3:
+        if minIncome == 1 or minIncome == 3:
             continue
 
         buyPrice = float(model.oriPrice)
@@ -257,7 +257,7 @@ def mergeBuyModel(env,buyModels,transactionModel,price):
         for buyModel in buyModels:
 
             amount = float(buyModel.amount)
-            if amount > everyBuyAmount * 5:#合并过很多次就不处理了
+            if amount > everyBuyAmount * 3:#合并过很多次就不处理了
                 unDealList.append(buyModel)
                 continue
 

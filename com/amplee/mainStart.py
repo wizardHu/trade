@@ -12,7 +12,7 @@ import Refresh as refresh
 import time
 import JumpUtil as jumpUtil
 
-#策略模块
+#策略模块 1
 def dealData(data,transactionModel,env):
     try:
         kdjFlag = kDJUtil.judgeBuy(transactionModel.symbol)
@@ -24,9 +24,9 @@ def dealData(data,transactionModel,env):
         lowFlag = commonUtil.juideLowest(data['close'], transactionModel.symbol)
         riskFlag = amountUtil.judgeRisk(transactionModel.symbol)
 
-        sellFlag = kDJUtil.judgeSell(transactionModel.symbol)
+       # sellFlag = kDJUtil.judgeSell(transactionModel.symbol)
 
-        logUtil.info(("kdjFlag={}, rSIFlag={}, maFlag={}, avgFlag={}, highFlag={}, bollFlag={}, lowFlag={}, riskFlag={} sellFlag={}").format(kdjFlag, rSIFlag, maFlag, avgFlag, highFlag, bollFlag, lowFlag, riskFlag,sellFlag))
+        logUtil.info(("kdjFlag={}, rSIFlag={}, maFlag={}, avgFlag={}, highFlag={}, bollFlag={}, lowFlag={}, riskFlag={}").format(kdjFlag, rSIFlag, maFlag, avgFlag, highFlag, bollFlag, lowFlag, riskFlag))
 
         price = float(data['close'])
 
@@ -47,17 +47,32 @@ def dealData(data,transactionModel,env):
         elif avgFlag and lowFlag and bollFlag and riskFlag and highFlag:
             commonUtil.nextBuy = True
 
-        if sellFlag:
-            sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, env)
-
-            logUtil.info(sellPackage)
-
-            if len(sellPackage) > 0:
-                for buyModel in sellPackage:
-                    biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
+        # if sellFlag:
+        #     sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, env)
+        #
+        #     logUtil.info(sellPackage)
+        #
+        #     if len(sellPackage) > 0:
+        #         for buyModel in sellPackage:
+        #             biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
 
     except Exception as err:
         logUtil.info('deal error', err)
+
+#策略模块 2
+def dealSell(data,transactionModel,env):
+    try:
+        price = float(data['close'])
+        sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, env)
+
+        logUtil.info(sellPackage)
+
+        if len(sellPackage) > 0:
+            for buyModel in sellPackage:
+                biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
+
+    except Exception as err:
+        logUtil.info('dealSell error', err)
 
 #止损模块
 def dealStopLoss(data,transactionModel,env):
@@ -76,7 +91,7 @@ def dealStopLoss(data,transactionModel,env):
         if len(stopLossPackage) > 0:
             for stopLoss in stopLossPackage:
                 logUtil.info("buy stop loss ", stopLoss)
-                biTradeUtil.stopLossBuy(env, price, stopLoss, transactionModel.symbol)
+                biTradeUtil.stopLossBuy(env, price, stopLoss, transactionModel.symbol, data['id'])
 
     except Exception as err:
         logUtil.info('dealStopLoss error', err)
@@ -86,7 +101,7 @@ def dealStopLoss(data,transactionModel,env):
 def doTrade(data,transactionModel,env):
     try:
         price = float(data['close'])
-        jumpUtil.doTrade(env,price,transactionModel)
+        jumpUtil.doTrade(env,price,data['id'],transactionModel)
     except Exception as err:
         logUtil.info('doTrade error', err)
 
@@ -120,16 +135,19 @@ if __name__ == '__main__':
 
                 dealStopLoss(lastData['data'][0],transactionModel,env)#止损模块处理
 
-                if lastId != thisData['data'][0]['id']: #策略模块处理
+                if lastId != thisData['data'][0]['id']: #策略模块1处理
                     commonUtil.addSymbol(lastData['data'][0],transactionModel)
                     dealData(lastData['data'][0],transactionModel,env)
+
+                # 策略模块2处理
+                dealSell(lastData['data'][0], transactionModel, env)
 
                 #交割模块处理
                 doTrade(lastData['data'][0],transactionModel,env)
 
                 commonUtil.lastDataDict[transactionModel.symbol] = thisData
                 commonUtil.lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
-                print(huobi.balance)
+                logUtil.info(huobi.balance," ",huobi.maxBalance," ",huobi.minBalance)
 
         except Exception as err:
             logUtil.info('connect https error,retry...', err)

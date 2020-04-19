@@ -170,13 +170,23 @@ def send_order(amount, source, symbol, _type, price=0):
     return api_key_post(params, url)
 
 balance = 10000
+maxBalance = 0
+minBalance = 99999
 # 创建并执行订单 dev
 def send_order_dev(amount,type, price):
     global balance
+    global maxBalance
+    global minBalance
     if type == 1:
         balance = balance - (float(amount) * price)
     elif type == 0:
         balance = balance + (float(amount) * price)
+
+    if balance > maxBalance:
+        maxBalance = balance
+
+    if balance < minBalance:
+        minBalance = balance
 
 # 查询所有当前帐号下未成交订单
 def open_orders(account_id, symbol, side='', size=10):
