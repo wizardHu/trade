@@ -44,7 +44,7 @@ def get_kline(symbol, period, size=150):
         lastId = id
         return ditc
     except Exception as err:
-        print(balance)
+        print(balance,minBalance,maxBalance)
     return eval('{"status":"error"}')
 
 # 获取marketdepth

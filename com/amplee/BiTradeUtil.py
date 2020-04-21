@@ -49,7 +49,9 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
         newBuyModel = BuyModel(buyPrice,buyModel.price,index,newAmount,orderId,transactionModel.minIncome,buyPrice)
         modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
         fileOperUtil.delMsgFromFile(jumpQueueModel,"queue/"+symbol+"-queue")
-        fileOperUtil.write(jumpQueueModel, "queue/" + symbol + "-queuerecord")
+
+        fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
+
         fileOperUtil.write(('1,{},{},{},{},{},{}').format(int(time.time()),index,buyPrice, buyModel.amount,orderId,
                                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol + "-record")
 
@@ -98,7 +100,12 @@ def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
 
         fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
         fileOperUtil.delMsgFromFile(buyModel,"buy/"+symbol+"buy")
-        fileOperUtil.write(jumpQueueModel, "queue/" + symbol + "-queuerecord")
+
+        a = ",-1"
+        if int(jumpQueueModel.jumpCount) == 0:
+            a = ",-2"
+        fileOperUtil.write(jumpQueueModel.getValue()+a, "queue/" + symbol + "-queuerecord")
+
         fileOperUtil.write(('0,{},{},{},{},{},{},{}').format(int(time.time()),index,buyModel.price, buyModel.amount,buyModel.orderId,sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol+"-record")
 
     except Exception as err:
@@ -191,6 +198,8 @@ def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
         modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
         fileOperUtil.delMsgFromFile(stopLossModel, "stopLossSell/"+symbol+"-sell")
         fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
+
+        fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 
         #记录日志
         # 在{什么时候} 以 {什么价格} 买入 {原价是什么} 的 {多少个} {原来的orderId} {这次的orderId}
