@@ -19,7 +19,7 @@ def buy(buyPrice,amount,symbol,index):
 
         buyModel = BuyModel(buyPrice,buyPrice,index,amount,orderId,2,buyPrice)
         newJumpModel = JumpQueueModel(1, orderId, round(buyPrice*1.005,decimalLength), round(buyPrice*1.008,decimalLength), round(buyPrice*0.99,decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index)),index)
+                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index)),buyPrice)
 
         fileOperUtil.write(newJumpModel,"queue/"+symbol+"-queue")
         fileOperUtil.write(buyModel,"buy/"+symbol+"buy")
@@ -50,6 +50,8 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
         modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
         fileOperUtil.delMsgFromFile(jumpQueueModel,"queue/"+symbol+"-queue")
 
+        jumpProfit = float(jumpQueueModel.oriPrice) - buyPrice
+        huobi.jumpProfit = huobi.jumpProfit + jumpProfit
         fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 
         fileOperUtil.write(('1,{},{},{},{},{},{}').format(int(time.time()),index,buyPrice, buyModel.amount,orderId,
@@ -67,9 +69,13 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
         decimalLength = commonUtil.calDecimal(sellPrice)
 
         newBuyModel = BuyModel(buyModel.price, buyModel.oriPrice, buyModel.index, buyModel.amount, buyModel.orderId, 3, buyModel.lastPrice)
-        newJumpModel = JumpQueueModel(2, buyModel.orderId, round(sellPrice * 0.992, decimalLength),
-                                      round(sellPrice * 0.995, decimalLength), round(sellPrice * 1.01, decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex)),sellIndex)
+        # newJumpModel = JumpQueueModel(2, buyModel.orderId, round(sellPrice * 0.992, decimalLength),
+        #                               round(sellPrice * 0.995, decimalLength), round(sellPrice * 1.01, decimalLength), 0,
+        #                               time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex)),sellPrice)
+
+        #统计发现，因为提高了最低收入值，因此不大可能会再次触发跳跃
+        newJumpModel = JumpQueueModel(2, buyModel.orderId, sellPrice,sellPrice , round(sellPrice * 1.01, decimalLength), 0,
+                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex)), sellPrice)
 
         fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
         modelUtil.modBuyModel(buyModel,newBuyModel,symbol)
@@ -100,11 +106,7 @@ def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
 
         fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
         fileOperUtil.delMsgFromFile(buyModel,"buy/"+symbol+"buy")
-
-        a = ",-1"
-        if int(jumpQueueModel.jumpCount) == 0:
-            a = ",-2"
-        fileOperUtil.write(jumpQueueModel.getValue()+a, "queue/" + symbol + "-queuerecord")
+        fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 
         fileOperUtil.write(('0,{},{},{},{},{},{},{}').format(int(time.time()),index,buyModel.price, buyModel.amount,buyModel.orderId,sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol+"-record")
 
@@ -159,7 +161,7 @@ def stopLossBuy(env,price,stopLossModel,symbol,index):
 
         newJumpModel = JumpQueueModel(3, stopLossModel.orderId, round(price * 1.005, decimalLength),
                                       round(price * 1.008, decimalLength), round(price * 0.99, decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())),index)
+                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())),price)
 
         fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
         modelUtil.modStopLossModel(stopLossModel,newStopLossModel,symbol)
@@ -199,6 +201,8 @@ def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
         fileOperUtil.delMsgFromFile(stopLossModel, "stopLossSell/"+symbol+"-sell")
         fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
 
+        jumpProfit = float(jumpQueueModel.oriPrice) - buyPrice
+        huobi.jumpProfit = huobi.jumpProfit + jumpProfit
         fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 
         #记录日志

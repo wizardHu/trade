@@ -150,9 +150,9 @@ def getJumpModel(symbol):
             jumpPrice = params[4]
             jumpCount = params[5]
             time = params[6]
-            index = params[7]
+            price = params[7]
 
-            jumpQueueModel = JumpQueueModel(type, orderId, lowPrice, highPrice,jumpPrice,jumpCount,time,index)
+            jumpQueueModel = JumpQueueModel(type, orderId, lowPrice, highPrice,jumpPrice,jumpCount,time,price)
             models.append(jumpQueueModel)
 
     return models

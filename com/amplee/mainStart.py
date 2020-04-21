@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
                 commonUtil.lastDataDict[transactionModel.symbol] = thisData
                 commonUtil.lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
-                logUtil.info(huobi.balance," ",huobi.maxBalance," ",huobi.minBalance)
+                logUtil.info(huobi.balance," ",huobi.maxBalance," ",huobi.minBalance," ",huobi.jumpProfit)
 
         except Exception as err:
             logUtil.info('connect https error,retry...', err)

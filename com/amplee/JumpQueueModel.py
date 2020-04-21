@@ -8,9 +8,9 @@ class JumpQueueModel:
     jumpPrice = 0.0
     jumpCount = 0
     time = ""
-    index = 0
+    oriPrice = 0.0
 
-    def __init__(self, type,orderId, lowPrice, highPrice, jumpPrice,jumpCount,time,index):
+    def __init__(self, type,orderId, lowPrice, highPrice, jumpPrice,jumpCount,time,oriPrice):
         self.type = type
         self.orderId = orderId
         self.lowPrice = lowPrice
@@ -18,10 +18,10 @@ class JumpQueueModel:
         self.jumpPrice = jumpPrice
         self.jumpCount = jumpCount
         self.time = time
-        self.index = index
+        self.oriPrice = oriPrice
 
     def getValue(self):
-        return "{},{},{},{},{},{},{},{}".format(self.type,self.orderId, self.lowPrice, self.highPrice, self.jumpPrice,self.jumpCount,self.time,self.index)
+        return "{},{},{},{},{},{},{},{}".format(self.type,self.orderId, self.lowPrice, self.highPrice, self.jumpPrice,self.jumpCount,self.time,self.oriPrice)
 
 
     def __str__(self):

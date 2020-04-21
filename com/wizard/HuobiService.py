@@ -30,6 +30,7 @@ Market data API
 # 获取KLine
 count =1
 lastId = 0
+jumpProfit = 0.0
 def get_kline(symbol, period, size=150):
     global count
     global lastId
@@ -44,7 +45,7 @@ def get_kline(symbol, period, size=150):
         lastId = id
         return ditc
     except Exception as err:
-        print(balance,minBalance,maxBalance)
+        print(balance,minBalance,maxBalance,jumpProfit)
     return eval('{"status":"error"}')
 
 # 获取marketdepth
