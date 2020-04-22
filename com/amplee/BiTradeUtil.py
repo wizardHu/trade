@@ -38,7 +38,7 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
         newAmount = round(float(transactionModel.everyExpense) / buyPrice, int(transactionModel.precision))
         if "pro" == env:
             result = huobi.send_order(newAmount, "api", symbol, "buy-limit", buyPrice)
-            logUtil.info("buy result",result,symbol,buyModel.amount,buyPrice)
+            logUtil.info("buy result",result,symbol,newAmount,buyPrice)
             if result['status'] == 'ok':
                 orderId = result['data']
             else:
@@ -50,11 +50,11 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
         modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
         fileOperUtil.delMsgFromFile(jumpQueueModel,"queue/"+symbol+"-queue")
 
-        jumpProfit = float(jumpQueueModel.oriPrice) - buyPrice
+        jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice )* float(newAmount)
         huobi.jumpProfit = huobi.jumpProfit + jumpProfit
         fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 
-        fileOperUtil.write(('1,{},{},{},{},{},{}').format(int(time.time()),index,buyPrice, buyModel.amount,orderId,
+        fileOperUtil.write(('1,{},{},{},{},{},{}').format(int(time.time()),index,buyPrice,newAmount,orderId,
                                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol + "-record")
 
         return True
@@ -201,7 +201,7 @@ def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
         fileOperUtil.delMsgFromFile(stopLossModel, "stopLossSell/"+symbol+"-sell")
         fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
 
-        jumpProfit = float(jumpQueueModel.oriPrice) - buyPrice
+        jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice) * float(buyModel.amount)
         huobi.jumpProfit = huobi.jumpProfit + jumpProfit
         fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 
