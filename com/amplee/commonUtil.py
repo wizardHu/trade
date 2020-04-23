@@ -56,7 +56,7 @@ def juideLowest(price,symbol):
 
     return False
 
-def canSell(price,symbol,minIncome,env):
+def canSell(price,symbol,env):
 
     sellPackage = []
 
@@ -64,6 +64,8 @@ def canSell(price,symbol,minIncome,env):
         buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
 
         for buyModel in buyPackage:
+
+            minIncome = float(buyModel.minIncome)
 
             if minIncome == 1 or minIncome == 2 or minIncome == 3:
                 continue
@@ -279,7 +281,6 @@ def mergeBuyModel(env,buyModels,transactionModel,price):
     return buyModels
 
 if __name__ == '__main__':
-    buyModels = getStopLossBuyModel(1.0517,"eosusdt",0.1)
-    tradeModel = TransactionModel("eosusdt",10,0.015,0.015,"1min",2,0.05)
-    list = mergeBuyModel("dev",buyModels,tradeModel)
-    print(list)
+    minIncome = "1.0"
+    a = float(minIncome)
+    print(a == 1)

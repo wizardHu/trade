@@ -50,7 +50,7 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
         modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
         fileOperUtil.delMsgFromFile(jumpQueueModel,"queue/"+symbol+"-queue")
 
-        jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice )* float(newAmount)
+        jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice) * float(newAmount)
         huobi.jumpProfit = huobi.jumpProfit + jumpProfit
         fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 

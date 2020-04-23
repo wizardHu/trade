@@ -63,9 +63,9 @@ def dealData(data,transactionModel,env):
 def dealSell(data,transactionModel,env):
     try:
         price = float(data['close'])
-        sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, env)
+        sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, env)
 
-        logUtil.info(sellPackage)
+        logUtil.info("can sell= ",sellPackage)
 
         if len(sellPackage) > 0:
             for buyModel in sellPackage:
