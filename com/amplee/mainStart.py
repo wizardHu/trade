@@ -65,8 +65,6 @@ def dealSell(data,transactionModel,env):
         price = float(data['close'])
         sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, env)
 
-        logUtil.info("can sell= ",sellPackage)
-
         if len(sellPackage) > 0:
             for buyModel in sellPackage:
                 biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)

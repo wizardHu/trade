@@ -4,7 +4,7 @@ class BuyModel:
     index = 0
     amount = 0.0
     orderId = 0
-    minIncome = 0.0 # 小数：已经交易了，待下一步处理  1 被止损了  2 进入买交易队列了  3进入卖交易队列
+    minIncome = 0.0 # 小数：已经交易了，待下一步处理  1 被止损了  2 进入买交易队列了  3进入卖交易队列  4进入挂单
     lastPrice = 0.0
 
     def __init__(self, price,oriPrice, index, amount, orderId,minIncome,lastPrice):

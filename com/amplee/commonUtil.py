@@ -22,7 +22,7 @@ def juideAllGap(price,symbol,tradeGap):
     for model in buyPackage:
 
         minIncome = float(model.minIncome)
-        if minIncome == 1 or minIncome == 3:
+        if minIncome == 1 or minIncome == 3 or minIncome == 4:
             continue
 
         buyPrice = float(model.oriPrice)
@@ -67,15 +67,18 @@ def canSell(price,symbol,env):
 
             minIncome = float(buyModel.minIncome)
 
-            if minIncome == 1 or minIncome == 2 or minIncome == 3:
+            if minIncome == 1 or minIncome == 2 or minIncome == 3 or minIncome == 4:
                 continue
+
+            if "pro" == env:
+                minIncome = minIncome - 0.01 #生产环境提前先挂单
 
             buyModelPrice = buyModel.price;
 
             gap = price - float(buyModelPrice)
             gap = gap / float(buyModelPrice)
 
-            if gap >= float(minIncome) and gap >= float(buyModel.minIncome):
+            if gap >= minIncome:
                 sellPackage.append(buyModel)
 
     except Exception as err:

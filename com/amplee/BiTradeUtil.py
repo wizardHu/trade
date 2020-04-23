@@ -9,6 +9,7 @@ from StopLossModel import StopLossModel
 import random
 import commonUtil as commonUtil
 from TransactionModel import TransactionModel
+from SellOrderModel import SellOrderModel
 
 # 只是加入了跳跃队列
 def buy(buyPrice,amount,symbol,index):
@@ -87,6 +88,7 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
 def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
     try:
 
+        sellOrderId = random.randint(0, 1999999999)
         symbol = transactionModel.symbol
         orderId = jumpQueueModel.orderId
         buyModel = modelUtil.getBuyModelByOrderId(symbol, orderId)
@@ -99,16 +101,23 @@ def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
                 result = huobi.send_order(buyModel.amount, "api", symbol, 'sell-limit', sellPrice)
                 if result['status'] != 'ok':
                     return
+                sellOrderId = result['data']
+
             else:
                 return
         else:
             huobi.send_order_dev(buyModel.amount, 0, sellPrice)
 
+        sellOrderModel = SellOrderModel(buyModel.price,sellPrice,buyModel.index,index,buyModel.orderId,sellOrderId,buyModel.amount,
+                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
+        newBuyModel = BuyModel(buyModel.price, buyModel.oriPrice, buyModel.index, buyModel.amount, buyModel.orderId, 4,
+                               buyModel.lastPrice)
+        modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
         fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
-        fileOperUtil.delMsgFromFile(buyModel,"buy/"+symbol+"buy")
         fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
+        fileOperUtil.write(sellOrderModel, "sellOrder/" + symbol + "-sellorder")
 
-        fileOperUtil.write(('0,{},{},{},{},{},{},{}').format(int(time.time()),index,buyModel.price, buyModel.amount,buyModel.orderId,sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol+"-record")
+       # fileOperUtil.write(('0,{},{},{},{},{},{},{}').format(int(time.time()),index,buyModel.price, buyModel.amount,buyModel.orderId,sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol+"-record")
 
     except Exception as err:
         logUtil.info("BiTradeUtil--jumpSell"+err)
