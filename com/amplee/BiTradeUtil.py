@@ -93,11 +93,15 @@ def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
         orderId = jumpQueueModel.orderId
         buyModel = modelUtil.getBuyModelByOrderId(symbol, orderId)
         if "pro" == env:
+            #{'status': 'ok', 'data': {'symbol': 'xrpusdt', 'source': 'api', 'field-cash-amount': '0.0', 'price': '0.1972',
+            # 'canceled-at': 0, 'field-amount': '0.0', 'type': 'sell-limit', 'state': 'submitted', 'client-order-id': '', 'field-fees': '0.0',
+            # 'created-at': 1587721600720, 'account-id': account-id, 'id': 82495000363, 'amount': '26.0000', 'finished-at': 0}}
             result = huobi.order_info(buyModel.orderId)
             data = result['data']
             state = data['state']
             logUtil.info("sell result", result, symbol)
             if state == 'filled':
+                #{'status': 'ok', 'data': 'orderId'}
                 result = huobi.send_order(buyModel.amount, "api", symbol, 'sell-limit', sellPrice)
                 if result['status'] != 'ok':
                     return
@@ -116,8 +120,6 @@ def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
         fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
         fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
         fileOperUtil.write(sellOrderModel, "sellOrder/" + symbol + "-sellorder")
-
-       # fileOperUtil.write(('0,{},{},{},{},{},{},{}').format(int(time.time()),index,buyModel.price, buyModel.amount,buyModel.orderId,sellPrice,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))),"record/"+symbol+"-record")
 
     except Exception as err:
         logUtil.info("BiTradeUtil--jumpSell"+err)

@@ -125,7 +125,7 @@ def getStopLossBuyModel(price,symbol,stopLoss):
             lastPrice = float(buyModel.lastPrice)
             stopLosssTemp = stopLoss
 
-            if minIncome == 1 or minIncome == 2 or minIncome == 3 or buyModelPrice <= price:
+            if minIncome == 1 or minIncome == 2 or minIncome == 3 or minIncome == 4 or buyModelPrice <= price:
                 continue
 
             #判断有没有进行过止损

@@ -11,6 +11,7 @@ import logUtil
 import Refresh as refresh
 import time
 import JumpUtil as jumpUtil
+from CheckOrderStatusThread import CheckOrderStatusThread
 
 #策略模块 1
 def dealData(data,transactionModel,env):
@@ -107,9 +108,12 @@ if __name__ == '__main__':
 
     env = "dev"
 
+    checkOrderStatusThread = CheckOrderStatusThread(env)
+    # checkOrderStatusThread.start()
     while True:
         transactionModels = refresh.getAllPairAndRefresh()
 
+        checkOrderStatusThread.doCheck(transactionModels)
         lastDataDict = commonUtil.lastDataDict
         lastIdDict = commonUtil.lastIdDict
 
@@ -122,6 +126,8 @@ if __name__ == '__main__':
                 if len(lastData) == 0:
                     lastData = huobi.get_kline(transactionModel.symbol, transactionModel.period, 1)
 
+                #{'ch': 'market.xrpusdt.kline.1min', 'status': 'ok', 'ts': 1587722033132,
+                # 'data': [{'open': 0.19629, 'id': 1587721980, 'count': 29, 'amount': 36697.23, 'close': 0.1963, 'vol': 7200.5755178, 'high': 0.1963, 'low': 0.19613}]}
                 thisData = huobi.get_kline(transactionModel.symbol, transactionModel.period, 1)
 
                 if thisData['status'] == 'ok' and thisData['data'] and len(thisData['data']) >= 1:

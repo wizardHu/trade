@@ -1,5 +1,6 @@
 import fileOperUtil as fileOperUtil
 from JumpQueueModel import JumpQueueModel
+from SellOrderModel import SellOrderModel
 from TransactionModel import TransactionModel
 from BuyModel import BuyModel
 from StopLossModel import  StopLossModel
@@ -154,6 +155,28 @@ def getJumpModel(symbol):
 
             jumpQueueModel = JumpQueueModel(type, orderId, lowPrice, highPrice,jumpPrice,jumpCount,time,price)
             models.append(jumpQueueModel)
+
+    return models
+
+def getSellOrderModels(symbol):
+    lines = fileOperUtil.readAll("sellOrder/"+symbol+"-sellorder")
+    models = []
+
+    for model in lines:
+
+        if model != '' and model != '\n':
+            params = model.split(',')
+            buyPrice = params[0]
+            sellPrice = params[1]
+            buyIndex = params[2]
+            sellIndex = params[3]
+            buyOrderId = params[4]
+            sellOrderId = params[5]
+            amount = params[6]
+            time = params[7]
+
+            sellOrderModel = SellOrderModel(buyPrice, sellPrice, buyIndex, sellIndex,buyOrderId,sellOrderId,amount,time)
+            models.append(sellOrderModel)
 
     return models
 
