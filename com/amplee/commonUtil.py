@@ -193,8 +193,8 @@ def calDecimal(ori):
         priceStr = oriStr[index + 1:]
         length = len(priceStr)
 
-    if length <2:
-        length = 2
+    if length <4:
+        length = 4
 
     return length
 
