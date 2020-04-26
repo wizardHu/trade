@@ -1,11 +1,65 @@
-import logging
+import logging.config
 
-# 1.初始化日志默认配置
-logging.basicConfig(filename='./my.log',                                                 # 日志输出文件
-                    level=logging.INFO,                                                 # 日志写入级别
-                    datefmt='%Y-%m-%d %H:%M:%S',                                         # 时间格式
-                    format='%(asctime)s Line:%(lineno)s==>%(message)s')    # 日志写入格式
+LOG_LEVEL = logging.INFO
+
+LOGGER = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'default': {
+            'class': 'logging.Formatter',
+            'format': '%(asctime)s Line:%(lineno)s==>%(message)s'
+        },'kline': {
+            'class': 'logging.Formatter',
+            'format': '%(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': LOG_LEVEL,
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+        'file1': {
+            'level': LOG_LEVEL,
+            'class': 'logging.FileHandler',
+            'mode': 'a',
+            'formatter': 'default',
+            'filename': 'my.log',
+            'encoding': 'utf-8'
+        },
+        'file2': {
+            'level': LOG_LEVEL,
+            'class': 'logging.FileHandler',
+            'mode': 'a',
+            'formatter': 'kline',
+            'filename': 'kline.log',
+            'encoding': 'utf-8'
+        },
+    },
+    'loggers': {
+        '__main__': {
+            'handlers': ['file1', 'file2', 'console'],
+            'level': LOG_LEVEL,
+        },'default': {
+            'handlers': ['file1'],
+            'level': LOG_LEVEL,
+        },'kline': {
+            'handlers': ['file2'],
+            'level': LOG_LEVEL,
+        }
+    }
+}
+
+logging.config.dictConfig(LOGGER)
 
 def info(*msg):
-    logging.info(msg)
+    # logger = logging.getLogger("default")
+    # logger.info(msg)
+    print(msg)
+
+def kLineData(*msg):
+    # logger = logging.getLogger("kline")
+    # logger.info(msg)
     # print(msg)
+    pass

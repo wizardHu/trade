@@ -135,7 +135,8 @@ if __name__ == '__main__':
                 else:
                     continue
 
-                # logUtil.info(thisData['data'],transactionModel.symbol)
+                logUtil.info(thisData['data'],transactionModel.symbol)
+                logUtil.kLineData(transactionModel.symbol+"-->"+str(thisData['data'][0]))
 
                 dealStopLoss(lastData['data'][0],transactionModel,env)#止损模块处理
 
