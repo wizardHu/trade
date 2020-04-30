@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 class TransactionModel:
+    id = 0
     #交易对 eosusdt
     symbol = ''
 
@@ -21,7 +22,8 @@ class TransactionModel:
     #止损点
     stopLoss = 0.05
 
-    def __init__(self,symbol,everyExpense,tradeGap,minIncome,period,precision,stopLoss):
+    def __init__(self,id,symbol,everyExpense,tradeGap,minIncome,period,precision,stopLoss):
+        self.id = id
         self.symbol = symbol
         self.everyExpense = everyExpense
         self.tradeGap = tradeGap
@@ -33,10 +35,10 @@ class TransactionModel:
 
 
     def __str__(self):
-        return "{},{},{},{},{}".format(self.symbol,self.everyExpense,self.tradeGap,self.minIncome,self.period)
+        return "{},{},{},{},{},{}".format(self.id,self.symbol,self.everyExpense,self.tradeGap,self.minIncome,self.period)
 
     def __repr__(self):
-        return "{},{},{},{},{}".format(self.symbol,self.everyExpense,self.tradeGap,self.minIncome,self.period)
+        return "{},{},{},{},{},{}".format(self.id,self.symbol,self.everyExpense,self.tradeGap,self.minIncome,self.period)
 
     def printTransaction(self):
         print('symbol={} everyExpense={} tradeGap={} minIncome={} period={}'.format(self.symbol,self.everyExpense,self.tradeGap,self.minIncome,self.period))

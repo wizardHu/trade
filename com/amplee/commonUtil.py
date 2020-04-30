@@ -8,8 +8,7 @@ import AmountUtil as amountUtil
 import logUtil
 from BuyModel import BuyModel
 import HuobiService as huobi
-import fileOperUtil as fileOperUtil
-from TransactionModel import TransactionModel
+import random
 
 nextBuy = False
 lastIdDict = {}
@@ -21,8 +20,8 @@ def juideAllGap(price,symbol,tradeGap):
 
     for model in buyPackage:
 
-        minIncome = float(model.minIncome)
-        if minIncome == 1 or minIncome == 3 or minIncome == 4:
+        status = int(model.status)
+        if status == 1 or status == 3 or status == 4:
             continue
 
         buyPrice = float(model.oriPrice)
@@ -66,8 +65,9 @@ def canSell(price,symbol,env):
         for buyModel in buyPackage:
 
             minIncome = float(buyModel.minIncome)
+            status = int(buyModel.status)
 
-            if minIncome == 1 or minIncome == 2 or minIncome == 3 or minIncome == 4:
+            if status != 0:
                 continue
 
             if "pro" == env:
@@ -82,7 +82,7 @@ def canSell(price,symbol,env):
                 sellPackage.append(buyModel)
 
     except Exception as err:
-        logUtil.info("commonUtil--canSell"+err)
+        logUtil.error("commonUtil--canSell"+err)
 
     return sellPackage
 
@@ -110,7 +110,7 @@ def delSymbol(transactionModel):
     highCount[transactionModel.symbol] = 0
 
 #得到需要止损的
-def getStopLossBuyModel(price,symbol,stopLoss):
+def getStopLossBuyModel(price,symbol,stopLoss,env):
     stopLossPackage = []
 
     stopLoss = float(stopLoss)
@@ -121,11 +121,11 @@ def getStopLossBuyModel(price,symbol,stopLoss):
 
             buyModelPrice = float(buyModel.price)
             buyModelOriPrice = float(buyModel.oriPrice)
-            minIncome = float(buyModel.minIncome)
+            status = int(buyModel.status)
             lastPrice = float(buyModel.lastPrice)
             stopLosssTemp = stopLoss
 
-            if minIncome == 1 or minIncome == 2 or minIncome == 3 or minIncome == 4 or buyModelPrice <= price:
+            if status != 0 or buyModelPrice <= price:
                 continue
 
             #判断有没有进行过止损
@@ -145,15 +145,23 @@ def getStopLossBuyModel(price,symbol,stopLoss):
                     if lastGap < 0.02 or nowGap < stopLoss:
                         continue
 
-
             gap = buyModelPrice - price
             gap = gap / buyModelPrice
 
             if gap >= stopLosssTemp:
+
+                if "pro" == env:
+                    result = huobi.order_info(buyModel.orderId)
+                    data = result['data']
+                    state = data['state']
+                    logUtil.info("order_info result", buyModel.orderId, result, symbol)
+                    if state != 'filled':
+                        continue
+
                 stopLossPackage.append(buyModel)
 
     except Exception as err:
-        logUtil.info("commonUtil--getStopLossBuyModel" + err)
+        logUtil.error("commonUtil--getStopLossBuyModel" + err)
 
     return stopLossPackage
 
@@ -180,7 +188,7 @@ def getCanBuyStopLoss(price,symbol):
                 stopLossPackage.append(stopLossModel)
 
     except Exception as err:
-        logUtil.info("commonUtil--getCanBuyStopLoss" + err)
+        logUtil.error("commonUtil--getCanBuyStopLoss" + err)
 
     return stopLossPackage
 
@@ -239,14 +247,14 @@ def doMerge(env,list, transactionModel):
     amount = round(amount,int(transactionModel.precision))
     avgPrice = round(price / amount, decimallength)
 
-    newBuyModel = BuyModel(avgPrice, avgPrice, index, amount, orderId,
-                           transactionModel.minIncome, avgPrice)
+    newBuyModel = BuyModel(0,list[0].symbol,avgPrice, avgPrice, index, amount, orderId,
+                           transactionModel.minIncome, avgPrice,0)
 
     for shouldDelBuyModel in shouldDel:
-        fileOperUtil.delMsgFromFile(shouldDelBuyModel,"buy/"+transactionModel.symbol+"buy")
+        modelUtil.delBuyModel(shouldDelBuyModel.id)
 
-    fileOperUtil.write(newBuyModel,"buy/"+transactionModel.symbol+"buy")
-
+    id = modelUtil.insertBuyModel(newBuyModel)
+    newBuyModel.id = id
     return newBuyModel
 
     # 合并购买的
@@ -283,7 +291,12 @@ def mergeBuyModel(env,buyModels,transactionModel,price):
 
     return buyModels
 
+
+def getRandomOrderId():
+    orderId1 = random.randint(0, 999999999)
+    orderId2 = random.randint(0, 999999999)
+    orderId = str(orderId1) + str(orderId2)
+    return orderId
+
 if __name__ == '__main__':
-    minIncome = "1.0"
-    a = float(minIncome)
-    print(a == 1)
+    print(getRandomOrderId())

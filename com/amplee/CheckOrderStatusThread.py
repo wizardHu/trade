@@ -32,7 +32,7 @@ class CheckOrderStatusThread(Thread):
                 return True
 
         except Exception as err:
-            logUtil.info('chechOrder error', err)
+            logUtil.error('chechOrder error', err)
 
         return False
 
@@ -45,7 +45,7 @@ class CheckOrderStatusThread(Thread):
                 self.doCheck(transactionModels)
 
             except Exception as err:
-                logUtil.info('checkOrderStatusThread error', err.__traceback__)
+                logUtil.error('checkOrderStatusThread error', err.__traceback__)
 
             time.sleep(5)
 
@@ -59,16 +59,13 @@ class CheckOrderStatusThread(Thread):
                     orderStatus = self.chechOrder(sellOrderModel.sellOrderId)
                     logUtil.info("orderId=", sellOrderModel.sellOrderId, " status=", orderStatus)
                     if orderStatus:
-                        buyModel = modelUtil.getBuyModelByOrderId(symbol, sellOrderModel.buyOrderId)
-                        fileOperUtil.delMsgFromFile(buyModel, "buy/" + symbol + "buy")
+                        buyModel = modelUtil.getBuyModelByOrderId(sellOrderModel.buyOrderId)
+                        modelUtil.delBuyModel(buyModel.id)
                         fileOperUtil.delMsgFromFile(sellOrderModel, "sellOrder/" + symbol + "-sellorder")
-                        fileOperUtil.write(
-                            ('0,{},{},{},{},{},{},{}').format(int(time.time()), int(time.time()), buyModel.price,
-                                                              buyModel.amount, buyModel.orderId,
-                                                              sellOrderModel.sellPrice,
-                                                              time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                            time.localtime(time.time()))),
-                            "record/" + symbol + "-record")
+
+                        modelUtil.insertBuySellReocrd(buyModel.symbol, 0,  sellOrderModel.buyPrice, sellOrderModel.sellPrice,
+                                                      sellOrderModel.buyOrderId, sellOrderModel.sellOrderId,
+                                                      sellOrderModel.amount, int(time.time()))
                         continue
 
                     # 测试环境不会走到这里，因为测试环境能直接卖成功
@@ -85,9 +82,9 @@ class CheckOrderStatusThread(Thread):
                                 if result['status'] == 'ok':
                                     fileOperUtil.delMsgFromFile(sellOrderModel,
                                                                 "sellOrder/" + symbol + "-sellorder")
-                                    buyModel = modelUtil.getBuyModelByOrderId(symbol, sellOrderModel.buyOrderId)
-                                    newBuyModel = BuyModel(buyModel.price, buyModel.oriPrice, buyModel.index,
+                                    buyModel = modelUtil.getBuyModelByOrderId(sellOrderModel.buyOrderId)
+                                    newBuyModel = BuyModel(buyModel.id,buyModel.symbol,buyModel.price, buyModel.oriPrice, buyModel.index,
                                                            buyModel.amount, buyModel.orderId,
                                                            transactionModel.minIncome,
-                                                           buyModel.lastPrice)
-                                    modelUtil.modBuyModel(buyModel, newBuyModel, symbol)
+                                                           buyModel.lastPrice,0)
+                                    modelUtil.modBuyModel(newBuyModel)

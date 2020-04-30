@@ -23,7 +23,7 @@ LOGGER = {
         'file1': {
             'level': LOG_LEVEL,
             'class': 'logging.FileHandler',
-            'mode': 'a',
+            'mode': 'w',
             'formatter': 'default',
             'filename': 'my.log',
             'encoding': 'utf-8'
@@ -35,7 +35,14 @@ LOGGER = {
             'formatter': 'kline',
             'filename': 'kline.log',
             'encoding': 'utf-8'
-        },
+        },'file3': {
+            'level': LOG_LEVEL,
+            'class': 'logging.FileHandler',
+            'mode': 'w',
+            'formatter': 'default',
+            'filename': 'error.log',
+            'encoding': 'utf-8'
+        }
     },
     'loggers': {
         '__main__': {
@@ -47,6 +54,9 @@ LOGGER = {
         },'kline': {
             'handlers': ['file2'],
             'level': LOG_LEVEL,
+        },'error': {
+            'handlers': ['file3'],
+            'level': LOG_LEVEL,
         }
     }
 }
@@ -57,9 +67,14 @@ def info(*msg):
     # logger = logging.getLogger("default")
     # logger.info(msg)
     print(msg)
+    # pass
 
 def kLineData(*msg):
     # logger = logging.getLogger("kline")
     # logger.info(msg)
     # print(msg)
     pass
+
+def error(*msg):
+    logger = logging.getLogger("error")
+    logger.info(msg)

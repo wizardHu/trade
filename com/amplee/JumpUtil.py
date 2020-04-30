@@ -71,7 +71,7 @@ def doTrade(env,price,index, transactionModel):
                     modelUtil.modJumpModel(jumpModel,newJumpModel,transactionModel.symbol)
 
     except Exception as err:
-        logUtil.info("JumpUtil--doTrade" + err)
+        logUtil.error("JumpUtil--doTrade" + err)
 
 
 if __name__ == '__main__':

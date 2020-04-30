@@ -1,0 +1,3 @@
+buyModelCache = {}
+stopLossCache = {}
+stopLossListCache = {}

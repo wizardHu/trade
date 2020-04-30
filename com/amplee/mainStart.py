@@ -9,7 +9,6 @@ import BollUtil as bollUtil
 import AmountUtil as amountUtil
 import logUtil
 import Refresh as refresh
-import time
 import JumpUtil as jumpUtil
 from CheckOrderStatusThread import CheckOrderStatusThread
 
@@ -33,7 +32,7 @@ def dealData(data,transactionModel,env):
 
         if commonUtil.nextBuy and avgFlag:
             amount = round(float(transactionModel.everyExpense) / price, int(transactionModel.precision))
-            isSuccess = biTradeUtil.buy( price, amount, transactionModel.symbol, data['id'])
+            isSuccess = biTradeUtil.buy( price, amount, transactionModel.symbol, data['id'],transactionModel.minIncome)
             logUtil.info(("is next buy symbol={},price={},data['id']={} issuccess={}").format(transactionModel.symbol,price,data['id'],isSuccess))
 
             if isSuccess:
@@ -41,24 +40,15 @@ def dealData(data,transactionModel,env):
 
         elif kdjFlag and rSIFlag and maFlag and avgFlag and highFlag:
             amount = round(float(transactionModel.everyExpense) / price, int(transactionModel.precision))
-            isSuccess = biTradeUtil.buy(price, amount, transactionModel.symbol, data['id'])
+            isSuccess = biTradeUtil.buy(price, amount, transactionModel.symbol, data['id'],transactionModel.minIncome)
             logUtil.info(("is first buy symbol={},price={},data['id']={} issuccess={}").format(transactionModel.symbol, price, data['id'],isSuccess))
 
 
         elif avgFlag and lowFlag and bollFlag and riskFlag and highFlag:
             commonUtil.nextBuy = True
 
-        # if sellFlag:
-        #     sellPackage = commonUtil.canSell(data['close'], transactionModel.symbol, transactionModel.minIncome, env)
-        #
-        #     logUtil.info(sellPackage)
-        #
-        #     if len(sellPackage) > 0:
-        #         for buyModel in sellPackage:
-        #             biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
-
     except Exception as err:
-        logUtil.info('deal error', err)
+        logUtil.error('deal error', err)
 
 #策略模块 2
 def dealSell(data,transactionModel,env):
@@ -71,17 +61,17 @@ def dealSell(data,transactionModel,env):
                 biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
 
     except Exception as err:
-        logUtil.info('dealSell error', err)
+        logUtil.error('dealSell error', err)
 
 #止损模块
 def dealStopLoss(data,transactionModel,env):
     try:
 
         price = float(data['close'])
-        neesStopLossPackage = commonUtil.getStopLossBuyModel(data['close'], transactionModel.symbol,
-                                                             transactionModel.stopLoss)
-        if len(neesStopLossPackage) > 0:  # 价格到达止损点
-            mergeBuyModel = commonUtil.mergeBuyModel(env,neesStopLossPackage,transactionModel,price)
+        needStopLossPackage = commonUtil.getStopLossBuyModel(data['close'], transactionModel.symbol,
+                                                             transactionModel.stopLoss,env)
+        if len(needStopLossPackage) > 0:  # 价格到达止损点
+            mergeBuyModel = commonUtil.mergeBuyModel(env,needStopLossPackage,transactionModel,price)
             for buyModel in mergeBuyModel:
                 logUtil.info("can stop loss ", buyModel)
                 biTradeUtil.stopLossSell(env, price, buyModel, transactionModel.symbol)
@@ -93,7 +83,7 @@ def dealStopLoss(data,transactionModel,env):
                 biTradeUtil.stopLossBuy(env, price, stopLoss, transactionModel.symbol, data['id'])
 
     except Exception as err:
-        logUtil.info('dealStopLoss error', err)
+        logUtil.error('dealStopLoss error', err)
 
 
 #交割模块
@@ -102,7 +92,7 @@ def doTrade(data,transactionModel,env):
         price = float(data['close'])
         jumpUtil.doTrade(env,price,data['id'],transactionModel)
     except Exception as err:
-        logUtil.info('doTrade error', err)
+        logUtil.error('doTrade error', err)
 
 if __name__ == '__main__':
 
@@ -135,7 +125,7 @@ if __name__ == '__main__':
                 else:
                     continue
 
-                logUtil.info(thisData['data'],transactionModel.symbol)
+                # logUtil.info(thisData['data'],transactionModel.symbol)
                 logUtil.kLineData(transactionModel.symbol+"-->"+str(thisData['data'][0]))
 
                 dealStopLoss(lastData['data'][0],transactionModel,env)#止损模块处理
@@ -155,6 +145,6 @@ if __name__ == '__main__':
                 logUtil.info(huobi.balance," ",huobi.maxBalance," ",huobi.minBalance," ",huobi.jumpProfit)
 
         except Exception as err:
-            logUtil.info('connect https error,retry...', err)
+            logUtil.error('connect https error,retry...', err)
 
         # time.sleep(1)

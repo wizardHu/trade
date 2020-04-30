@@ -85,7 +85,7 @@ if __name__ == '__main__':
             lastDate = data
             time.sleep(1)
         except Exception as err:
-            logging.info('connect https error,retry...', err)
+            logging.error('connect https error,retry...', err)
             time.sleep(1)
 
 
