@@ -32,10 +32,10 @@ count =1
 lastId = 0
 jumpProfit = 0.0
 
-lines = []
-with open("eosusdt.txt", "r") as f:
-    for fLine in f:
-        lines.append(fLine)
+# lines = []
+# with open("eosusdt.txt", "r") as f:
+#     for fLine in f:
+#         lines.append(fLine)
 
 def get_kline(symbol, period, size=150):
     global count
@@ -43,8 +43,8 @@ def get_kline(symbol, period, size=150):
     global lines
 
     try:
-        # line = linecache.getline("eosusdt.txt", count)
-        line = lines[count]
+        line = linecache.getline("eosusdt.txt", count)
+        # line = lines[count]
         line = '{"status":"ok","data":['+line+']}'
         count = count + 1
         ditc = eval(line)
