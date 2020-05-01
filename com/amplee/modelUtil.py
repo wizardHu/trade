@@ -92,9 +92,9 @@ def modStopLossModel(stopLossModel):
     myCache.stopLossCache.clear()
     mysql = MySqlConn()
     sql = "update tb_stop_loss_record set sell_price=%s,ori_price=%s,ori_amount=%s,ori_order_id=%s" \
-          ",order_id=%s,status=%s,where id=%s"
+          ",order_id=%s,status=%s where id=%s"
     result = mysql.update(sql, (stopLossModel.sellPrice, stopLossModel.oriPrice,stopLossModel.oriAmount,
-                                stopLossModel.oriOrderId, stopLossModel.oriOrderId, stopLossModel.orderId,
+                                stopLossModel.oriOrderId,  stopLossModel.orderId,
                                 stopLossModel.status, stopLossModel.id))
     mysql.dispose()
     if result:

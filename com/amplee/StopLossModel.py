@@ -20,7 +20,7 @@ class StopLossModel:  #在{什么时候} 以 {什么价格} 卖出 {原价是什
         self.status = status
 
     def getValue(self):
-        return "{},{},{},{},{},{},{}".format(self.id, self.symbol, self.sellPrice, self.oriPrice, self.oriAmount,self.oriOrderId,self.orderId,self.status)
+        return "{},{},{},{},{},{},{},{}".format(self.id, self.symbol, self.sellPrice, self.oriPrice, self.oriAmount,self.oriOrderId,self.orderId,self.status)
 
 
     def __str__(self):

@@ -181,7 +181,7 @@ def stopLossSell(env,sellPrice,buyModel,symbol):
 
 
 #买入因止损卖出的
-def stopLossBuy(env,price,stopLossModel,symbol,index):
+def stopLossBuy(price,stopLossModel,symbol):
     try:
 
         decimalLength = commonUtil.calDecimal(price)
@@ -193,9 +193,10 @@ def stopLossBuy(env,price,stopLossModel,symbol,index):
                                       round(price * 1.008, decimalLength), round(price * 0.99, decimalLength), 0,
                                       time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())),price)
 
-        fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
-        modelUtil.modStopLossModel(newStopLossModel)
-
+        if modelUtil.modStopLossModel(newStopLossModel):
+            fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
+        else:
+            logUtil.error("BiTradeUtil--modStopLossModel=",newStopLossModel)
 
     except Exception as err:
         logUtil.error("BiTradeUtil--stopLossBuy"+err)
@@ -230,19 +231,21 @@ def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
                                buyModel.orderId, transactionModel.minIncome,buyPrice,0)
 
         if modelUtil.modBuyModel(newBuyModel):
-            modelUtil.delStopLossModelById(stopLossModel.id)
-            fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
+            if modelUtil.delStopLossModelById(stopLossModel.id):
+                fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
 
-            jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice) * float(buyModel.amount)
-            huobi.jumpProfit = huobi.jumpProfit + jumpProfit
-            fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
+                jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice) * float(buyModel.amount)
+                huobi.jumpProfit = huobi.jumpProfit + jumpProfit
+                fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 
-            # 记录止损买日志
-            modelUtil.insertStopLossHistoryReocrd(symbol, 1, buyPrice, stopLossModel.oriPrice, stopLossModel.oriAmount,
-                                                  stopLossModel.oriOrderId, orderId)
+                # 记录止损买日志
+                modelUtil.insertStopLossHistoryReocrd(symbol, 1, buyPrice, stopLossModel.oriPrice, stopLossModel.oriAmount,
+                                                      stopLossModel.oriOrderId, orderId)
+            else:
+                logUtil.error("BiTradeUtil--delStopLossModelById 0 =", stopLossModel)
 
         else:
-            logUtil.error("BiTradeUtil--sell stopLossJumpBuy 0 orderId=", buyModel.orderId)
+            logUtil.error("BiTradeUtil--stopLossJumpBuy 0 orderId=", buyModel.orderId)
 
 
     except Exception as err:

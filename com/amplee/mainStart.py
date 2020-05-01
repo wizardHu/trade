@@ -80,10 +80,10 @@ def dealStopLoss(data,transactionModel,env):
         if len(stopLossPackage) > 0:
             for stopLoss in stopLossPackage:
                 logUtil.info("buy stop loss ", stopLoss)
-                biTradeUtil.stopLossBuy(env, price, stopLoss, transactionModel.symbol, data['id'])
+                biTradeUtil.stopLossBuy( price, stopLoss, transactionModel.symbol)
 
     except Exception as err:
-        logUtil.error('dealStopLoss error', err)
+        logUtil.error('dealStopLoss error', err,data)
 
 
 #交割模块
