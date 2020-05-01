@@ -99,11 +99,11 @@ if __name__ == '__main__':
     env = "dev"
 
     checkOrderStatusThread = CheckOrderStatusThread(env)
-    # checkOrderStatusThread.start()
+    checkOrderStatusThread.start()
     while True:
         transactionModels = refresh.getAllPairAndRefresh()
 
-        checkOrderStatusThread.doCheck(transactionModels)
+        # checkOrderStatusThread.doCheck(transactionModels)
         lastDataDict = commonUtil.lastDataDict
         lastIdDict = commonUtil.lastIdDict
 

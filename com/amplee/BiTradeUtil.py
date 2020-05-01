@@ -1,6 +1,4 @@
 from BuyModel import BuyModel
-import fileOperUtil as fileOperUtil
-import time
 import HuobiService as huobi
 import logUtil
 import modelUtil as modelUtil
@@ -18,11 +16,13 @@ def buy(buyPrice,amount,symbol,index,minIncome):
         decimalLength = commonUtil.calDecimal(buyPrice)
 
         buyModel = BuyModel(0,symbol,buyPrice,buyPrice,index,amount,orderId,minIncome,buyPrice,2)
-        newJumpModel = JumpQueueModel(1, orderId, round(buyPrice*1.005,decimalLength), round(buyPrice*1.008,decimalLength), round(buyPrice*0.99,decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(index)),buyPrice)
+        newJumpModel = JumpQueueModel(0,symbol,1, orderId, round(buyPrice*1.005,decimalLength),
+                                      round(buyPrice*1.008,decimalLength), round(buyPrice*0.99,decimalLength), 0,buyPrice)
 
         if modelUtil.insertBuyModel(buyModel):
-            fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
+
+            modelUtil.insertJumpQueueModel(newJumpModel)
+
         else:
             logUtil.error("BiTradeUtil--buy insert 0")
 
@@ -55,11 +55,12 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
 
         newBuyModel = BuyModel(buyModel.id,buyModel.symbol,buyPrice,buyModel.oriPrice,index,newAmount,orderId,transactionModel.minIncome,buyPrice,0)
         if modelUtil.modBuyModel(newBuyModel):
-            fileOperUtil.delMsgFromFile(jumpQueueModel,"queue/"+symbol+"-queue")
+            modelUtil.delJumpModelById(jumpQueueModel.id)
 
             jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice) * float(newAmount)
             huobi.jumpProfit = huobi.jumpProfit + jumpProfit
-            fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
+
+            modelUtil.insertHistoryJumpQueueModel(jumpQueueModel,buyPrice,newAmount)
 
             modelUtil.insertBuySellReocrd(buyModel.symbol,1,buyPrice,0,orderId,0,newAmount,index)
         else:
@@ -86,11 +87,11 @@ def sell(env,sellPrice,sellIndex,buyModel,symbol):
         #                               time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex)),sellPrice)
 
         #统计发现，因为提高了最低收入值，因此不大可能会再次触发跳跃
-        newJumpModel = JumpQueueModel(2, buyModel.orderId, sellPrice,sellPrice , round(sellPrice * 1.01, decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sellIndex)), sellPrice)
+        newJumpModel = JumpQueueModel(0,symbol,2, buyModel.orderId, sellPrice,sellPrice , round(sellPrice * 1.01, decimalLength), 0,
+                                       sellPrice)
 
         if modelUtil.modBuyModel(newBuyModel):
-            fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
+            modelUtil.insertJumpQueueModel(newJumpModel)
         else:
             logUtil.error("BiTradeUtil--sell modBuyModel 0 orderId=", buyModel.orderId)
 
@@ -126,14 +127,17 @@ def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
         else:
             huobi.send_order_dev(buyModel.amount, 0, sellPrice)
 
-        sellOrderModel = SellOrderModel(buyModel.price,sellPrice,buyModel.index,index,buyModel.orderId,sellOrderId,buyModel.amount,
-                                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
+        sellOrderModel = SellOrderModel(0,buyModel.symbol,buyModel.price,sellPrice,buyModel.index,index,buyModel.orderId,sellOrderId,buyModel.amount)
+
         newBuyModel = BuyModel(buyModel.id,buyModel.symbol,buyModel.price, buyModel.oriPrice, buyModel.index, buyModel.amount, buyModel.orderId, buyModel.minIncome,
                                buyModel.lastPrice,4)
         if modelUtil.modBuyModel(newBuyModel):
-            fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
-            fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
-            fileOperUtil.write(sellOrderModel, "sellOrder/" + symbol + "-sellorder")
+            modelUtil.delJumpModelById(jumpQueueModel.id)
+
+            modelUtil.insertHistoryJumpQueueModel(jumpQueueModel, sellPrice, buyModel.amount)
+
+            modelUtil.insertSellOrderReocrd(sellOrderModel)
+
         else:
             logUtil.error("BiTradeUtil--sell jumpSell 0 orderId=", buyModel.orderId)
 
@@ -189,12 +193,11 @@ def stopLossBuy(price,stopLossModel,symbol):
                                          stopLossModel.sellPrice, stopLossModel.oriPrice, stopLossModel.oriAmount,
                                          stopLossModel.oriOrderId,stopLossModel.orderId,1)
 
-        newJumpModel = JumpQueueModel(3, stopLossModel.orderId, round(price * 1.005, decimalLength),
-                                      round(price * 1.008, decimalLength), round(price * 0.99, decimalLength), 0,
-                                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())),price)
+        newJumpModel = JumpQueueModel(0,symbol,3, stopLossModel.orderId, round(price * 1.005, decimalLength),
+                                      round(price * 1.008, decimalLength), round(price * 0.99, decimalLength), 0,price)
 
         if modelUtil.modStopLossModel(newStopLossModel):
-            fileOperUtil.write(newJumpModel, "queue/" + symbol + "-queue")
+            modelUtil.insertJumpQueueModel(newJumpModel)
         else:
             logUtil.error("BiTradeUtil--modStopLossModel=",newStopLossModel)
 
@@ -232,11 +235,13 @@ def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
 
         if modelUtil.modBuyModel(newBuyModel):
             if modelUtil.delStopLossModelById(stopLossModel.id):
-                fileOperUtil.delMsgFromFile(jumpQueueModel, "queue/" + symbol + "-queue")
+
+                modelUtil.delJumpModelById(jumpQueueModel.id)
+
+                modelUtil.insertHistoryJumpQueueModel(jumpQueueModel, buyPrice, buyModel.amount)
 
                 jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice) * float(buyModel.amount)
                 huobi.jumpProfit = huobi.jumpProfit + jumpProfit
-                fileOperUtil.write(jumpQueueModel.getValue(), "queue/" + symbol + "-queuerecord")
 
                 # 记录止损买日志
                 modelUtil.insertStopLossHistoryReocrd(symbol, 1, buyPrice, stopLossModel.oriPrice, stopLossModel.oriAmount,

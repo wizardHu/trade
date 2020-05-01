@@ -9,8 +9,6 @@ from StopLossModel import  StopLossModel
 from MySqlConn import MySqlConn
 import MyCache as myCache
 
-
-
 def getAllPair():
     pairs = []
     mysql = MySqlConn()
@@ -34,6 +32,8 @@ def getAllPair():
                 pairs.append(tradeModel)
 
     return pairs
+
+######################BUYMODEL##############################
 
 def insertBuyModel(buyModel):
     myCache.buyModelCache.clear()
@@ -83,9 +83,124 @@ def modBuyModel(buyModel):
 
     return False
 
-def modJumpModel(oldJumpMode,newJumpMode,symbol):
-    fileOperUtil.delMsgFromFile(oldJumpMode, "queue/" + symbol + "-queue")
-    fileOperUtil.write(newJumpMode, "queue/" + symbol + "-queue")
+def getBuyModelByOrderId(orderId):
+    sql = "select * from tb_buy_record where order_id=%s "
+    mysql = MySqlConn()
+    result = mysql.getOne(sql, (orderId))
+    mysql.dispose()
+    if result:
+        buyModel = BuyModel(result['id'], result['symbol'].decode('utf-8'), result['price'], result['ori_price'], result['buy_index']
+                            ,result['amount'], result['order_id'].decode('utf-8'),result['min_income'],result['last_price'],result['status'])
+        return buyModel
+
+    return None
+
+def delBuyModel(id):
+    mysql = MySqlConn()
+    sql = "delete from tb_buy_record where id = %s"
+    result = mysql.delete(sql, (id))
+    mysql.dispose()
+    if result:
+        return True
+
+    return False
+
+def insertBuySellReocrd(symbol,type,buy_price,sell_price,buy_order_id,sell_order_id,amount,oper_index):
+    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    mysql = MySqlConn()
+    sql = "insert into tb_buy_sell_history_record(symbol,type,buy_price,sell_price,buy_order_id,sell_order_id,amount,oper_index," \
+          "create_time) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+    result = mysql.insertOne(sql, (symbol,type,buy_price,sell_price,buy_order_id,sell_order_id,amount,oper_index,dt))
+
+    mysql.dispose()
+    if result:
+        return result
+
+    return False
+
+######################JUMP##############################
+
+def modJumpModel(jumpQueueModel):
+    myCache.jumpQueueModelCache.clear()
+    mysql = MySqlConn()
+    sql = "update tb_jump_queue_record set low_price=%s,high_price=%s,jump_price=%s,jump_count=%s where id=%s"
+    result = mysql.update(sql, (jumpQueueModel.lowPrice,jumpQueueModel.highPrice,jumpQueueModel.jumpPrice,jumpQueueModel.jumpCount,
+                                jumpQueueModel.id))
+    mysql.dispose()
+    if result:
+        return True
+
+    return False
+
+def delJumpModelById(id):
+    myCache.jumpQueueModelCache.clear()
+
+    mysql = MySqlConn()
+    sql = "delete from tb_jump_queue_record  where id=%s"
+    result = mysql.delete(sql, (id))
+    mysql.dispose()
+    if result:
+        return True
+    return False
+
+
+def getJumpModel(symbol):
+    models = []
+
+    if myCache.jumpQueueModelCache.get(symbol, None):
+        return myCache.jumpQueueModelCache.get(symbol, None)
+
+    mysql = MySqlConn()
+    sql = "select * from tb_jump_queue_record where symbol=%s"
+
+    results = mysql.getAll(sql, (symbol))
+    mysql.dispose()
+    if results:
+        for row in results:
+            jumpQueueModel = JumpQueueModel(row['id'], row['symbol'].decode('utf-8'), row['type'],
+                                          row['order_id'].decode('utf-8'), row['low_price'],
+                                          row['high_price'],row['jump_price']
+                                          , row['jump_count'], row['ori_price'])
+
+            models.append(jumpQueueModel)
+        myCache.jumpQueueModelCache[symbol] = models
+
+    return models
+
+def insertJumpQueueModel(jumpQueueModel):
+    myCache.jumpQueueModelCache.clear()
+    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    mysql = MySqlConn()
+    sql = "insert into tb_jump_queue_record(symbol,type,order_id,low_price,high_price,jump_price,jump_count" \
+          ",create_time,ori_price) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+    result = mysql.insertOne(sql, (jumpQueueModel.symbol,jumpQueueModel.type,jumpQueueModel.orderId,jumpQueueModel.lowPrice,
+                                   jumpQueueModel.highPrice,jumpQueueModel.jumpPrice,jumpQueueModel.jumpCount,dt,jumpQueueModel.oriPrice))
+
+    mysql.dispose()
+    if result:
+        return result
+
+    return False
+
+def insertHistoryJumpQueueModel(jumpQueueModel,oper_price,amount):
+    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    mysql = MySqlConn()
+    sql = "insert into tb_jump_queue_history_record(symbol,type,order_id,low_price,high_price,jump_price,jump_count" \
+          ",create_time,ori_price,oper_price,amount) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+    result = mysql.insertOne(sql, (jumpQueueModel.symbol,jumpQueueModel.type,jumpQueueModel.orderId,jumpQueueModel.lowPrice
+                                   ,jumpQueueModel.highPrice,jumpQueueModel.jumpPrice,jumpQueueModel.jumpCount,dt,
+                                   jumpQueueModel.oriPrice,oper_price,amount))
+
+    mysql.dispose()
+    if result:
+        return result
+
+    return False
+
+######################StopLoss##############################
 
 def modStopLossModel(stopLossModel):
     myCache.stopLossListCache.clear()
@@ -101,19 +216,6 @@ def modStopLossModel(stopLossModel):
         return True
 
     return False
-
-
-# 得到每次买需要的平均花费
-def getAllPairAvgBuyExpense():
-    pairsModel = getAllPair()
-
-    count = 0
-
-    for model in pairsModel:
-        expense = model.everyExpense
-        count += float(expense)
-
-    return float(count/len(pairsModel))
 
 def getStopLossModel(symbol):
     models = []
@@ -170,87 +272,6 @@ def delStopLossModelById(id):
         return True
     return False
 
-def getBuyModelByOrderId(orderId):
-    sql = "select * from tb_buy_record where order_id=%s "
-    mysql = MySqlConn()
-    result = mysql.getOne(sql, (orderId))
-    mysql.dispose()
-    if result:
-        buyModel = BuyModel(result['id'], result['symbol'].decode('utf-8'), result['price'], result['ori_price'], result['buy_index']
-                            ,result['amount'], result['order_id'].decode('utf-8'),result['min_income'],result['last_price'],result['status'])
-        return buyModel
-
-    return None
-
-def getJumpModel(symbol):
-    lines = fileOperUtil.readAll("queue/"+symbol+"-queue")
-    models = []
-
-    #type,orderId,lowPrice,highPrice,jumpPrice,jumpCount
-    for model in lines:
-
-        if model != '' and model != '\n':
-            params = model.split(',')
-            type = params[0]
-            orderId = params[1]
-            lowPrice = params[2]
-            highPrice = params[3]
-            jumpPrice = params[4]
-            jumpCount = params[5]
-            time = params[6]
-            price = params[7]
-
-            jumpQueueModel = JumpQueueModel(type, orderId, lowPrice, highPrice,jumpPrice,jumpCount,time,price)
-            models.append(jumpQueueModel)
-
-    return models
-
-def getSellOrderModels(symbol):
-    lines = fileOperUtil.readAll("sellOrder/"+symbol+"-sellorder")
-    models = []
-
-    for model in lines:
-
-        if model != '' and model != '\n':
-            params = model.split(',')
-            buyPrice = params[0]
-            sellPrice = params[1]
-            buyIndex = params[2]
-            sellIndex = params[3]
-            buyOrderId = params[4]
-            sellOrderId = params[5]
-            amount = params[6]
-            time = params[7]
-
-            sellOrderModel = SellOrderModel(buyPrice, sellPrice, buyIndex, sellIndex,buyOrderId,sellOrderId,amount,time)
-            models.append(sellOrderModel)
-
-    return models
-
-def delBuyModel(id):
-    mysql = MySqlConn()
-    sql = "delete from tb_buy_record where id = %s"
-    result = mysql.delete(sql, (id))
-    mysql.dispose()
-    if result:
-        return True
-
-    return False
-
-def insertBuySellReocrd(symbol,type,buy_price,sell_price,buy_order_id,sell_order_id,amount,oper_index):
-    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    mysql = MySqlConn()
-    sql = "insert into tb_buy_sell_history_record(symbol,type,buy_price,sell_price,buy_order_id,sell_order_id,amount,oper_index," \
-          "create_time) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-
-    result = mysql.insertOne(sql, (symbol,type,buy_price,sell_price,buy_order_id,sell_order_id,amount,oper_index,dt))
-
-    mysql.dispose()
-    if result:
-        return result
-
-    return False
-
 def insertStopLossReocrd(symbol,sell_price,ori_price,ori_amount,ori_order_id,order_id,status):
     myCache.stopLossCache.clear()
     myCache.stopLossListCache.clear()
@@ -281,5 +302,75 @@ def insertStopLossHistoryReocrd(symbol,type,oper_price,last_price,amount,ori_ord
 
     return False
 
+######################SellOrderModel##############################
+
+def getSellOrderModels(symbol):
+    models = []
+
+    if myCache.sellOrderCache.get(symbol, None):
+        return myCache.sellOrderCache.get(symbol, None)
+
+    mysql = MySqlConn()
+    sql = "select * from tb_sell_order_record where symbol=%s"
+
+    results = mysql.getAll(sql, (symbol))
+    mysql.dispose()
+    if results:
+        for row in results:
+            sellOrderModel = SellOrderModel(row["id"], row["symbol"].decode('utf-8'), row["buy_price"],
+                                            row["sell_price"], row["buy_index"], row["sell_index"], row["buy_orderId"].decode('utf-8'),
+                                            row["sell_orderId"].decode('utf-8'),row["amount"])
+            models.append(sellOrderModel)
+
+        myCache.sellOrderCache[symbol] = models
+
+    return models
+
+def insertSellOrderReocrd(sellOrderModel):
+
+    myCache.sellOrderCache.clear()
+
+    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    mysql = MySqlConn()
+    sql = "insert into tb_sell_order_record(symbol,buy_price,sell_price,buy_index,sell_index,buy_orderId,sell_orderId" \
+          ",amount,create_time) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+    result = mysql.insertOne(sql, (sellOrderModel.symbol,sellOrderModel.buyPrice,sellOrderModel.sellPrice,sellOrderModel.buyIndex
+                                   ,sellOrderModel.sellIndex,sellOrderModel.buyOrderId,sellOrderModel.sellOrderId
+                                   ,sellOrderModel.amount,dt))
+
+    mysql.dispose()
+    if result:
+        return result
+
+    return False
+
+def delSellOrderById(id):
+    myCache.sellOrderCache.clear()
+
+    mysql = MySqlConn()
+    sql = "delete from tb_sell_order_record where id=%s"
+    result = mysql.delete(sql, (id))
+    mysql.dispose()
+    if result:
+        return True
+
+    return False
+
+
+######################OTHER##############################
+
+# 得到每次买需要的平均花费
+def getAllPairAvgBuyExpense():
+    pairsModel = getAllPair()
+
+    count = 0
+
+    for model in pairsModel:
+        expense = model.everyExpense
+        count += float(expense)
+
+    return float(count/len(pairsModel))
+
 if __name__ == '__main__':
-   print(getAllPair())
+   print(getJumpModel("eosusdt"))

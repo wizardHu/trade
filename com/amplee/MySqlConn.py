@@ -159,7 +159,9 @@ class MySqlConn(object):
 if __name__ == '__main__':
     mysql = MySqlConn()
     dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    sql = "delete from tb_stop_loss_record where id=%s"
-    result = mysql.delete(sql, (1))
+    sql = "insert into tb_jump_queue_history_record(symbol,type,order_id,low_price,high_price,jump_price,jump_count" \
+          ",create_time,ori_price,oper_price,amount) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    result = mysql.insertOne(sql, ("eosusdt",1,2,3,4,5,6,dt,5,6,7))
+    print(result)
     mysql.dispose()
     # 释放资源

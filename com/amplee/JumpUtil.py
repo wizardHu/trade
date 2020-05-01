@@ -54,8 +54,8 @@ def doTrade(env,price,index, transactionModel):
                     highPrice = round(price + price * highGap, length)
                     jumpCount = jumpCount + 1
                     jumpPrice = round(price - price * 0.01, length)#下调jumpPrice价格
-                    newJumpModel = JumpQueueModel(jumpModel.type,jumpModel.orderId,lowPrice,highPrice,jumpPrice,jumpCount,jumpModel.time,jumpModel.oriPrice)
-                    modelUtil.modJumpModel(jumpModel,newJumpModel,transactionModel.symbol)
+                    newJumpModel = JumpQueueModel(jumpModel.id,jumpModel.symbol,jumpModel.type,jumpModel.orderId,lowPrice,highPrice,jumpPrice,jumpCount,jumpModel.oriPrice)
+                    modelUtil.modJumpModel(newJumpModel)
 
                 # 为双数即为卖,到达跳跃点，需要不断上调jumpPrice价格
                 if type % 2 == 0 and jumpPrice <= price:
@@ -67,8 +67,8 @@ def doTrade(env,price,index, transactionModel):
                     highPrice = round(price - price * lowGap, length)
                     jumpCount = jumpCount + 1
                     jumpPrice = round(price + price * 0.01, length)#上调jumpPrice价格
-                    newJumpModel = JumpQueueModel(jumpModel.type,jumpModel.orderId,lowPrice,highPrice,jumpPrice,jumpCount,jumpModel.time,jumpModel.oriPrice)
-                    modelUtil.modJumpModel(jumpModel,newJumpModel,transactionModel.symbol)
+                    newJumpModel = JumpQueueModel(jumpModel.id,jumpModel.symbol,jumpModel.type,jumpModel.orderId,lowPrice,highPrice,jumpPrice,jumpCount,jumpModel.oriPrice)
+                    modelUtil.modJumpModel(newJumpModel)
 
     except Exception as err:
         logUtil.error("JumpUtil--doTrade" + err)

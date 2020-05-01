@@ -1,4 +1,6 @@
 class SellOrderModel:
+    id = 0
+    symbol = ""
     buyPrice = 0.0
     sellPrice = 0.0
     buyIndex = 0
@@ -6,9 +8,10 @@ class SellOrderModel:
     buyOrderId = 0
     sellOrderId = 0
     amount = 0.0
-    time = ''
 
-    def __init__(self, buyPrice,sellPrice, buyIndex, sellIndex, buyOrderId,sellOrderId,amount,time):
+    def __init__(self, id,symbol,buyPrice,sellPrice, buyIndex, sellIndex, buyOrderId,sellOrderId,amount):
+        self.id = id
+        self.symbol = symbol
         self.buyPrice = buyPrice
         self.sellPrice = sellPrice
         self.buyIndex = buyIndex
@@ -16,10 +19,9 @@ class SellOrderModel:
         self.buyOrderId = buyOrderId
         self.sellOrderId = sellOrderId
         self.amount = amount
-        self.time = time
 
     def getValue(self):
-        return "{},{},{},{},{},{},{},{}".format(self.buyPrice,self.sellPrice, self.buyIndex, self.sellIndex, self.buyOrderId,self.sellOrderId,self.amount,self.time)
+        return "{},{},{},{},{},{},{},{},{}".format(self.id,self.symbol,self.buyPrice,self.sellPrice, self.buyIndex, self.sellIndex, self.buyOrderId,self.sellOrderId,self.amount)
 
 
     def __str__(self):

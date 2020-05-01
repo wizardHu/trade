@@ -61,7 +61,7 @@ class CheckOrderStatusThread(Thread):
                     if orderStatus:
                         buyModel = modelUtil.getBuyModelByOrderId(sellOrderModel.buyOrderId)
                         modelUtil.delBuyModel(buyModel.id)
-                        fileOperUtil.delMsgFromFile(sellOrderModel, "sellOrder/" + symbol + "-sellorder")
+                        modelUtil.delSellOrderById(sellOrderModel.id)
 
                         modelUtil.insertBuySellReocrd(buyModel.symbol, 0,  sellOrderModel.buyPrice, sellOrderModel.sellPrice,
                                                       sellOrderModel.buyOrderId, sellOrderModel.sellOrderId,
@@ -80,11 +80,7 @@ class CheckOrderStatusThread(Thread):
                                 #{'status': 'ok', 'data': '82495000363'}
                                 result = huobi.cancel_order(sellOrderModel.sellOrderId)
                                 if result['status'] == 'ok':
-                                    fileOperUtil.delMsgFromFile(sellOrderModel,
-                                                                "sellOrder/" + symbol + "-sellorder")
+                                    modelUtil.delSellOrderById(sellOrderModel.id)
                                     buyModel = modelUtil.getBuyModelByOrderId(sellOrderModel.buyOrderId)
-                                    newBuyModel = BuyModel(buyModel.id,buyModel.symbol,buyModel.price, buyModel.oriPrice, buyModel.index,
-                                                           buyModel.amount, buyModel.orderId,
-                                                           transactionModel.minIncome,
-                                                           buyModel.lastPrice,0)
-                                    modelUtil.modBuyModel(newBuyModel)
+                                    buyModel.status = 0
+                                    modelUtil.modBuyModel(buyModel)
