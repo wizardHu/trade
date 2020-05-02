@@ -27,7 +27,7 @@ def doOper(env,price, transactionModel, jumpModel,index):
 # 交割模块
 def doTrade(env,price,index, transactionModel):
     try:
-        jumpModelList = modelUtil.getJumpModel(transactionModel.symbol)
+        jumpModelList = modelUtil.getJumpModel(transactionModel.symbol,env)
 
         if len(jumpModelList) > 0:
             for jumpModel in jumpModelList:

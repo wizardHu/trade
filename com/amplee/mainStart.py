@@ -18,7 +18,7 @@ def dealData(data,transactionModel,env):
         kdjFlag = kDJUtil.judgeBuy(transactionModel.symbol)
         rSIFlag = rSIUtil.rsiJudgeBuy(transactionModel.symbol, 12)
         maFlag = mAUtil.maJudgeBuy(data, transactionModel.symbol)
-        avgFlag = commonUtil.juideAllGap(data['close'], transactionModel.symbol, transactionModel.tradeGap)
+        avgFlag = commonUtil.juideAllGap(data['close'], transactionModel.symbol, transactionModel.tradeGap,env)
         highFlag = commonUtil.juideHighest(data['close'], transactionModel.symbol)
         bollFlag = bollUtil.judgeBollBuy(data['close'], transactionModel.symbol)
         lowFlag = commonUtil.juideLowest(data['close'], transactionModel.symbol)
@@ -76,7 +76,7 @@ def dealStopLoss(data,transactionModel,env):
                 logUtil.info("can stop loss ", buyModel)
                 biTradeUtil.stopLossSell(env, price, buyModel, transactionModel.symbol)
 
-        stopLossPackage = commonUtil.getCanBuyStopLoss(data['close'], transactionModel.symbol)
+        stopLossPackage = commonUtil.getCanBuyStopLoss(data['close'], transactionModel.symbol,env)
         if len(stopLossPackage) > 0:
             for stopLoss in stopLossPackage:
                 logUtil.info("buy stop loss ", stopLoss)
@@ -96,7 +96,7 @@ def doTrade(data,transactionModel,env):
 
 if __name__ == '__main__':
 
-    env = "dev"
+    env = "pro"
 
     checkOrderStatusThread = CheckOrderStatusThread(env)
     checkOrderStatusThread.start()
@@ -125,7 +125,7 @@ if __name__ == '__main__':
                 else:
                     continue
 
-                # logUtil.info(thisData['data'],transactionModel.symbol)
+                logUtil.info(thisData['data'],transactionModel.symbol)
                 logUtil.kLineData(transactionModel.symbol+"-->"+str(thisData['data'][0]))
 
                 dealStopLoss(lastData['data'][0],transactionModel,env)#止损模块处理

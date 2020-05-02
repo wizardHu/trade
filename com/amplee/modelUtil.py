@@ -37,6 +37,7 @@ def getAllPair():
 
 def insertBuyModel(buyModel):
     myCache.buyModelCache.clear()
+    myCache.buyModelIsNone = False
     mysql = MySqlConn()
     sql = "insert into tb_buy_record(symbol,price,ori_price,buy_index,amount,order_id,min_income,last_price," \
           "status) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
@@ -50,11 +51,15 @@ def insertBuyModel(buyModel):
 
     return False
 
-def getBuyModel(symbol):
+def getBuyModel(symbol,env):
     models = []
 
-    if myCache.buyModelCache.get(symbol,None):
-        return myCache.buyModelCache.get(symbol,None)
+    if "dev" == env:
+        if myCache.buyModelIsNone:
+            return models
+
+        if myCache.buyModelCache.get(symbol,None):
+            return myCache.buyModelCache.get(symbol,None)
 
     mysql = MySqlConn()
     sql = "select * from tb_buy_record where symbol=%s"
@@ -66,7 +71,10 @@ def getBuyModel(symbol):
                                 ,row['amount'], row['order_id'].decode('utf-8'),row['min_income'],row['last_price'],row['status'])
             models.append(buyModel)
 
-    myCache.buyModelCache[symbol] = models
+        myCache.buyModelIsNone = False
+        myCache.buyModelCache[symbol] = models
+    else:
+        myCache.buyModelIsNone = True
     return models
 
 
@@ -145,11 +153,15 @@ def delJumpModelById(id):
     return False
 
 
-def getJumpModel(symbol):
+def getJumpModel(symbol,env):
     models = []
 
-    if myCache.jumpQueueModelCache.get(symbol, None):
-        return myCache.jumpQueueModelCache.get(symbol, None)
+    if "dev" == env:
+        if myCache.jumpQueueModelIsNone:
+            return models
+
+        if myCache.jumpQueueModelCache.get(symbol, None):
+            return myCache.jumpQueueModelCache.get(symbol, None)
 
     mysql = MySqlConn()
     sql = "select * from tb_jump_queue_record where symbol=%s"
@@ -165,11 +177,15 @@ def getJumpModel(symbol):
 
             models.append(jumpQueueModel)
         myCache.jumpQueueModelCache[symbol] = models
+        myCache.jumpQueueModelIsNone = False
+    else:
+        myCache.jumpQueueModelIsNone = True
 
     return models
 
 def insertJumpQueueModel(jumpQueueModel):
     myCache.jumpQueueModelCache.clear()
+    myCache.jumpQueueModelIsNone = False
     dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mysql = MySqlConn()
     sql = "insert into tb_jump_queue_record(symbol,type,order_id,low_price,high_price,jump_price,jump_count" \
@@ -217,11 +233,15 @@ def modStopLossModel(stopLossModel):
 
     return False
 
-def getStopLossModel(symbol):
+def getStopLossModel(symbol,env):
     models = []
 
-    if myCache.stopLossListCache.get(symbol,None):
-        return myCache.stopLossListCache.get(symbol,None)
+    if "dev" == env:
+        if myCache.stopLossIsNone:
+            return models
+
+        if myCache.stopLossListCache.get(symbol,None):
+            return myCache.stopLossListCache.get(symbol,None)
 
     mysql = MySqlConn()
     sql = "select * from tb_stop_loss_record where symbol=%s"
@@ -237,6 +257,9 @@ def getStopLossModel(symbol):
 
             models.append(stopLossModel)
         myCache.stopLossListCache[symbol] = models
+        myCache.stopLossIsNone = False
+    else:
+        myCache.stopLossIsNone = True
 
     return models
 
@@ -275,6 +298,7 @@ def delStopLossModelById(id):
 def insertStopLossReocrd(symbol,sell_price,ori_price,ori_amount,ori_order_id,order_id,status):
     myCache.stopLossCache.clear()
     myCache.stopLossListCache.clear()
+    myCache.stopLossIsNone = False
     dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mysql = MySqlConn()
     sql = "insert into tb_stop_loss_record(symbol,create_time,sell_price,ori_price,ori_amount,ori_order_id,order_id," \
@@ -304,11 +328,15 @@ def insertStopLossHistoryReocrd(symbol,type,oper_price,last_price,amount,ori_ord
 
 ######################SellOrderModel##############################
 
-def getSellOrderModels(symbol):
+def getSellOrderModels(symbol,env):
     models = []
 
-    if myCache.sellOrderCache.get(symbol, None):
-        return myCache.sellOrderCache.get(symbol, None)
+    if "dev" == env:
+        if myCache.sellOrderIsNone:
+            return models
+
+        if myCache.sellOrderCache.get(symbol, None):
+            return myCache.sellOrderCache.get(symbol, None)
 
     mysql = MySqlConn()
     sql = "select * from tb_sell_order_record where symbol=%s"
@@ -323,11 +351,14 @@ def getSellOrderModels(symbol):
             models.append(sellOrderModel)
 
         myCache.sellOrderCache[symbol] = models
+        myCache.sellOrderIsNone = False
+    else:
+        myCache.sellOrderIsNone = True
 
     return models
 
 def insertSellOrderReocrd(sellOrderModel):
-
+    myCache.sellOrderIsNone = False
     myCache.sellOrderCache.clear()
 
     dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

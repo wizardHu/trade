@@ -52,7 +52,7 @@ class CheckOrderStatusThread(Thread):
     def doCheck(self, transactionModels):
         for transactionModel in transactionModels:
             symbol = transactionModel.symbol
-            sellOrderModels = modelUtil.getSellOrderModels(symbol)
+            sellOrderModels = modelUtil.getSellOrderModels(symbol,self.env)
 
             if len(sellOrderModels) > 0:
                 for sellOrderModel in sellOrderModels:

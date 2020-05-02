@@ -15,8 +15,8 @@ lastIdDict = {}
 lastDataDict = {}
 highCount = {}
 
-def juideAllGap(price,symbol,tradeGap):
-    buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
+def juideAllGap(price,symbol,tradeGap,env):
+    buyPackage = modelUtil.getBuyModel(symbol,env)  # 查询购买历史 #查询购买历史
 
     for model in buyPackage:
 
@@ -60,7 +60,7 @@ def canSell(price,symbol,env):
     sellPackage = []
 
     try:
-        buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史 #查询购买历史
+        buyPackage = modelUtil.getBuyModel(symbol,env)  # 查询购买历史 #查询购买历史
 
         for buyModel in buyPackage:
 
@@ -115,7 +115,7 @@ def getStopLossBuyModel(price,symbol,stopLoss,env):
 
     stopLoss = float(stopLoss)
     try:
-        buyPackage = modelUtil.getBuyModel(symbol)  # 查询购买历史
+        buyPackage = modelUtil.getBuyModel(symbol,env)  # 查询购买历史
 
         for buyModel in buyPackage:
 
@@ -166,11 +166,11 @@ def getStopLossBuyModel(price,symbol,stopLoss,env):
     return stopLossPackage
 
 #判断之前因为止损卖出的  现在可不可以买回来
-def getCanBuyStopLoss(price,symbol):
+def getCanBuyStopLoss(price,symbol,env):
     stopLossPackage = []
 
     try:
-        sellPackage = modelUtil.getStopLossModel(symbol)  # 查询卖出历史
+        sellPackage = modelUtil.getStopLossModel(symbol,env)  # 查询卖出历史
 
         for stopLossModel in sellPackage:
 

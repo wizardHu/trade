@@ -1,5 +1,9 @@
 buyModelCache = {}
+buyModelIsNone = True
 stopLossCache = {}
+stopLossIsNone = True
 stopLossListCache = {}
 sellOrderCache = {}
+sellOrderIsNone = True
 jumpQueueModelCache = {}
+jumpQueueModelIsNone = True
