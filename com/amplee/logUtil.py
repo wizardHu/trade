@@ -64,16 +64,16 @@ LOGGER = {
 logging.config.dictConfig(LOGGER)
 
 def info(*msg):
-    logger = logging.getLogger("default")
-    logger.info(msg)
-    # print(msg)
+    # logger = logging.getLogger("default")
+    # logger.info(msg)
+    print(msg)
     # pass
 
 def kLineData(*msg):
-    logger = logging.getLogger("kline")
-    logger.info(msg)
+    # logger = logging.getLogger("kline")
+    # logger.info(msg)
     # print(msg)
-    # pass
+    pass
 
 def error(*msg):
     logger = logging.getLogger("error")

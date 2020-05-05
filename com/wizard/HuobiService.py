@@ -13,19 +13,19 @@ Market data API
 
 
 # # 获取KLine
-def get_kline(symbol, period, size=150):
-    """
-    :param symbol
-    :param period: 可选值：{1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year }
-    :param size: 可选值： [1,2000]
-    :return:
-    """
-    params = {'symbol': symbol,
-              'period': period,
-              'size': size}
-
-    url = MARKET_URL + '/market/history/kline'
-    return http_get_request(url, params)
+# def get_kline(symbol, period, size=150):
+#     """
+#     :param symbol
+#     :param period: 可选值：{1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year }
+#     :param size: 可选值： [1,2000]
+#     :return:
+#     """
+#     params = {'symbol': symbol,
+#               'period': period,
+#               'size': size}
+#
+#     url = MARKET_URL + '/market/history/kline'
+#     return http_get_request(url, params)
 
 # 获取KLine
 count = {}
@@ -33,42 +33,42 @@ lastIdDit = {}
 jumpProfit = 0.0
 
 lines = {}
-# with open("eosusdt.txt", "r") as f:
-#     list = []
-#     for fLine in f:
-#         list.append(fLine)
-#     lines["eosusdt"]=list
+with open("eosusdt.txt", "r") as f:
+    list = []
+    for fLine in f:
+        list.append(fLine)
+    lines["eosusdt"]=list
 
-# with open("btcusdt.txt", "r") as f:
-#     list = []
-#     for fLine in f:
-#         list.append(fLine)
-#     lines["btcusdt"]=list
-#
-#
-# def get_kline(symbol, period, size=150):
-#     global count
-#     global lastIdDit
-#
-#     try:
-#         index = count.get(symbol,0)
-#         lastId = lastIdDit.get(symbol,0)
-#         # line = linecache.getline(symbol+".txt", index)
-#         line = lines[symbol][index]
-#         # line = lines[count]
-#         line = '{"status":"ok","data":['+line+']}'
-#         index = index + 1
-#         count[symbol] = index
-#         ditc = eval(line)
-#         id = ditc['data'][0]['id']
-#         if id < lastId:
-#             return eval('{"status":"error"}')
-#         lastId = id
-#         lastIdDit[symbol] = lastId
-#         return ditc
-#     except Exception as err:
-#         print(balance,minBalance,maxBalance,jumpProfit)
-#     return eval('{"status":"error"}')
+with open("btcusdt.txt", "r") as f:
+    list = []
+    for fLine in f:
+        list.append(fLine)
+    lines["btcusdt"]=list
+
+
+def get_kline(symbol, period, size=150):
+    global count
+    global lastIdDit
+
+    try:
+        index = count.get(symbol,1)
+        lastId = lastIdDit.get(symbol,0)
+        # line = linecache.getline("eosusdt.txt", index)
+        line = lines[symbol][index]
+        # line = lines[count]
+        line = '{"status":"ok","data":['+line+']}'
+        index = index + 1
+        count[symbol] = index
+        ditc = eval(line)
+        id = ditc['data'][0]['id']
+        if id < lastId:
+            return eval('{"status":"error"}')
+        lastId = id
+        lastIdDit[symbol] = lastId
+        return ditc
+    except Exception as err:
+        print(balance,minBalance,maxBalance,jumpProfit)
+    return eval('{"status":"error"}')
 
 # 获取marketdepth
 def get_depth(symbol, type):
