@@ -38,7 +38,7 @@ def doTrade(env,price,index, transactionModel):
                 type = int(jumpModel.type)
 
                 # 达到需要操作的价格区间
-                if (price >= lowPrice and price <= highPrice) or jumpCount >= 15:
+                if (price >= lowPrice and price <= highPrice) or jumpCount >= 20 or lowPrice == highPrice:
                     doOper(env,price, transactionModel, jumpModel,index)
                     continue
 
