@@ -36,14 +36,15 @@ def getAllPair():
 ######################BUYMODEL##############################
 
 def insertBuyModel(buyModel):
+    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     myCache.buyModelCache.clear()
     myCache.buyModelIsNone = False
     mysql = MySqlConn()
     sql = "insert into tb_buy_record(symbol,price,ori_price,buy_index,amount,order_id,min_income,last_price," \
-          "status) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+          "status,create_time) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
     result = mysql.insertOne(sql, (buyModel.symbol, buyModel.price, buyModel.oriPrice, buyModel.index, buyModel.amount,
-                                   buyModel.orderId, buyModel.minIncome, buyModel.lastPrice, buyModel.status))
+                                   buyModel.orderId, buyModel.minIncome, buyModel.lastPrice, buyModel.status,dt))
 
     mysql.dispose()
     if result:

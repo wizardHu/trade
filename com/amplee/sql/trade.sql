@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50557
 File Encoding         : 65001
 
-Date: 2020-05-01 09:55:14
+Date: 2020-05-06 17:15:33
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -30,11 +30,12 @@ CREATE TABLE `tb_buy_record` (
   `min_income` float(11,5) DEFAULT NULL COMMENT '最低收入',
   `last_price` float(11,5) DEFAULT NULL COMMENT '最近一次买的价格',
   `status` tinyint(2) DEFAULT '0' COMMENT '0 正常状态 1 被止损了  2 进入买交易队列了  3进入卖交易队列  4进入挂单',
+  `create_time` datetime DEFAULT NULL,
   `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `order_id_idx` (`order_id`),
   KEY `symbol_idx` (`symbol`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8 COMMENT='记录每次买';
+) ENGINE=InnoDB AUTO_INCREMENT=170 DEFAULT CHARSET=utf8 COMMENT='记录每次买';
 
 -- ----------------------------
 -- Table structure for tb_buy_sell_history_record
@@ -53,14 +54,14 @@ CREATE TABLE `tb_buy_sell_history_record` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `s_ct_idx` (`symbol`,`create_time`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8 COMMENT='每次正常买卖的记录';
+) ENGINE=InnoDB AUTO_INCREMENT=294 DEFAULT CHARSET=utf8 COMMENT='每次正常买卖的记录';
 
 -- ----------------------------
 -- Table structure for tb_jump_queue_history_record
 -- ----------------------------
 DROP TABLE IF EXISTS `tb_jump_queue_history_record`;
 CREATE TABLE `tb_jump_queue_history_record` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `symbol` varchar(20) DEFAULT NULL,
   `type` tinyint(2) DEFAULT NULL COMMENT '为单数即为买  1 正常买  2 正常卖  3 止损后买',
   `order_id` varchar(50) DEFAULT NULL,
@@ -72,7 +73,6 @@ CREATE TABLE `tb_jump_queue_history_record` (
   `ori_price` float(11,5) DEFAULT NULL COMMENT '第一次加入跳跃队列时的价格',
   `oper_price` float(11,5) DEFAULT NULL COMMENT '最后执行操作的价格',
   `amount` float(11,5) DEFAULT NULL COMMENT '数量',
-  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `symbol_idx` (`symbol`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='价格跳跃历史表';
@@ -82,7 +82,7 @@ CREATE TABLE `tb_jump_queue_history_record` (
 -- ----------------------------
 DROP TABLE IF EXISTS `tb_jump_queue_record`;
 CREATE TABLE `tb_jump_queue_record` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `symbol` varchar(20) DEFAULT NULL,
   `type` tinyint(2) DEFAULT NULL COMMENT '为单数即为买  1 正常买  2 正常卖  3 止损后买',
   `order_id` varchar(50) DEFAULT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE `tb_jump_queue_record` (
 -- ----------------------------
 DROP TABLE IF EXISTS `tb_sell_order_record`;
 CREATE TABLE `tb_sell_order_record` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `symbol` varchar(20) DEFAULT NULL,
   `buy_price` float(11,5) DEFAULT NULL COMMENT '买入时的价格',
   `sell_price` float(11,5) DEFAULT NULL COMMENT '卖出的价格',
@@ -133,7 +133,7 @@ CREATE TABLE `tb_stop_loss_history_record` (
   `order_id` varchar(50) DEFAULT NULL COMMENT '本次止损的订单id',
   PRIMARY KEY (`id`),
   KEY `symbol_idx` (`symbol`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='止损的历史记录';
+) ENGINE=InnoDB AUTO_INCREMENT=260 DEFAULT CHARSET=utf8 COMMENT='止损的历史记录';
 
 -- ----------------------------
 -- Table structure for tb_stop_loss_record
@@ -152,7 +152,7 @@ CREATE TABLE `tb_stop_loss_record` (
   `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `symbol_idx` (`symbol`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='止损卖出的记录';
+) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8 COMMENT='止损卖出的记录';
 
 -- ----------------------------
 -- Table structure for tb_transaction_config
