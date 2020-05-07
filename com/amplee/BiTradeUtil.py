@@ -60,6 +60,7 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
             jumpProfit = (float(jumpQueueModel.oriPrice) - buyPrice) * float(newAmount)
             huobi.jumpProfit = huobi.jumpProfit + jumpProfit
 
+            jumpQueueModel.orderId = orderId
             modelUtil.insertHistoryJumpQueueModel(jumpQueueModel,buyPrice,newAmount)
 
             modelUtil.insertBuySellReocrd(buyModel.symbol,1,buyPrice,0,orderId,0,newAmount,index)
