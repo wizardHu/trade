@@ -76,10 +76,10 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
 def sell(env,sellPrice,sellIndex,buyModel,symbol):
     try:
 
-        if "pro" == env:
-            sellPrice = float(buyModel.price)*(1+float(buyModel.minIncome))
-
         decimalLength = commonUtil.calDecimal(sellPrice)
+
+        if "pro" == env:
+            sellPrice = round(float(buyModel.price)*(1+float(buyModel.minIncome)),decimalLength)
 
         newBuyModel = BuyModel(buyModel.id,buyModel.symbol,buyModel.price, buyModel.oriPrice, buyModel.index,
                                buyModel.amount, buyModel.orderId, buyModel.minIncome, buyModel.lastPrice,3)
@@ -115,10 +115,11 @@ def jumpSell(env,sellPrice,jumpQueueModel,transactionModel,index):
             result = huobi.order_info(buyModel.orderId)
             data = result['data']
             state = data['state']
-            logUtil.info("sell result", result, symbol)
+            logUtil.info("order_info result", result, symbol)
             if state == 'filled':
                 #{'status': 'ok', 'data': 'orderId'}
                 result = huobi.send_order(buyModel.amount, "api", symbol, 'sell-limit', sellPrice)
+                logUtil.info("send_order result", result, symbol)
                 if result['status'] != 'ok':
                     return
                 sellOrderId = result['data']

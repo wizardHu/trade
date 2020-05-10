@@ -19,5 +19,5 @@ def getConn():
         logUtil.error("is None")
         __pool = PooledDB(creator=pymysql, mincached=5, maxcached=20,
                           host=DBConfig.DBHOST, port=DBConfig.DBPORT, user=DBConfig.DBUSER, passwd=DBConfig.DBPWD,
-                          db=DBConfig.DBNAME, use_unicode=False, charset=DBConfig.DBCHAR, cursorclass=DictCursor)
+                          db=DBConfig.DBNAME, use_unicode=True, charset=DBConfig.DBCHAR, cursorclass=DictCursor)
     return __pool.connection()

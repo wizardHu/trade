@@ -17,11 +17,11 @@ def getAllPair():
     mysql.dispose()
     if result:
         for pair in result:
-            symbol = pair['symbol'].decode('utf-8')
+            symbol = pair['symbol']
             everyExpense = pair['every_expense']
             tradeGap = pair['trade_gap']
             minIncome = pair['min_income']
-            period = pair['period'].decode('utf-8')
+            period = pair['period']
             precision = pair['precision']
             stopLoss = pair['stopLoss']
             status = pair['status']
@@ -68,8 +68,8 @@ def getBuyModel(symbol,env):
     mysql.dispose()
     if results:
         for row in results:
-            buyModel = BuyModel(row['id'], row['symbol'].decode('utf-8'), row['price'], row['ori_price'], row['buy_index']
-                                ,row['amount'], row['order_id'].decode('utf-8'),row['min_income'],row['last_price'],row['status'])
+            buyModel = BuyModel(row['id'], row['symbol'], row['price'], row['ori_price'], row['buy_index']
+                                ,row['amount'], row['order_id'],row['min_income'],row['last_price'],row['status'])
             models.append(buyModel)
 
         myCache.buyModelIsNone = False
@@ -98,8 +98,8 @@ def getBuyModelByOrderId(orderId):
     result = mysql.getOne(sql, (orderId))
     mysql.dispose()
     if result:
-        buyModel = BuyModel(result['id'], result['symbol'].decode('utf-8'), result['price'], result['ori_price'], result['buy_index']
-                            ,result['amount'], result['order_id'].decode('utf-8'),result['min_income'],result['last_price'],result['status'])
+        buyModel = BuyModel(result['id'], result['symbol'], result['price'], result['ori_price'], result['buy_index']
+                            ,result['amount'], result['order_id'],result['min_income'],result['last_price'],result['status'])
         return buyModel
 
     return None
@@ -171,8 +171,8 @@ def getJumpModel(symbol,env):
     mysql.dispose()
     if results:
         for row in results:
-            jumpQueueModel = JumpQueueModel(row['id'], row['symbol'].decode('utf-8'), row['type'],
-                                          row['order_id'].decode('utf-8'), row['low_price'],
+            jumpQueueModel = JumpQueueModel(row['id'], row['symbol'], row['type'],
+                                          row['order_id'], row['low_price'],
                                           row['high_price'],row['jump_price']
                                           , row['jump_count'], row['ori_price'])
 
@@ -251,10 +251,10 @@ def getStopLossModel(symbol,env):
     mysql.dispose()
     if results:
         for row in results:
-            stopLossModel = StopLossModel(row['id'], row['symbol'].decode('utf-8'), row['sell_price'],
+            stopLossModel = StopLossModel(row['id'], row['symbol'], row['sell_price'],
                                           row['ori_price'], row['ori_amount'],
-                                          row['ori_order_id'].decode('utf-8')
-                                          , row['order_id'].decode('utf-8'), row['status'])
+                                          row['ori_order_id']
+                                          , row['order_id'], row['status'])
 
             models.append(stopLossModel)
         myCache.stopLossListCache[symbol] = models
@@ -275,9 +275,9 @@ def getStopLossModelByOrderId(selectOrderId):
     result = mysql.getOne(sql, (selectOrderId))
     mysql.dispose()
     if result:
-        stopLossModel = StopLossModel(result['id'], result['symbol'].decode('utf-8'),result['sell_price'], result['ori_price'], result['ori_amount'],
-                            result['ori_order_id'].decode('utf-8')
-                            , result['order_id'].decode('utf-8'), result['status'])
+        stopLossModel = StopLossModel(result['id'], result['symbol'],result['sell_price'], result['ori_price'], result['ori_amount'],
+                            result['ori_order_id']
+                            , result['order_id'], result['status'])
         myCache.stopLossCache[selectOrderId] = stopLossModel
         return stopLossModel
 
@@ -346,9 +346,9 @@ def getSellOrderModels(symbol,env):
     mysql.dispose()
     if results:
         for row in results:
-            sellOrderModel = SellOrderModel(row["id"], row["symbol"].decode('utf-8'), row["buy_price"],
-                                            row["sell_price"], row["buy_index"], row["sell_index"], row["buy_orderId"].decode('utf-8'),
-                                            row["sell_orderId"].decode('utf-8'),row["amount"])
+            sellOrderModel = SellOrderModel(row["id"], row["symbol"], row["buy_price"],
+                                            row["sell_price"], row["buy_index"], row["sell_index"], row["buy_orderId"],
+                                            row["sell_orderId"],row["amount"])
             models.append(sellOrderModel)
 
         myCache.sellOrderCache[symbol] = models
@@ -405,4 +405,4 @@ def getAllPairAvgBuyExpense():
     return float(count/len(pairsModel))
 
 if __name__ == '__main__':
-   print(getJumpModel("eosusdt"))
+   print(getAllPair())
