@@ -39,8 +39,8 @@ def juideHighest(price,symbol):
     lastPrice = klineUtil.prices.get(symbol, [])
 
     high = max(lastPrice)
-    # 比最大值少两个点还要大就不要买了 风险高
-    if price >= high * 0.98:
+    # 比最大值少X个点还要大就不要买了 风险高
+    if price >= high * 0.97:
         return False
 
     return True

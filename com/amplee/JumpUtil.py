@@ -38,11 +38,18 @@ def doTrade(env,price,index, transactionModel):
                 type = int(jumpModel.type)
 
                 # 达到需要操作的价格区间
-                if (price >= lowPrice and price <= highPrice) or jumpCount >= 20 \
-                        or (lowPrice == highPrice and price >= lowPrice):
-                    if lowPrice == highPrice:
-                        price = lowPrice
+                if (price >= lowPrice and price <= highPrice) or jumpCount >= 20:
                     doOper(env,price, transactionModel, jumpModel,index)
+                    continue
+
+                #买类型
+                if type % 2 == 1 and lowPrice == highPrice and price >= lowPrice:
+                    doOper(env,price, transactionModel, jumpModel,index)
+                    continue
+
+                # 卖类型
+                if type % 2 == 0 and lowPrice == highPrice and price <= lowPrice:
+                    doOper(env, price, transactionModel, jumpModel, index)
                     continue
 
                 highGap = 0.008
