@@ -43,13 +43,13 @@ def doTrade(env,price,index, transactionModel):
                     continue
 
                 #买类型
-                if type % 2 == 1 and lowPrice == highPrice and price >= lowPrice:
-                    doOper(env,price, transactionModel, jumpModel,index)
+                if type % 2 == 1 and lowPrice == highPrice :
+                    doOper(env,lowPrice, transactionModel, jumpModel,index)
                     continue
 
                 # 卖类型
-                if type % 2 == 0 and lowPrice == highPrice and price <= lowPrice:
-                    doOper(env, price, transactionModel, jumpModel, index)
+                if type % 2 == 0 and lowPrice == highPrice:
+                    doOper(env, lowPrice, transactionModel, jumpModel, index)
                     continue
 
                 highGap = 0.008
