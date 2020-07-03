@@ -96,6 +96,7 @@ def addSymbol(data,transactionModel):
     mAUtil.add(transactionModel.symbol, 30)
     mAUtil.add(transactionModel.symbol, 60)
     amountUtil.add(data,transactionModel.symbol)
+    modelUtil.insertKLineReocrd(data,transactionModel.symbol)
 
 def delSymbol(transactionModel):
     klineUtil.delSymbol(transactionModel.symbol)

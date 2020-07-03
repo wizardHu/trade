@@ -404,5 +404,26 @@ def getAllPairAvgBuyExpense():
 
     return float(count/len(pairsModel))
 
+
+def insertKLineReocrd(data,symbol):
+
+    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:00")
+    mysql = MySqlConn()
+    sql = "insert into tb_kline_record(symbol,open,close,high,low,amount,count" \
+          ",vol,line_index,create_time) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+    result = mysql.insertOne(sql, (symbol,data['open'],data['close'],data['high'],data['low']
+                                   ,data['amount'],data['count'],data['vol']
+                                   ,data['id'],dt))
+
+    mysql.dispose()
+    if result:
+        return result
+
+    return False
+
 if __name__ == '__main__':
-   print(getAllPair())
+
+    data = {"data": [{"open": 0.19629, "id": 1587721980, "count": 29, "amount": 36697.23, "close": 0.1963, "vol": 7200.5755178, "high": 0.1963, "low": 0.19613}]}
+
+    print(insertKLineReocrd(data['data'][0],"eosusdt"))
