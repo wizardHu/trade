@@ -86,7 +86,7 @@ def canSell(price,symbol,env):
 
     return sellPackage
 
-def addSymbol(data,transactionModel):
+def addSymbol(data,transactionModel,needInserDb):
     logUtil.info(data, "new data-----",transactionModel.symbol)
 
     klineUtil.add(data, transactionModel.symbol)
@@ -96,7 +96,9 @@ def addSymbol(data,transactionModel):
     mAUtil.add(transactionModel.symbol, 30)
     mAUtil.add(transactionModel.symbol, 60)
     amountUtil.add(data,transactionModel.symbol)
-    modelUtil.insertKLineReocrd(data,transactionModel.symbol)
+
+    if needInserDb:
+        modelUtil.insertKLineReocrd(data,transactionModel.symbol)
 
 def delSymbol(transactionModel):
     klineUtil.delSymbol(transactionModel.symbol)

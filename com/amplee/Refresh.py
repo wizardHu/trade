@@ -23,7 +23,7 @@ def addSymbol(needAdd):
         datas = kline['data']
         datas.reverse()
         for data in datas:
-            commonUtil.addSymbol(data,model)
+            commonUtil.addSymbol(data,model,False)
         logUtil.info("end add={}".format(model))
 
 def contains(pairsModel,symbol):

@@ -96,7 +96,7 @@ def doTrade(data,transactionModel,env):
 
 if __name__ == '__main__':
 
-    env = "dev"
+    env = "pro"
 
     checkOrderStatusThread = CheckOrderStatusThread(env)
     checkOrderStatusThread.start()
@@ -125,13 +125,13 @@ if __name__ == '__main__':
                 else:
                     continue
 
-                # logUtil.info(thisData['data'],transactionModel.symbol)
-                #logUtil.kLineData(transactionModel.symbol+"-->"+str(thisData['data'][0]))
+                logUtil.info(thisData['data'],transactionModel.symbol)
+                logUtil.kLineData(transactionModel.symbol+"-->"+str(thisData['data'][0]))
 
                 dealStopLoss(lastData['data'][0],transactionModel,env)#止损模块处理
 
                 if lastId != thisData['data'][0]['id']: #策略模块1处理
-                    commonUtil.addSymbol(lastData['data'][0],transactionModel)
+                    commonUtil.addSymbol(lastData['data'][0],transactionModel,True)
                     dealData(lastData['data'][0],transactionModel,env)
 
                 # 策略模块2处理
@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
                 commonUtil.lastDataDict[transactionModel.symbol] = thisData
                 commonUtil.lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
-                logUtil.info(huobi.balance," ",huobi.maxBalance," ",huobi.minBalance," ",huobi.jumpProfit)
+                # logUtil.info(huobi.balance," ",huobi.maxBalance," ",huobi.minBalance," ",huobi.jumpProfit)
 
         except Exception as err:
             logUtil.error('connect https error,retry...', err)
