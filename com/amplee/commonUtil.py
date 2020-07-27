@@ -21,7 +21,7 @@ def juideAllGap(price,symbol,tradeGap,env):
     for model in buyPackage:
 
         status = int(model.status)
-        if status == 1 or status == 3 or status == 4:
+        if status == 1:
             continue
 
         buyPrice = float(model.oriPrice)
