@@ -32,7 +32,7 @@ def dealData(data,transactionModel,env):
 
         if commonUtil.nextBuy and avgFlag:
             amount = round(float(transactionModel.everyExpense) / price, int(transactionModel.precision))
-            isSuccess = biTradeUtil.buy( price, amount, transactionModel.symbol, data['id'],transactionModel.minIncome)
+            isSuccess = biTradeUtil.buy( price, amount, data['id'],transactionModel)
             logUtil.info(("is next buy symbol={},price={},data['id']={} issuccess={}").format(transactionModel.symbol,price,data['id'],isSuccess))
 
             if isSuccess:
@@ -40,7 +40,7 @@ def dealData(data,transactionModel,env):
 
         elif kdjFlag and rSIFlag and maFlag and avgFlag and highFlag:
             amount = round(float(transactionModel.everyExpense) / price, int(transactionModel.precision))
-            isSuccess = biTradeUtil.buy(price, amount, transactionModel.symbol, data['id'],transactionModel.minIncome)
+            isSuccess = biTradeUtil.buy(price, amount, data['id'],transactionModel)
             logUtil.info(("is first buy symbol={},price={},data['id']={} issuccess={}").format(transactionModel.symbol, price, data['id'],isSuccess))
 
 
@@ -58,7 +58,7 @@ def dealSell(data,transactionModel,env):
 
         if len(sellPackage) > 0:
             for buyModel in sellPackage:
-                biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel.symbol)
+                biTradeUtil.sell(env, price, data['id'], buyModel, transactionModel)
 
     except Exception as err:
         logUtil.error('dealSell error', err)
@@ -80,7 +80,7 @@ def dealStopLoss(data,transactionModel,env):
         if len(stopLossPackage) > 0:
             for stopLoss in stopLossPackage:
                 logUtil.info("buy stop loss ", stopLoss)
-                biTradeUtil.stopLossBuy( price, stopLoss, transactionModel.symbol)
+                biTradeUtil.stopLossBuy( price, stopLoss, transactionModel)
 
     except Exception as err:
         logUtil.error('dealStopLoss error', err,data)
@@ -99,11 +99,14 @@ if __name__ == '__main__':
     env = "pro"
 
     checkOrderStatusThread = CheckOrderStatusThread(env)
-    checkOrderStatusThread.start()
+    if env == "pro":
+        checkOrderStatusThread.start()
     while True:
         transactionModels = refresh.getAllPairAndRefresh()
 
-        # checkOrderStatusThread.doCheck(transactionModels)
+        if env != "pro":
+            checkOrderStatusThread.doCheck(transactionModels)
+
         lastDataDict = commonUtil.lastDataDict
         lastIdDict = commonUtil.lastIdDict
 
@@ -125,8 +128,9 @@ if __name__ == '__main__':
                 else:
                     continue
 
-                logUtil.info(thisData['data'],transactionModel.symbol)
-                logUtil.kLineData(transactionModel.symbol+"-->"+str(thisData['data'][0]))
+                if env == "pro":
+                    logUtil.info(thisData['data'],transactionModel.symbol)
+                    logUtil.kLineData(transactionModel.symbol+"-->"+str(thisData['data'][0]))
 
                 dealStopLoss(lastData['data'][0],transactionModel,env)#止损模块处理
 
@@ -142,7 +146,8 @@ if __name__ == '__main__':
 
                 commonUtil.lastDataDict[transactionModel.symbol] = thisData
                 commonUtil.lastIdDict[transactionModel.symbol] = thisData['data'][0]['id']
-                # logUtil.info(huobi.balance," ",huobi.maxBalance," ",huobi.minBalance," ",huobi.jumpProfit)
+                if env != "pro":
+                    logUtil.info(huobi.balance," ",huobi.maxBalance," ",huobi.minBalance," ",huobi.jumpProfit)
 
         except Exception as err:
             logUtil.error('connect https error,retry...', err)

@@ -195,20 +195,6 @@ def getCanBuyStopLoss(price,symbol,env):
 
     return stopLossPackage
 
-#计算小数点后的位数
-def calDecimal(ori):
-    oriStr = str(ori)
-    index = oriStr.find(".")
-    length = 4
-    if index != -1:
-        priceStr = oriStr[index + 1:]
-        length = len(priceStr)
-
-    if length <4:
-        length = 4
-
-    return length
-
 # 判断订单的状态
 def checkOrderIsFilled(env,orderId):
     if "pro" == env:
@@ -227,7 +213,7 @@ def doMerge(env,list, transactionModel):
     if len(list) < 1:
         return None
 
-    decimallength = calDecimal(list[0].price)
+    decimallength = transactionModel.pricePrecision
     price = 0.0
     amount = 0.0
     index = 0

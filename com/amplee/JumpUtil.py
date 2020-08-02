@@ -56,7 +56,7 @@ def doTrade(env,price,index, transactionModel):
                 lowGap = 0.005
                 # 为单数即为买,到达跳跃点，需要不断下调jumpPrice价格
                 if type % 2 == 1 and jumpPrice >= price:
-                    length = commonUtil.calDecimal(price)
+                    length = transactionModel.pricePrecision
                     if jumpCount > 2:
                         highGap = 0.015
                         lowGap = 0.01
@@ -69,7 +69,7 @@ def doTrade(env,price,index, transactionModel):
 
                 # 为双数即为卖,到达跳跃点，需要不断上调jumpPrice价格
                 if type % 2 == 0 and jumpPrice <= price:
-                    length = commonUtil.calDecimal(price)
+                    length = transactionModel.pricePrecision
                     if jumpCount > 2:
                         highGap = 0.015
                         lowGap = 0.01

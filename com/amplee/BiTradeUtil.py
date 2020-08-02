@@ -9,15 +9,22 @@ from TransactionModel import TransactionModel
 from SellOrderModel import SellOrderModel
 
 # 只是加入了跳跃队列
-def buy(buyPrice,amount,symbol,index,minIncome):
+def buy(buyPrice,amount,index,transactionModel):
     try:
+
+        symbol = transactionModel.symbol
+        minIncome = transactionModel.minIncome
+        decimalLength = transactionModel.pricePrecision
+
         orderId = commonUtil.getRandomOrderId()
 
-        decimalLength = commonUtil.calDecimal(buyPrice)
+        # 已经不存在这个交易对的买入 说明是第一次买入 需要降低买入的花费
+        if modelUtil.getBuyModelBySymbolAndStatus(transactionModel.symbol,0) is None:
+            amount = round(float(transactionModel.everyExpense)*0.6 / buyPrice, int(transactionModel.precision))
 
         buyModel = BuyModel(0,symbol,buyPrice,buyPrice,index,amount,orderId,minIncome,buyPrice,2)
         newJumpModel = JumpQueueModel(0,symbol,1, orderId, round(buyPrice*1.005,decimalLength),
-                                      round(buyPrice*1.008,decimalLength), round(buyPrice*0.99,decimalLength), 0,buyPrice)
+                                      round(buyPrice*1.008,decimalLength), round(buyPrice*0.995,decimalLength), 0,buyPrice)
 
         if modelUtil.insertBuyModel(buyModel):
 
@@ -43,6 +50,10 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
             return
 
         newAmount = round(float(transactionModel.everyExpense) / buyPrice, int(transactionModel.precision))
+        # 已经不存在这个交易对的买入 说明是第一次买入 需要降低买入的花费
+        if modelUtil.getBuyModelBySymbolAndStatus(transactionModel.symbol, 0) is None:
+            newAmount = round(float(transactionModel.everyExpense) * 0.6 / buyPrice, int(transactionModel.precision))
+
         if "pro" == env:
             result = huobi.send_order(newAmount, "api", symbol, "buy-limit", buyPrice)
             logUtil.info("buy result",result,symbol,newAmount,buyPrice)
@@ -73,10 +84,11 @@ def jumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
     return False
 
 # 正常卖
-def sell(env,sellPrice,sellIndex,buyModel,symbol):
+def sell(env,sellPrice,sellIndex,buyModel,transactionModel):
     try:
 
-        decimalLength = commonUtil.calDecimal(sellPrice)
+        symbol = transactionModel.symbol
+        decimalLength = transactionModel.pricePrecision
 
         if "pro" == env:
             sellPrice = round(float(buyModel.price)*(1+float(buyModel.minIncome)),decimalLength)
@@ -187,10 +199,10 @@ def stopLossSell(env,sellPrice,buyModel,symbol):
 
 
 #买入因止损卖出的
-def stopLossBuy(price,stopLossModel,symbol):
+def stopLossBuy(price,stopLossModel,transactionModel):
     try:
-
-        decimalLength = commonUtil.calDecimal(price)
+        symbol = transactionModel.symbol
+        decimalLength = transactionModel.pricePrecision
         newStopLossModel = StopLossModel(stopLossModel.id,stopLossModel.symbol,
                                          stopLossModel.sellPrice, stopLossModel.oriPrice, stopLossModel.oriAmount,
                                          stopLossModel.oriOrderId,stopLossModel.orderId,1)
@@ -229,7 +241,7 @@ def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
             huobi.send_order_dev(buyModel.amount, 1, buyPrice)
 
         # 计算新的价格
-        length = commonUtil.calDecimal(buyPrice)
+        length = transactionModel.pricePrecision
         newPrice = round(float(buyModel.price) - (float(stopLossModel.sellPrice)-float(buyPrice)), length)
 
         newBuyModel = BuyModel(buyModel.id,buyModel.symbol,newPrice,buyModel.oriPrice, buyModel.index, buyModel.amount,

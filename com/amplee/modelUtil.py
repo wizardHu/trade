@@ -26,9 +26,10 @@ def getAllPair():
             stopLoss = pair['stopLoss']
             status = pair['status']
             id = pair['id']
+            pricePrecision = pair['price_precision']
 
             if status == 1:
-                tradeModel = TransactionModel(id,symbol, everyExpense, tradeGap, minIncome, period,precision,stopLoss)
+                tradeModel = TransactionModel(id,symbol, everyExpense, tradeGap, minIncome, period,precision,stopLoss,pricePrecision)
                 pairs.append(tradeModel)
 
     return pairs
@@ -127,6 +128,18 @@ def insertBuySellReocrd(symbol,type,buy_price,sell_price,buy_order_id,sell_order
         return result
 
     return False
+
+def getBuyModelBySymbolAndStatus(symbol,status):
+    sql = "select * from tb_buy_record where symbol=%s and status=%s"
+    mysql = MySqlConn()
+    result = mysql.getOne(sql, (symbol,status))
+    mysql.dispose()
+    if result:
+        buyModel = BuyModel(result['id'], result['symbol'], result['price'], result['ori_price'], result['buy_index']
+                            ,result['amount'], result['order_id'],result['min_income'],result['last_price'],result['status'])
+        return buyModel
+
+    return None
 
 ######################JUMP##############################
 
@@ -424,6 +437,10 @@ def insertKLineReocrd(data,symbol):
 
 if __name__ == '__main__':
 
-    data = {"data": [{"open": 0.19629, "id": 1587721980, "count": 29, "amount": 36697.23, "close": 0.1963, "vol": 7200.5755178, "high": 0.1963, "low": 0.19613}]}
-
-    print(insertKLineReocrd(data['data'][0],"eosusdt"))
+    # data = {"data": [{"open": 0.19629, "id": 1587721980, "count": 29, "amount": 36697.23, "close": 0.1963, "vol": 7200.5755178, "high": 0.1963, "low": 0.19613}]}
+    #
+    # print(insertKLineReocrd(data['data'][0],"eosusdt"))
+    if getBuyModelBySymbolAndStatus("eowsusdt",0) is None:
+        print(True)
+    else:
+        print(False)
