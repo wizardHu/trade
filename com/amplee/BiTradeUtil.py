@@ -230,19 +230,30 @@ def stopLossJumpBuy(env,buyPrice,jumpQueueModel,transactionModel,index):
             return
 
         buyModel = modelUtil.getBuyModelByOrderId(stopLossModel.oriOrderId)
+
+
+        minAmount = round( 5.1 / buyPrice, int(transactionModel.precision))
+        buyAmount = float(buyModel.amount)
+        oldAmount = float(buyModel.amount)
+
+        if minAmount > oldAmount:
+            buyAmount = minAmount
+
         if "pro" == env:
-            result = huobi.send_order(float(buyModel.amount), "api", symbol, "buy-limit", buyPrice)
-            logUtil.info("buy result", result, symbol, buyModel.amount, buyPrice)
+            result = huobi.send_order(buyAmount, "api", symbol, "buy-limit", buyPrice)
+            logUtil.info("buy result", result, symbol,buyAmount, buyPrice)
             if result['status'] == 'ok':
                 orderId = result['data']
             else:
                 return False
         else:
-            huobi.send_order_dev(buyModel.amount, 1, buyPrice)
+            huobi.send_order_dev(buyAmount, 1, buyPrice)
 
         # 计算新的价格
         length = transactionModel.pricePrecision
-        newPrice = round(float(buyModel.price) - (float(stopLossModel.sellPrice)-float(buyPrice)), length)
+
+        #原本用掉的钱 - （止损卖出等到的钱 - 这次买回来花费的钱）/目前的数量
+        newPrice = round((float(buyModel.price)*oldAmount - (float(stopLossModel.sellPrice)*oldAmount-float(buyPrice)*buyAmount))/buyAmount, length)
 
         newBuyModel = BuyModel(buyModel.id,buyModel.symbol,newPrice,buyModel.oriPrice, buyModel.index, buyModel.amount,
                                buyModel.orderId, transactionModel.minIncome,buyPrice,0)
