@@ -340,6 +340,18 @@ def insertStopLossHistoryReocrd(symbol,type,oper_price,last_price,amount,ori_ord
 
     return False
 
+def getStopLossModelCountByOrderId(selectOrderId):
+
+    mysql = MySqlConn()
+    sql = "select count(*) from tb_stop_loss_history_record where ori_order_id=%s"
+
+    result = mysql.getOne(sql, (selectOrderId))
+    mysql.dispose()
+    if result:
+        return result["count(*)"]
+
+    return 0
+
 ######################SellOrderModel##############################
 
 def getSellOrderModels(symbol,env):
@@ -439,8 +451,8 @@ if __name__ == '__main__':
 
     # data = {"data": [{"open": 0.19629, "id": 1587721980, "count": 29, "amount": 36697.23, "close": 0.1963, "vol": 7200.5755178, "high": 0.1963, "low": 0.19613}]}
     #
-    # print(insertKLineReocrd(data['data'][0],"eosusdt"))
-    if getBuyModelBySymbolAndStatus("eowsusdt",0) is None:
-        print(True)
-    else:
-        print(False)
+    print(getStopLossModelCountByOrderId("1111")==1)
+    # if getBuyModelBySymbolAndStatus("eowsusdt",0) is None:
+    #     print(True)
+    # else:
+    #     print(False)

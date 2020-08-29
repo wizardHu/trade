@@ -123,7 +123,6 @@ def getStopLossBuyModel(price,symbol,stopLoss,env):
         for buyModel in buyPackage:
 
             buyModelPrice = float(buyModel.price)
-            buyModelOriPrice = float(buyModel.oriPrice)
             status = int(buyModel.status)
             lastPrice = float(buyModel.lastPrice)
             stopLosssTemp = stopLoss
@@ -131,8 +130,9 @@ def getStopLossBuyModel(price,symbol,stopLoss,env):
             if status != 0 or buyModelPrice <= price:
                 continue
 
+            stoplossCount = modelUtil.getStopLossModelCountByOrderId(buyModel.orderId)
             #判断有没有进行过止损
-            if buyModelPrice != buyModelOriPrice:
+            if stoplossCount > 0:
                 if price < lastPrice:
                     stopLosssTemp = stopLoss / 2
                     buyModelPrice = lastPrice
